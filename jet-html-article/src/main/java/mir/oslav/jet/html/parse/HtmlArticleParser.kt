@@ -3,6 +3,7 @@ package mir.oslav.jet.html.parse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mir.oslav.jet.html.HtmlConstants
+import mir.oslav.jet.html.composables.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.data.IgnoreOptions
@@ -28,14 +29,16 @@ object HtmlArticleParser {
      */
     suspend fun parse(
         content: String,
+        listener: HtmlArticleParserListener = LinearListener(),
         ignoreOptions: IgnoreOptions = IgnoreOptions(),
-        listener: HtmlArticleParserListener = LinearListener()
+        config: HtmlConfig = HtmlConfig(),
     ): HtmlData = withContext(context = Dispatchers.IO) {
         return@withContext try {
             parseHtmlArticle(
                 content = content,
                 ignoreOptions = ignoreOptions,
-                listener = listener
+                listener = listener,
+                config = config
             )
         } catch (exception: Exception) {
             exception.printStackTrace()
@@ -54,7 +57,8 @@ object HtmlArticleParser {
     private fun parseHtmlArticle(
         content: String,
         ignoreOptions: IgnoreOptions,
-        listener: HtmlArticleParserListener
+        listener: HtmlArticleParserListener,
+        config: HtmlConfig,
     ): HtmlData.Success {
         //start time for monitoring
         val startTime = System.currentTimeMillis()
@@ -122,7 +126,8 @@ object HtmlArticleParser {
                                     image = HtmlElement.Image(
                                         url = it,
                                         startIndex = index,
-                                        endIndex = startingTagEndIndex
+                                        endIndex = startingTagEndIndex,
+                                        span = config.spanCount
                                     )
                                 )
                                 imagesCount += 1
@@ -174,7 +179,8 @@ object HtmlArticleParser {
                                     quote = HtmlElement.Quote(
                                         text = tagBody,
                                         startIndex = startingTagEndIndex + 1,
-                                        endIndex = closingTagStart
+                                        endIndex = closingTagStart,
+                                        span = config.spanCount
                                     )
                                 )
                             }
@@ -184,7 +190,8 @@ object HtmlArticleParser {
                                     textBlock = HtmlElement.TextBlock(
                                         text = tagBody,
                                         startIndex = startingTagEndIndex + 1,
-                                        endIndex = closingTagStart
+                                        endIndex = closingTagStart,
+                                        span = config.spanCount
                                     )
                                 )
                             }

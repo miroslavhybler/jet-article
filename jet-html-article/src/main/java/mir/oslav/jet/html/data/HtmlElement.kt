@@ -11,7 +11,7 @@ package mir.oslav.jet.html.data
 sealed class HtmlElement private constructor(
     open val startIndex: Int,
     open val endIndex: Int,
-    open val span: Int = 1
+    open val span: Int
 ) {
 
 
@@ -22,9 +22,11 @@ sealed class HtmlElement private constructor(
         val url: String,
         override val startIndex: Int,
         override val endIndex: Int,
+        override val span: Int
     ) : HtmlElement(
         startIndex = startIndex,
-        endIndex = endIndex
+        endIndex = endIndex,
+        span = span
     )
 
 
@@ -34,10 +36,12 @@ sealed class HtmlElement private constructor(
     data class TextBlock constructor(
         val text: String,
         override val startIndex: Int,
-        override val endIndex: Int
+        override val endIndex: Int,
+        override val span: Int
     ) : HtmlElement(
         startIndex = startIndex,
-        endIndex = endIndex
+        endIndex = endIndex,
+        span = span
     )
 
 
@@ -47,10 +51,12 @@ sealed class HtmlElement private constructor(
     data class Quote constructor(
         val text: String,
         override val startIndex: Int,
-        override val endIndex: Int
+        override val endIndex: Int,
+        override val span: Int
     ) : HtmlElement(
         startIndex = startIndex,
-        endIndex = endIndex
+        endIndex = endIndex,
+        span = span
     )
 
 
@@ -60,10 +66,12 @@ sealed class HtmlElement private constructor(
     data class Table constructor(
         val rows: List<List<String>>,
         override val startIndex: Int,
-        override val endIndex: Int
+        override val endIndex: Int,
+        override val span: Int
     ) : HtmlElement(
         startIndex = startIndex,
-        endIndex = endIndex
+        endIndex = endIndex,
+        span = span
     )
 
 
@@ -74,10 +82,12 @@ sealed class HtmlElement private constructor(
     data class Gallery constructor(
         val images: List<Image>,
         override val startIndex: Int,
-        override val endIndex: Int
+        override val endIndex: Int,
+        override val span: Int
     ) : HtmlElement(
         startIndex = startIndex,
-        endIndex = endIndex
+        endIndex = endIndex,
+        span = span
     )
 
 
@@ -89,10 +99,12 @@ sealed class HtmlElement private constructor(
         val title: String,
         val image: String,
         override val startIndex: Int,
-        override val endIndex: Int
+        override val endIndex: Int,
+        override val span: Int
     ) : HtmlElement(
         startIndex = startIndex,
-        endIndex = endIndex
+        endIndex = endIndex,
+        span = span
     )
 
 
@@ -104,9 +116,11 @@ sealed class HtmlElement private constructor(
         val title: String,
         val image: String,
         override val startIndex: Int,
-        override val endIndex: Int
+        override val endIndex: Int,
+        override val span: Int
     ) : HtmlElement(
         startIndex = startIndex,
-        endIndex = endIndex
+        endIndex = endIndex,
+        span = span
     )
 }

@@ -86,7 +86,8 @@ private fun QuotePreview() {
         data = HtmlElement.Quote(
             text = "Hello There! This is famous quote of me, general Kenobi from the Star Wars",
             startIndex = 0,
-            endIndex = 0
+            endIndex = 0,
+            span = 1
         )
     )
 

@@ -17,7 +17,7 @@ internal object CoreHtmlArticleParser {
     /**
      * @since 1.0.0
      */
-    fun ignoreCaseOpt(
+    internal fun ignoreCaseOpt(
         ignoreCase: Boolean
     ): Set<RegexOption> {
         return if (ignoreCase) ignoreCaseOpt else emptySet()
@@ -108,7 +108,8 @@ internal object CoreHtmlArticleParser {
         return HtmlElement.Table(
             startIndex = startIndex,
             endIndex = endIndex,
-            rows = outRows
+            rows = outRows,
+            span = 1
         )
     }
 }

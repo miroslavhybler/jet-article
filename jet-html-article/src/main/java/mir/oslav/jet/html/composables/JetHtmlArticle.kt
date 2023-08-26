@@ -43,7 +43,7 @@ import mir.oslav.jet.html.toHtml
 fun JetHtmlArticle(
     modifier: Modifier = Modifier,
     data: HtmlData,
-    spanCount: Int
+    config: HtmlConfig = HtmlConfig(spanCount = 1)
 ) {
 
     val colorScheme = MaterialTheme.colorScheme
@@ -57,7 +57,7 @@ fun JetHtmlArticle(
         modifier = modifier
             .fillMaxSize(),
         state = listState,
-        columns = GridCells.Fixed(count = spanCount),
+        columns = GridCells.Fixed(count = config.spanCount),
         content = {
             when (data) {
                 is HtmlData.Empty -> {
@@ -74,14 +74,22 @@ fun JetHtmlArticle(
 
                 is HtmlData.Success -> {
                     item(
-                        span = { GridItemSpan(currentLineSpan = spanCount) }
+                        span = { GridItemSpan(currentLineSpan = config.spanCount) },
                     ) {
                         HtmlMetrics(monitoring = data.monitoring)
                     }
 
+                    item(
+                        span = { GridItemSpan(currentLineSpan = config.spanCount) }
+                    ) {
+                        MaterialColorPallete()
+                    }
+
                     itemsIndexed(
-                        span = { index, item -> GridItemSpan(currentLineSpan = spanCount) },
-                        items = data.htmlElements
+                        span = { index, item -> GridItemSpan(currentLineSpan = config.spanCount) },
+                        items = data.htmlElements,
+                        contentType = { intex, element -> element },
+                        key = { index, element -> index }
                     ) { index, element ->
                         when (element) {
                             is HtmlElement.Image -> HtmlImage(data = element)
@@ -99,9 +107,16 @@ fun JetHtmlArticle(
                             }
 
                             else -> throw IllegalStateException(
-                                "Element ${element.javaClass.simpleName} not suppported yet!"
+                                "Element ${element.javaClass.simpleName} not supported yet!"
                             )
                         }
+                    }
+
+
+                    item(
+                        span = { GridItemSpan(currentLineSpan = config.spanCount) }
+                    ) {
+                        BrandingFooter()
                     }
                 }
             }

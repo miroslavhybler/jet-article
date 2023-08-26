@@ -199,7 +199,8 @@ private fun TablePreview() {
                 listOf("3232", "King Carl III.", "God Save the king!", "1. 6. 1960")
             ),
             startIndex = 0,
-            endIndex = 0
+            endIndex = 0,
+            span = 1
         )
     )
 }
