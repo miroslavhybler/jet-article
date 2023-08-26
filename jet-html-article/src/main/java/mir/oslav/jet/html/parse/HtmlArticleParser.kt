@@ -58,11 +58,16 @@ object HtmlArticleParser {
     ): HtmlData.Success {
         //start time for monitoring
         val startTime = System.currentTimeMillis()
+        val tagDurations: ArrayList<Long> = ArrayList()
 
         //preventing duplicates
         val styledMap: HashMap<Pair<Int, Int>, String> = HashMap()
         var index = 0
         var imagesCount = 0
+        var totalTags = 0
+        var ignoredTags = 0
+        var usedTags = 0
+        var tagStartTime = 0L
 
         //helps to determine if we are parsing tag that's inside another one
         var enclosingTag: String? = null
@@ -71,6 +76,7 @@ object HtmlArticleParser {
             val char = content[index]
 
             if (char == '<') {
+                tagStartTime = System.currentTimeMillis()
                 val startingTagEndIndex = content.indexOf(
                     char = '>',
                     startIndex = index
@@ -91,6 +97,8 @@ object HtmlArticleParser {
                 //Continue when tag should be ignored
                 if (isTagIgnored || isKeywordIgnored) {
                     index += content.indexOf(char = '>', startIndex = index)
+                    ignoredTags += 1
+                    totalTags += 1
                     continue
                 }
 
@@ -183,16 +191,23 @@ object HtmlArticleParser {
                         }
                     }
                 }
-
+                usedTags += 1
+                totalTags += 1
                 index = startingTagEndIndex + 1
-
+                tagDurations.add(System.currentTimeMillis() - tagStartTime)
             } else {
                 index += 1
             }
         }
 
-        val monitoring = Monitoring(startTime = startTime, endTime = System.currentTimeMillis())
-        val data = listener.onDataRequested(monitoring = monitoring)
-        return data
+        val monitoring = Monitoring(
+            startTime = startTime,
+            endTime = System.currentTimeMillis(),
+            ignoredTags = ignoredTags,
+            usedTags = usedTags,
+            totalTags = totalTags,
+            averageDurationPerTag = tagDurations.average()
+        )
+        return listener.onDataRequested(monitoring = monitoring)
     }
 }

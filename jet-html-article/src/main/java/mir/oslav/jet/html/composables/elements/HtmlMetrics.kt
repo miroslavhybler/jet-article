@@ -31,8 +31,24 @@ fun HtmlMetrics(
             .then(other = modifier)
     ) {
         ValueRow(
-            title = "Duration",
+            title = "Duration (Millis)",
             value = monitoring.duration.toString()
+        )
+        ValueRow(
+            title = "Average duration per tag (Millis)",
+            value = String.format("%.3f", monitoring.averageDurationPerTag)
+        )
+        ValueRow(
+            title = "Total Tags",
+            value = monitoring.totalTags.toString()
+        )
+        ValueRow(
+            title = "Ignored Tags",
+            value = monitoring.ignoredTags.toString()
+        )
+        ValueRow(
+            title = "Used Tags",
+            value = monitoring.usedTags.toString()
         )
     }
 }
@@ -54,14 +70,14 @@ private fun ValueRow(
         Text(
             text = title,
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.tertiary,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
             modifier = Modifier.weight(weight = 1f)
         )
 
         Text(
             text = value,
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.tertiary,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
             textAlign = TextAlign.End,
             modifier = Modifier.weight(weight = 1f),
         )
@@ -76,7 +92,11 @@ private fun HtmlMetricsPreview() {
     HtmlMetrics(
         monitoring = Monitoring(
             startTime = System.currentTimeMillis() - 3230L,
-            endTime = System.currentTimeMillis()
+            endTime = System.currentTimeMillis(),
+            usedTags = 100,
+            ignoredTags = 20,
+            totalTags = 120,
+            averageDurationPerTag = 3.0
         )
     )
 }

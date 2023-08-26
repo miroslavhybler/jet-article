@@ -13,7 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import jet.html.article.example.ui.theme.JetHtmlArticleTheme
-import mir.oslav.jet.html.composables.JetHtml
+import mir.oslav.jet.html.composables.JetHtmlArticle
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.parse.HtmlArticleParser
 
@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
                     })
 
                     data?.let {
-                        JetHtml(data = it, spanCount = 3)
+                        JetHtmlArticle(data = it, spanCount = 3)
                     }
                 }
             }

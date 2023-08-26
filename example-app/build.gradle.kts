@@ -1,3 +1,7 @@
+@file:Suppress("UnstableApiUsage")
+
+import com.android.build.api.dsl.ManagedVirtualDevice
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -28,6 +32,13 @@ android {
                 "proguard-rules.pro"
             )
         }
+        create("benchmark") {
+            initWith(buildTypes.getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
+            isProfileable = true
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -35,6 +46,11 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+        //Supressing Jet warnings
+        freeCompilerArgs += listOf(
+            "-Xopt-in=mir.oslav.jet.annotations.JetExperimental",
+            "-Xopt-in=mir.oslav.jet.annotations.JetBenchmark",
+        )
     }
     buildFeatures {
         compose = true
@@ -45,6 +61,17 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+    testOptions {
+        managedDevices {
+            devices {
+                create(name = "pixel6Api32", type = ManagedVirtualDevice::class) {
+                    device = "Pixel 6"
+                    apiLevel = 32
+                    systemImageSource = "aosp"
+                }
+            }
         }
     }
 }

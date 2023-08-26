@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":benchmark")
+
+
 pluginManagement {
     repositories {
         google()
@@ -12,6 +15,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven(url = "https://maven.pkg.github.com/miroslavhybler/Maven")
     }
 }
 
