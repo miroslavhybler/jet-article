@@ -10,17 +10,18 @@ package mir.oslav.jet.html.data
  */
 sealed class HtmlElement private constructor(
     open val startIndex: Int,
-    open val endIndex: Int
+    open val endIndex: Int,
+    open val span: Int = 1
 ) {
 
 
     /**
      * @since 1.0.0
      */
-    data class Image internal constructor(
+    data class Image constructor(
         val url: String,
         override val startIndex: Int,
-        override val endIndex: Int
+        override val endIndex: Int,
     ) : HtmlElement(
         startIndex = startIndex,
         endIndex = endIndex
@@ -30,7 +31,7 @@ sealed class HtmlElement private constructor(
     /**
      * @since 1.0.0
      */
-    data class TextBlock internal constructor(
+    data class TextBlock constructor(
         val text: String,
         override val startIndex: Int,
         override val endIndex: Int
@@ -43,7 +44,7 @@ sealed class HtmlElement private constructor(
     /**
      * @since 1.0.0
      */
-    data class Quote internal constructor(
+    data class Quote constructor(
         val text: String,
         override val startIndex: Int,
         override val endIndex: Int
@@ -56,8 +57,52 @@ sealed class HtmlElement private constructor(
     /**
      * @since 1.0.0
      */
-    data class Table internal constructor(
+    data class Table constructor(
         val rows: List<List<String>>,
+        override val startIndex: Int,
+        override val endIndex: Int
+    ) : HtmlElement(
+        startIndex = startIndex,
+        endIndex = endIndex
+    )
+
+
+    /**
+     * TODO docs
+     * @since 1.0.0
+     */
+    data class Gallery constructor(
+        val images: List<Image>,
+        override val startIndex: Int,
+        override val endIndex: Int
+    ) : HtmlElement(
+        startIndex = startIndex,
+        endIndex = endIndex
+    )
+
+
+    /**
+     * TODO docs
+     * @since 1.0.0
+     */
+    data class TopBarHeader constructor(
+        val title: String,
+        val image: String,
+        override val startIndex: Int,
+        override val endIndex: Int
+    ) : HtmlElement(
+        startIndex = startIndex,
+        endIndex = endIndex
+    )
+
+
+    /**
+     * TODO docs
+     * @since 1.0.0
+     */
+    data class FullScreenHeader constructor(
+        val title: String,
+        val image: String,
         override val startIndex: Int,
         override val endIndex: Int
     ) : HtmlElement(

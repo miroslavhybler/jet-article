@@ -3,6 +3,7 @@ package mir.oslav.jet.html.composables.elements
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,8 +22,11 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.text.toSpannable
 import mir.oslav.jet.html.HtmlDimensions
 import mir.oslav.jet.html.data.HtmlElement
+import mir.oslav.jet.html.toAnnotatedString
+import mir.oslav.jet.html.toHtml
 
 
 /**
@@ -35,32 +40,38 @@ fun HtmlQuoete(
     data: HtmlElement.Quote
 ) {
 
+    val colorScheme = MaterialTheme.colorScheme
     val density = LocalDensity.current
 
     var dividerHeight by remember { mutableStateOf(0.dp) }
 
     Row(
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 8.dp)
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
-        Divider(
+        VerticalDivider(
             modifier = Modifier
-                .size(width = 5.dp, height = dividerHeight),
-            color = MaterialTheme.colorScheme.tertiary
+                .height(height = dividerHeight),
+            color = MaterialTheme.colorScheme.tertiary,
+            thickness = 5.dp,
         )
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(width = HtmlDimensions.sidePadding - 5.dp))
 
         Text(
-            text = data.text,
+            text = remember {
+                data.text.toHtml()
+                    .toSpannable()
+                    .toAnnotatedString(primaryColor = colorScheme.primary)
+            },
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier
                 .padding(vertical = 8.dp, horizontal = HtmlDimensions.sidePadding)
                 .onSizeChanged { intSize ->
                     with(density) {
-                        dividerHeight = intSize.height.toDp()
+                        dividerHeight = intSize.height.toDp() + 16.dp
                     }
                 }
         )

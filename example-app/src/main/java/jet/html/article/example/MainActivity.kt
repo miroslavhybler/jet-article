@@ -6,19 +6,16 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import jet.html.article.example.ui.theme.JetHtmlArticleTheme
 import mir.oslav.jet.html.composables.JetHtml
 import mir.oslav.jet.html.data.HtmlData
-import mir.oslav.jet.html.parse.HtmlParser
+import mir.oslav.jet.html.parse.HtmlArticleParser
 
 /**
  * @author Miroslav Hýbler <br>
@@ -37,13 +34,13 @@ class MainActivity : ComponentActivity() {
                     var data: HtmlData? by remember { mutableStateOf(value = null) }
 
                     LaunchedEffect(key1 = Unit, block = {
-                        data = HtmlParser.parse(
+                        data = HtmlArticleParser.parse(
                             content = getArticle(fileName = "default"),
                         )
                     })
 
                     data?.let {
-                        JetHtml(data = it)
+                        JetHtml(data = it, spanCount = 3)
                     }
                 }
             }

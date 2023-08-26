@@ -3,7 +3,7 @@ package mir.oslav.jet.html
 /**
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
- * created on 25.8.2023
+ * created on 25.08.2023
  */
 object HtmlConstants {
 
@@ -13,6 +13,8 @@ object HtmlConstants {
      * @since 1.0.0
      */
     val pairTags: List<String> = listOf(
+
+        /*
         "h1",
         "h2",
         "h3",
@@ -20,6 +22,8 @@ object HtmlConstants {
         "h5",
         "h6",
         "h7",
+        */
+
         "p",
         "b",
         "strong",

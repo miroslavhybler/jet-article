@@ -11,13 +11,18 @@ sealed class HtmlData private constructor(
 ) {
 
 
+    /**
+     * @since 1.0.0
+     */
     data object Empty : HtmlData(title = "")
+
 
     /**
      * @since 1.0.0
      */
     data class Success constructor(
         override val title: String,
+        val headerImage: String?,
         val htmlElements: List<HtmlElement>,
         val monitoring: Monitoring,
     ) : HtmlData(title = title)
@@ -29,5 +34,6 @@ sealed class HtmlData private constructor(
     data class Invalid constructor(
         override val title: String,
         val message: String,
+        val exception: Exception,
     ) : HtmlData(title = title)
 }

@@ -3,7 +3,6 @@ package mir.oslav.jet.html.data
 
 /**
  * TODO docs
- * @param classes
  * @param tags
  * @param keywords
  * @since 1.0.0
@@ -11,14 +10,30 @@ package mir.oslav.jet.html.data
  * created on 15.07.2023
  */
 data class IgnoreOptions constructor(
-    val classes: List<String> = emptyList(),
-    val tags: List<String> = emptyList(),
-    val keywords: List<String> = listOf("cookies")
+    val tags: List<String> = defaultTags,
+    val keywords: List<String> = defaultKeywords
 ) {
 
+    companion object {
 
+
+        /**
+         * @since 1.0.0
+         */
+        val defaultTags: List<String> = listOf("noscript")
+
+
+        /**
+         * @since 1.0.0
+         */
+        val defaultKeywords: List<String> = listOf("cookies")
+    }
+
+
+    /**
+     * @since 1.0.0
+     */
     val isEmpty: Boolean
-        get() = classes.isEmpty()
-                && tags.isEmpty()
+        get() = tags.isEmpty()
                 && keywords.isEmpty()
 }

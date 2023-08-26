@@ -7,14 +7,10 @@ package mir.oslav.jet.html.data
  * @author Miroslav Hýbler <br>
  * created on 25.08.2023
  */
-sealed class Monitoring private constructor() {
+data class Monitoring  constructor(
+    val startTime: Long,
+    val endTime: Long,
+) {
 
-
-    data object None : Monitoring()
-
-
-    data class Parse constructor(
-        val startTime: Long,
-        val endTime: Long,
-    ) : Monitoring()
+    val duration: Long = endTime - startTime
 }

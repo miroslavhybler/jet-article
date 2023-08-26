@@ -30,6 +30,8 @@ fun HtmlInvalid(
                 style = MaterialTheme.typography.titleLarge
             )
             Text(text = data.message)
+
+            Text(text = data.exception.toString())
         }
     }
 }

@@ -64,12 +64,24 @@ internal val Configuration.isLarge: Boolean get() = this.screenLayout.and(other 
 /**
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
- * created on 25.8.2023
+ * created on 25.08.2023
  */
 fun String.toHtml(): Spanned {
     return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
 }
 
+
+/**
+ * @since 1.0.0
+ * @author Miroslav Hýbler <br>
+ * created on 26.08.2023
+ */
+fun String.normalizedUrl(): String = this
+    .removePrefix(prefix = "\"")
+    .removePrefix(prefix = " ")
+    .removeSuffix(suffix = "/")
+    .removeSuffix(suffix = "\"")
+    .removeSuffix(suffix = " ")
 
 
 fun Spannable.toAnnotatedString(primaryColor: Color): AnnotatedString {

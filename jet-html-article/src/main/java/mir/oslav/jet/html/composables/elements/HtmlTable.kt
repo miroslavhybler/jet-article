@@ -81,7 +81,7 @@ fun HtmlTable(
                         ) {
                             Text(
                                 text = value,
-                                modifier = Modifier,
+                                modifier = Modifier.fillMaxWidth(),
                                 style = if (rowIndex == 0 || columnIndex == 0)
                                     MaterialTheme.typography.titleSmall
                                 else
