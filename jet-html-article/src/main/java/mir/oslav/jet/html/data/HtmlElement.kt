@@ -89,38 +89,4 @@ sealed class HtmlElement private constructor(
         endIndex = endIndex,
         span = span
     )
-
-
-    /**
-     * TODO docs
-     * @since 1.0.0
-     */
-    data class TopBarHeader constructor(
-        val title: String,
-        val image: String,
-        override val startIndex: Int,
-        override val endIndex: Int,
-        override val span: Int
-    ) : HtmlElement(
-        startIndex = startIndex,
-        endIndex = endIndex,
-        span = span
-    )
-
-
-    /**
-     * TODO docs
-     * @since 1.0.0
-     */
-    data class FullScreenHeader constructor(
-        val title: String,
-        val image: String,
-        override val startIndex: Int,
-        override val endIndex: Int,
-        override val span: Int
-    ) : HtmlElement(
-        startIndex = startIndex,
-        endIndex = endIndex,
-        span = span
-    )
 }

@@ -16,6 +16,10 @@ data object HtmlDimensions {
     var sidePadding: Dp = 0.dp
         private set
 
+    var topLinePadding: Dp = 0.dp
+        private set
+
+    var bottomLinePadding: Dp = 0.dp
 
     /**
      * @since 1.0.0
@@ -25,18 +29,24 @@ data object HtmlDimensions {
             when {
                 configuration.isExtraLarge -> {
                     sidePadding = 32.dp
+                    topLinePadding = 42.dp
                 }
+
                 else -> {
                     sidePadding = 20.dp
+                    topLinePadding = 16.dp
                 }
             }
         } else {
             when {
                 configuration.isExtraLarge -> {
                     sidePadding = 20.dp
+                    topLinePadding = 42.dp
                 }
+
                 else -> {
                     sidePadding = 16.dp
+                    topLinePadding = 24.dp
                 }
             }
         }

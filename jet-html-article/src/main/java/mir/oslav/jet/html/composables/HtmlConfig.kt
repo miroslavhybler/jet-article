@@ -2,6 +2,8 @@ package mir.oslav.jet.html.composables
 
 
 /**
+ * TODO docs
+ * @param spanCount Defines the max span count (max column count)
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
  * created on 26.08.2023

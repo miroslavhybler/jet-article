@@ -2,6 +2,7 @@ package mir.oslav.jet.html.parse
 
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
+import mir.oslav.jet.html.data.HtmlHeader
 import mir.oslav.jet.html.data.Monitoring
 
 
@@ -18,9 +19,9 @@ class LinearListener constructor() : HtmlArticleParserListener() {
 
 
     override fun onImage(image: HtmlElement.Image) {
-      if (!elements.contains(image)){
-          elements.add(image)
-      }
+        if (!elements.contains(image)) {
+            elements.add(image)
+        }
     }
 
     override fun onQuote(quote: HtmlElement.Quote) {
@@ -32,9 +33,9 @@ class LinearListener constructor() : HtmlArticleParserListener() {
     }
 
     override fun onTextBlock(textBlock: HtmlElement.TextBlock) {
-       if (!elements.contains(textBlock)) {
-           elements.add(textBlock)
-       }
+        if (!elements.contains(textBlock)) {
+            elements.add(textBlock)
+        }
     }
 
     override fun onTitle(title: String) {
@@ -47,7 +48,10 @@ class LinearListener constructor() : HtmlArticleParserListener() {
             title = title,
             htmlElements = ArrayList(elements),
             monitoring = monitoring,
-            headerImage = null
+            header = HtmlHeader.TopBarHeader(
+                title = title,
+                image = elements.filterIsInstance<HtmlElement.Image>().first().url
+            )
         )
     }
 

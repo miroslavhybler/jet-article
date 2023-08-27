@@ -1,5 +1,6 @@
 package mir.oslav.jet.html.parse
 
+import mir.oslav.jet.html.composables.HtmlConfig
 import mir.oslav.jet.html.data.HtmlElement
 
 
@@ -92,7 +93,8 @@ internal object CoreHtmlArticleParser {
     internal fun parseTableFromText(
         content: String,
         startIndex: Int,
-        endIndex: Int
+        endIndex: Int,
+        config: HtmlConfig,
     ): HtmlElement.Table {
         val outRows = ArrayList<List<String>>()
 
@@ -109,7 +111,7 @@ internal object CoreHtmlArticleParser {
             startIndex = startIndex,
             endIndex = endIndex,
             rows = outRows,
-            span = 1
+            span = config.spanCount
         )
     }
 }

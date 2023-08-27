@@ -21,7 +21,7 @@ object HtmlArticleParser {
 
 
     /**
-     * @param content Html content to parse
+     * @param content Html content text to parse
      * @param ignoreOptions Specifying elements that are going to be ingored in result
      * @return [HtmlData.Success] when [content] was processed and parsed sucessfully, [HtmlData.Invalid]
      * otherwise.
@@ -169,7 +169,8 @@ object HtmlArticleParser {
                                     table = CoreHtmlArticleParser.parseTableFromText(
                                         startIndex = startingTagEndIndex,
                                         endIndex = lastContentIndex,
-                                        content = tagBody
+                                        content = tagBody,
+                                        config = config
                                     )
                                 )
                             }
