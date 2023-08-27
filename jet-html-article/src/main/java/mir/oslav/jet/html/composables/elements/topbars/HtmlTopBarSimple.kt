@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -64,15 +66,18 @@ fun HtmlTopBarSimple(
             verticalAlignment = Alignment.CenterVertically,
         ) {
 
-            Image(
+
+            Icon(
                 painter = painterResource(id = R.drawable.ic_html_arrow_back),
-                contentDescription = "TODO",
+                contentDescription = stringResource(id = R.string.jet_html_back_button_content_description),
                 modifier = Modifier
-                    .size(size = 42.dp)
+                    .size(size = HtmlDimensions.clickableIconSize)
                     .clip(shape = CircleShape)
                     .clickable(onClick = navHostController::popBackStack)
-                    .padding(all = 8.dp)
+                    .padding(all = HtmlDimensions.clickableIconPadding),
+                tint = colorScheme.onBackground
             )
+
 
             Text(
                 text = title,

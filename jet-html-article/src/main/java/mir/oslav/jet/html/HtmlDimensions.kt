@@ -12,6 +12,8 @@ import androidx.compose.ui.unit.dp
  */
 data object HtmlDimensions {
 
+    val clickableIconSize: Dp = 42.dp
+    val clickableIconPadding:Dp = 8.dp
 
     var sidePadding: Dp = 0.dp
         private set

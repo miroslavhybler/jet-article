@@ -1,5 +1,6 @@
 package mir.oslav.jet.html.composables
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -28,6 +29,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.core.text.toSpannable
 import androidx.navigation.NavHostController
@@ -40,6 +42,7 @@ import mir.oslav.jet.html.composables.elements.HtmlInvalid
 import mir.oslav.jet.html.composables.elements.HtmlMetrics
 import mir.oslav.jet.html.composables.elements.HtmlQuoete
 import mir.oslav.jet.html.composables.elements.HtmlTable
+import mir.oslav.jet.html.composables.elements.topbars.HtmlCollapsingTopbar
 import mir.oslav.jet.html.composables.elements.topbars.HtmlTopBarSimple
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
@@ -68,13 +71,16 @@ fun JetHtmlArticle(
 
     val colorScheme = MaterialTheme.colorScheme
     val configuration = LocalConfiguration.current
+    val density = LocalDensity.current
 
     val systemUiController = rememberSystemUiController()
     val listState = rememberLazyGridState()
 
     HtmlDimensions.init(configuration = configuration)
+
     var fullScrollOffset by remember { mutableFloatStateOf(value = 0f) }
     var backgroundAlpha by remember { mutableFloatStateOf(value = 0f) }
+    var titleOffset by remember { mutableFloatStateOf(value = 0f) }
     var elevation by remember { mutableStateOf(value = 0.dp) }
     var topBarHeight by remember { mutableIntStateOf(value = 0) }
 
@@ -83,6 +89,18 @@ fun JetHtmlArticle(
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                 val offset = super.onPreScroll(available, source)
                 fullScrollOffset -= available.y
+
+                if (topBarHeight != 0) {
+                    backgroundAlpha = (fullScrollOffset / topBarHeight)
+                        .coerceIn(minimumValue = 0f, maximumValue = 1f)
+
+                    titleOffset = (1f - (fullScrollOffset / with(density) { 128.dp.toPx() }))
+
+                    titleOffset = titleOffset.coerceIn(minimumValue = 0f, maximumValue = 1f)
+
+                    elevation = (fullScrollOffset / topBarHeight)
+                        .coerceIn(minimumValue = 0f, maximumValue = 6f).dp
+                }
                 return offset
             }
         }
@@ -92,16 +110,6 @@ fun JetHtmlArticle(
         systemUiController.setSystemBarsColor(color = Color.White, darkIcons = true)
     })
 
-    LaunchedEffect(key1 = fullScrollOffset, block = {
-        if (topBarHeight != 0) {
-            backgroundAlpha = ((fullScrollOffset) / topBarHeight)
-                .coerceIn(minimumValue = 0f, maximumValue = 1f)
-
-            elevation = ((fullScrollOffset / topBarHeight))
-                .coerceIn(minimumValue = 0f, maximumValue = 6f).dp
-        }
-    })
-
 
     Scaffold(
         topBar = {
@@ -109,11 +117,12 @@ fun JetHtmlArticle(
                 is HtmlData.Success -> {
                     when (data.header) {
                         is HtmlHeader.TopBarHeader -> {
-                            HtmlTopBarSimple(
+                            HtmlCollapsingTopbar(
                                 navHostController = navHostController,
                                 title = data.title,
                                 shadow = elevation,
-                                backgroundAlpha = backgroundAlpha,
+                                //    backgroundAlpha = backgroundAlpha,
+                                titleOffset = titleOffset,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .wrapContentHeight()
