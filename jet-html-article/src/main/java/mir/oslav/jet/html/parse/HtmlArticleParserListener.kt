@@ -1,5 +1,6 @@
 package mir.oslav.jet.html.parse
 
+import mir.oslav.jet.html.composables.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.data.Monitoring
@@ -13,7 +14,7 @@ import mir.oslav.jet.html.data.Monitoring
 abstract class HtmlArticleParserListener constructor() {
 
 
-    open fun onTitle(title:String): Unit = Unit
+    open fun onTitle(title: String): Unit = Unit
 
     open fun onImage(image: HtmlElement.Image): Unit = Unit
 
@@ -23,7 +24,7 @@ abstract class HtmlArticleParserListener constructor() {
 
     open fun onTable(table: HtmlElement.Table): Unit = Unit
 
-   abstract fun onDataRequested(monitoring: Monitoring): HtmlData.Success
+    abstract fun onDataRequested(config: HtmlConfig, monitoring: Monitoring): HtmlData.Success
 
-   abstract fun clear(): Unit
+    abstract fun clear(): Unit
 }

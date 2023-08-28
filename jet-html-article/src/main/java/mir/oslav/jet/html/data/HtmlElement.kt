@@ -20,9 +20,10 @@ sealed class HtmlElement private constructor(
      */
     data class Image constructor(
         val url: String,
+        val description: String?,
         override val startIndex: Int,
         override val endIndex: Int,
-        override val span: Int
+        override val span: Int,
     ) : HtmlElement(
         startIndex = startIndex,
         endIndex = endIndex,
@@ -76,13 +77,13 @@ sealed class HtmlElement private constructor(
 
 
     /**
-     * TODO docs
+     * TODO split original html from constructed items
      * @since 1.0.0
      */
     data class Gallery constructor(
         val images: List<Image>,
-        override val startIndex: Int,
-        override val endIndex: Int,
+        override val startIndex: Int = Int.MIN_VALUE,
+        override val endIndex: Int = Int.MIN_VALUE,
         override val span: Int
     ) : HtmlElement(
         startIndex = startIndex,

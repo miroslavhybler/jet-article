@@ -15,7 +15,7 @@ sealed class HtmlHeader private constructor() {
      */
     data class TopBarHeader constructor(
         val title: String,
-        val image: String,
+        val image: HtmlElement.Image,
     ) : HtmlHeader()
 
 

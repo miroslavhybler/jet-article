@@ -1,9 +1,11 @@
-package mir.oslav.jet.html.parse
+package mir.oslav.jet.html.parse.listeners
 
+import mir.oslav.jet.html.composables.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.data.HtmlHeader
 import mir.oslav.jet.html.data.Monitoring
+import mir.oslav.jet.html.parse.HtmlArticleParserListener
 
 
 /**
@@ -11,11 +13,11 @@ import mir.oslav.jet.html.data.Monitoring
  * @author Miroslav Hýbler <br>
  * created on 26.08.2023
  */
-class LinearListener constructor() : HtmlArticleParserListener() {
+open class LinearListener constructor() : HtmlArticleParserListener() {
 
 
-    private var title: String = ""
-    private val elements: MutableSet<HtmlElement> = mutableSetOf()
+    protected var title: String = ""
+    protected val elements: MutableSet<HtmlElement> = mutableSetOf()
 
 
     override fun onImage(image: HtmlElement.Image) {
@@ -43,14 +45,14 @@ class LinearListener constructor() : HtmlArticleParserListener() {
     }
 
 
-    override fun onDataRequested(monitoring: Monitoring): HtmlData.Success {
+    override fun onDataRequested(config: HtmlConfig, monitoring: Monitoring): HtmlData.Success {
         return HtmlData.Success(
             title = title,
             htmlElements = ArrayList(elements),
             monitoring = monitoring,
             header = HtmlHeader.TopBarHeader(
                 title = title,
-                image = elements.filterIsInstance<HtmlElement.Image>().first().url
+                image = elements.filterIsInstance<HtmlElement.Image>().first()
             )
         )
     }

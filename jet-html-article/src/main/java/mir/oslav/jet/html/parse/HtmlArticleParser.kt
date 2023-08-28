@@ -10,6 +10,7 @@ import mir.oslav.jet.html.data.IgnoreOptions
 import mir.oslav.jet.html.data.Monitoring
 import mir.oslav.jet.html.normalizedUrl
 import mir.oslav.jet.html.parse.CoreHtmlArticleParser.indexOfSubstring
+import mir.oslav.jet.html.parse.listeners.GalleryGroupingListener
 
 
 /**
@@ -29,7 +30,7 @@ object HtmlArticleParser {
      */
     suspend fun parse(
         content: String,
-        listener: HtmlArticleParserListener = LinearListener(),
+        listener: HtmlArticleParserListener = GalleryGroupingListener(),
         ignoreOptions: IgnoreOptions = IgnoreOptions(),
         config: HtmlConfig = HtmlConfig(),
     ): HtmlData = withContext(context = Dispatchers.IO) {
@@ -112,26 +113,16 @@ object HtmlArticleParser {
                 when {
                     isSingeTag -> {
                         if (tagName == "img") {
-                            val rawUrl = rawTagWithAttributes.split("src=")
-                            var url = rawUrl
-                                .lastOrNull()
-                                ?.normalizedUrl()
-
-                            if (url?.contains(' ') == true) {
-                                url = url.split(' ').firstOrNull()
-                            }
-
-                            url?.let {
-                                listener.onImage(
-                                    image = HtmlElement.Image(
-                                        url = it,
-                                        startIndex = index,
-                                        endIndex = startingTagEndIndex,
-                                        span = config.spanCount
-                                    )
-                                )
+                            CoreHtmlArticleParser.pareseImageFromText(
+                                startIndex = index,
+                                endIndex = startingTagEndIndex,
+                                config = config,
+                                rawTagWithAttributes = rawTagWithAttributes
+                            )?.let { image ->
+                                listener.onImage(image)
                                 imagesCount += 1
                             }
+
                             index = startingTagEndIndex + 1
                             continue
                         }
@@ -216,6 +207,9 @@ object HtmlArticleParser {
             totalTags = totalTags,
             averageDurationPerTag = tagDurations.average()
         )
-        return listener.onDataRequested(monitoring = monitoring)
+        return listener.onDataRequested(
+            config = config,
+            monitoring = monitoring
+        )
     }
 }

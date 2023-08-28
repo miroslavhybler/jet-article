@@ -13,14 +13,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
+import mir.oslav.jet.html.HtmlDataSamples
 import mir.oslav.jet.html.R
+import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 
 
@@ -34,12 +38,9 @@ fun HtmlImage(
     modifier: Modifier = Modifier,
     data: HtmlElement.Image
 ) {
-    val painter = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(data.url)
-            .size(Size.ORIGINAL)
-            .build()
-    )
+
+    val isInspectionMode = LocalInspectionMode.current
+
 
     /*
     val transition by animateFloatAsState(
@@ -48,60 +49,81 @@ fun HtmlImage(
         animationSpec = tween(durationMillis = 4000)
     )
      */
-    when (painter.state) {
-        is AsyncImagePainter.State.Success -> {
-            Image(
-                painter = painter,
-                contentDescription = null,
-                modifier = modifier
-                //       .alpha(transition)
-                //       .scale(transition)
-                //       .animateContentSize(
-                //           animationSpec = tween(durationMillis = 800)
-                //       )
-            )
-        }
 
-        is AsyncImagePainter.State.Loading -> {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            ) {
-
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .align(Alignment.Center)
+    if (isInspectionMode) {
+        Image(
+            painter = painterResource(id = HtmlDataSamples.images.random()),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .then(other = modifier),
+            contentScale = ContentScale.Crop
+        )
+    } else {
+        val painter = rememberAsyncImagePainter(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(data.url)
+                .size(Size.ORIGINAL)
+                .build()
+        )
+        when (painter.state) {
+            is AsyncImagePainter.State.Success -> {
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    modifier = modifier,
+                    contentScale = ContentScale.Crop
+                    //       .alpha(transition)
+                    //       .scale(transition)
+                    //       .animateContentSize(
+                    //           animationSpec = tween(durationMillis = 800)
+                    //       )
                 )
             }
-        }
 
-        is AsyncImagePainter.State.Error -> {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            ) {
-                Column {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_jet_html_error_image),
-                        contentDescription = null,
-                        modifier = Modifier.size(size = 24.dp),
-                        tint = MaterialTheme.colorScheme.error
-                    )
+            is AsyncImagePainter.State.Loading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .then(other = modifier)
+                ) {
 
-                    Text(
-                        text = "Unable to load image",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.error
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .align(Alignment.Center)
                     )
                 }
             }
-        }
 
-        is AsyncImagePainter.State.Empty -> {
+            is AsyncImagePainter.State.Error -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                ) {
+                    Column {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_jet_html_error_image),
+                            contentDescription = null,
+                            modifier = Modifier.size(size = 24.dp),
+                            tint = MaterialTheme.colorScheme.error
+                        )
 
+                        Text(
+                            text = "Unable to load image",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+            }
+
+            is AsyncImagePainter.State.Empty -> {
+
+            }
         }
     }
 

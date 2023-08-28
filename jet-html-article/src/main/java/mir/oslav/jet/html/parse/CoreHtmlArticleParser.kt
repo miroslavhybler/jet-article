@@ -1,7 +1,10 @@
 package mir.oslav.jet.html.parse
 
+import android.util.Log
 import mir.oslav.jet.html.composables.HtmlConfig
 import mir.oslav.jet.html.data.HtmlElement
+import mir.oslav.jet.html.normalizedAttributeValue
+import mir.oslav.jet.html.normalizedUrl
 
 
 /**
@@ -80,6 +83,39 @@ internal object CoreHtmlArticleParser {
             } else index += 1
         }
         return outList
+    }
+
+
+    /**
+     * @param rawTagWithAttributes E.g. <img src="https://www.example.com" alt="Photo"/>
+     * @since 1.0.0
+     */
+    internal fun pareseImageFromText(
+        rawTagWithAttributes: String,
+        startIndex: Int,
+        endIndex: Int,
+        config: HtmlConfig,
+    ): HtmlElement.Image? {
+        val rawUrl = rawTagWithAttributes.split("src=")
+        var url = rawUrl.lastOrNull()?.normalizedUrl()
+
+        if (url?.contains(char = ' ') == true) {
+            url = url.split(' ')
+                .firstOrNull()
+                ?.normalizedUrl()
+        }
+
+        if (url == null) {
+            return null
+        }
+
+        return HtmlElement.Image(
+            url = url,
+            startIndex = startIndex,
+            endIndex = endIndex,
+            span = config.spanCount,
+            description = null
+        )
     }
 
 

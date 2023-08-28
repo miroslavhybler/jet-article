@@ -10,10 +10,12 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -37,12 +39,14 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import mir.oslav.jet.annotations.JetBenchmark
 import mir.oslav.jet.annotations.JetExperimental
 import mir.oslav.jet.html.HtmlDimensions
+import mir.oslav.jet.html.JetRippleTheme
 import mir.oslav.jet.html.composables.elements.HtmlImage
 import mir.oslav.jet.html.composables.elements.HtmlInvalid
 import mir.oslav.jet.html.composables.elements.HtmlMetrics
 import mir.oslav.jet.html.composables.elements.HtmlQuoete
 import mir.oslav.jet.html.composables.elements.HtmlTable
 import mir.oslav.jet.html.composables.elements.topbars.HtmlCollapsingTopbar
+import mir.oslav.jet.html.composables.elements.topbars.HtmlPhotoGallery
 import mir.oslav.jet.html.composables.elements.topbars.HtmlTopBarSimple
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
@@ -73,6 +77,7 @@ fun JetHtmlArticle(
     val configuration = LocalConfiguration.current
     val density = LocalDensity.current
 
+    val jetRippleTheme = remember { JetRippleTheme() }
     val systemUiController = rememberSystemUiController()
     val listState = rememberLazyGridState()
 
@@ -110,112 +115,117 @@ fun JetHtmlArticle(
         systemUiController.setSystemBarsColor(color = Color.White, darkIcons = true)
     })
 
+    CompositionLocalProvider(
+        value = LocalRippleTheme provides jetRippleTheme
+    ) {
+        Scaffold(
+            topBar = {
+                when (data) {
+                    is HtmlData.Success -> {
+                        when (data.header) {
+                            is HtmlHeader.TopBarHeader -> {
+                                HtmlCollapsingTopbar(
+                                    navHostController = navHostController,
+                                    title = data.title,
+                                    shadow = elevation,
+                                    //    backgroundAlpha = backgroundAlpha,
+                                    titleOffset = titleOffset,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight()
+                                        .onSizeChanged { size ->
+                                            topBarHeight = size.height
+                                        }
+                                )
+                            }
 
-    Scaffold(
-        topBar = {
-            when (data) {
-                is HtmlData.Success -> {
-                    when (data.header) {
-                        is HtmlHeader.TopBarHeader -> {
-                            HtmlCollapsingTopbar(
-                                navHostController = navHostController,
-                                title = data.title,
-                                shadow = elevation,
-                                //    backgroundAlpha = backgroundAlpha,
-                                titleOffset = titleOffset,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentHeight()
-                                    .onSizeChanged { size ->
-                                        topBarHeight = size.height
-                                    }
-                            )
+                            is HtmlHeader.FullScreenHeader -> {
+
+                            }
+
+                            HtmlHeader.None -> {}
                         }
-
-                        is HtmlHeader.FullScreenHeader -> {
-
-                        }
-
-                        HtmlHeader.None -> {}
                     }
+
+                    else -> {}
                 }
+            },
+            content = { paddingValues ->
+                LazyVerticalGrid(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .nestedScroll(connection = nestedScrollConnection),
 
-                else -> {}
-            }
-        },
-        content = { paddingValues ->
-            LazyVerticalGrid(
-                modifier = modifier
-                    .fillMaxSize()
-                    .nestedScroll(connection = nestedScrollConnection),
-
-                state = listState,
-                columns = GridCells.Fixed(count = config.spanCount),
-                contentPadding = paddingValues,
-                content = {
-                    when (data) {
-                        is HtmlData.Empty -> {
-                            item {
-                                Text(text = "TODO empty")
-                            }
-                        }
-
-                        is HtmlData.Invalid -> {
-                            item {
-                                HtmlInvalid(data = data)
-                            }
-                        }
-
-                        is HtmlData.Success -> {
-                            item(
-                                span = { GridItemSpan(currentLineSpan = config.spanCount) },
-                            ) {
-                                HtmlMetrics(monitoring = data.monitoring)
-                            }
-
-                            item(
-                                span = { GridItemSpan(currentLineSpan = config.spanCount) }
-                            ) {
-                                MaterialColorPallete()
-                            }
-
-                            itemsIndexed(
-                                span = { index, item -> GridItemSpan(currentLineSpan = item.span) },
-                                items = data.htmlElements,
-                                contentType = { intex, element -> element },
-                                key = { index, element -> index }
-                            ) { index, element ->
-                                when (element) {
-                                    is HtmlElement.Image -> HtmlImage(data = element)
-                                    is HtmlElement.Quote -> HtmlQuoete(data = element)
-                                    is HtmlElement.Table -> HtmlTable(data = element)
-                                    is HtmlElement.TextBlock -> {
-                                        Text(
-                                            text = remember {
-                                                element.text.toHtml()
-                                                    .toSpannable()
-                                                    .toAnnotatedString(primaryColor = colorScheme.primary)
-                                            },
-                                            modifier = Modifier.padding(horizontal = 16.dp)
-                                        )
-                                    }
-
-                                    else -> throw IllegalStateException(
-                                        "Element ${element.javaClass.simpleName} not supported yet!"
-                                    )
+                    state = listState,
+                    columns = GridCells.Fixed(count = config.spanCount),
+                    contentPadding = paddingValues,
+                    content = {
+                        when (data) {
+                            is HtmlData.Empty -> {
+                                item {
+                                    Text(text = "TODO empty")
                                 }
                             }
 
+                            is HtmlData.Invalid -> {
+                                item {
+                                    HtmlInvalid(data = data)
+                                }
+                            }
 
-                            item(
-                                span = { GridItemSpan(currentLineSpan = config.spanCount) }
-                            ) {
-                                BrandingFooter()
+                            is HtmlData.Success -> {
+                                item(
+                                    span = { GridItemSpan(currentLineSpan = config.spanCount) },
+                                ) {
+                                    HtmlMetrics(monitoring = data.monitoring)
+                                }
+
+                                item(
+                                    span = { GridItemSpan(currentLineSpan = config.spanCount) }
+                                ) {
+                                    MaterialColorPallete()
+                                }
+
+                                itemsIndexed(
+                                    span = { index, item -> GridItemSpan(currentLineSpan = item.span) },
+                                    items = data.htmlElements,
+                                    contentType = { intex, element -> element },
+                                    key = { index, element -> index }
+                                ) { index, element ->
+                                    when (element) {
+                                        is HtmlElement.Image -> HtmlImage(data = element)
+                                        is HtmlElement.Quote -> HtmlQuoete(data = element)
+                                        is HtmlElement.Table -> HtmlTable(data = element)
+                                        is HtmlElement.TextBlock -> {
+                                            Text(
+                                                text = remember {
+                                                    element.text.toHtml()
+                                                        .toSpannable()
+                                                        .toAnnotatedString(primaryColor = colorScheme.primary)
+                                                },
+                                                modifier = Modifier.padding(horizontal = 16.dp)
+                                            )
+                                        }
+                                        is HtmlElement.Gallery ->{
+                                            HtmlPhotoGallery(gallery = element)
+                                        }
+                                        else -> throw IllegalStateException(
+                                            "Element ${element.javaClass.simpleName} not supported yet!"
+                                        )
+                                    }
+                                }
+
+
+                                item(
+                                    span = { GridItemSpan(currentLineSpan = config.spanCount) }
+                                ) {
+                                    BrandingFooter()
+                                }
                             }
                         }
                     }
-                }
-            )
-        }
-    )
+                )
+            }
+        )
+    }
 }

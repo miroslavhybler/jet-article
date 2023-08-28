@@ -84,6 +84,12 @@ fun String.normalizedUrl(): String = this
     .removeSuffix(suffix = " ")
 
 
+fun String.normalizedAttributeValue(): String = this
+    .removePrefix(prefix = " ")
+    .removeSuffix(suffix = "/")
+    .removeSuffix(suffix = " ")
+
+
 fun Spannable.toAnnotatedString(primaryColor: Color): AnnotatedString {
     val builder = AnnotatedString.Builder(this.toString())
     val copierContext = CopierContext(primaryColor)
