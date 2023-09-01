@@ -15,7 +15,7 @@ android {
         applicationId = "jet.html.article.example"
         minSdk = 21
         targetSdk = 34
-        versionCode = 4
+        versionCode = 5
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

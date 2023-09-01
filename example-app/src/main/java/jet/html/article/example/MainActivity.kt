@@ -196,9 +196,8 @@ private fun GalleryPage(
     })
 
 
-
     (data as? HtmlData.Success)?.let { htmlData ->
-        htmlData.htmlElements.filterIsInstance<HtmlElement.Gallery>()
+        htmlData.htmlElements.filterIsInstance<HtmlElement.Constructed.Gallery>()
             .firstOrNull()
             ?.let { gallery ->
                 JetHtmlPhotoGalleryDetailScreen(

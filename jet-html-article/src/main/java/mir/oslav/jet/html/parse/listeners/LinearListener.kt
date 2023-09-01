@@ -20,21 +20,21 @@ open class LinearListener constructor() : HtmlArticleParserListener() {
     protected val elements: MutableSet<HtmlElement> = mutableSetOf()
 
 
-    override fun onImage(image: HtmlElement.Image) {
+    override fun onImage(image: HtmlElement.Parsed.Image) {
         if (!elements.contains(image)) {
             elements.add(image)
         }
     }
 
-    override fun onQuote(quote: HtmlElement.Quote) {
+    override fun onQuote(quote: HtmlElement.Parsed.Quote) {
         elements.add(quote)
     }
 
-    override fun onTable(table: HtmlElement.Table) {
+    override fun onTable(table: HtmlElement.Parsed.Table) {
         elements.add(table)
     }
 
-    override fun onTextBlock(textBlock: HtmlElement.TextBlock) {
+    override fun onTextBlock(textBlock: HtmlElement.Parsed.TextBlock) {
         if (!elements.contains(textBlock)) {
             elements.add(textBlock)
         }
@@ -44,7 +44,7 @@ open class LinearListener constructor() : HtmlArticleParserListener() {
         this.title = title
     }
 
-    override fun onAddress(address: HtmlElement.Address) {
+    override fun onAddress(address: HtmlElement.Parsed.Address) {
         if (!elements.contains(address)) {
             elements.add(address)
         }
@@ -58,7 +58,7 @@ open class LinearListener constructor() : HtmlArticleParserListener() {
             monitoring = monitoring,
             header = HtmlHeader.TopBarHeader(
                 title = title,
-                image = elements.filterIsInstance<HtmlElement.Image>().first()
+                image = elements.filterIsInstance<HtmlElement.Parsed.Image>().first()
             )
         )
     }

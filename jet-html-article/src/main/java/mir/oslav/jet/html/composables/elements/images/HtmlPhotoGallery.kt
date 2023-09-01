@@ -27,7 +27,7 @@ import mir.oslav.jet.html.data.HtmlElement
 @Composable
 fun HtmlPhotoGallery(
     modifier: Modifier = Modifier,
-    gallery: HtmlElement.Gallery
+    gallery: HtmlElement.Constructed.Gallery
 ) {
     val dimensions = LocalHtmlDimensions.current
 
@@ -90,31 +90,31 @@ fun HtmlPhotoGallery(
 private fun HtmlGalleryPreview() {
 
     HtmlPhotoGallery(
-        gallery = HtmlElement.Gallery(
+        gallery = HtmlElement.Constructed.Gallery(
             span = 1,
             images = listOf(
-                HtmlElement.Image(
+                HtmlElement.Parsed.Image(
                     span = 1,
                     startIndex = Int.MIN_VALUE,
                     endIndex = Int.MIN_VALUE,
                     url = "",
                     description = null
                 ),
-                HtmlElement.Image(
+                HtmlElement.Parsed.Image(
                     span = 1,
                     startIndex = Int.MIN_VALUE,
                     endIndex = Int.MIN_VALUE,
                     url = "",
                     description = null
                 ),
-                HtmlElement.Image(
+                HtmlElement.Parsed.Image(
                     span = 1,
                     startIndex = Int.MIN_VALUE,
                     endIndex = Int.MIN_VALUE,
                     url = "",
                     description = null
                 ),
-                HtmlElement.Image(
+                HtmlElement.Parsed.Image(
                     span = 1,
                     startIndex = Int.MIN_VALUE,
                     endIndex = Int.MIN_VALUE,

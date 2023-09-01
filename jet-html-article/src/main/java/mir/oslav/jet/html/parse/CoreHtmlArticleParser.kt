@@ -95,7 +95,7 @@ internal object CoreHtmlArticleParser {
         startIndex: Int,
         endIndex: Int,
         config: HtmlConfig,
-    ): HtmlElement.Image? {
+    ): HtmlElement.Parsed.Image? {
         val rawUrl = rawTagWithAttributes.split("src=")
         var url = rawUrl.lastOrNull()?.normalizedUrl()
 
@@ -109,7 +109,7 @@ internal object CoreHtmlArticleParser {
             return null
         }
 
-        return HtmlElement.Image(
+        return HtmlElement.Parsed.Image(
             url = url,
             startIndex = startIndex,
             endIndex = endIndex,
@@ -131,7 +131,7 @@ internal object CoreHtmlArticleParser {
         startIndex: Int,
         endIndex: Int,
         config: HtmlConfig,
-    ): HtmlElement.Table {
+    ): HtmlElement.Parsed.Table {
         val outRows = ArrayList<List<String>>()
 
         val rows = parsePairTagBody(content = content, searchedTag = "tr")
@@ -143,7 +143,7 @@ internal object CoreHtmlArticleParser {
             outRows.add(headers + cells)
         }
 
-        return HtmlElement.Table(
+        return HtmlElement.Parsed.Table(
             startIndex = startIndex,
             endIndex = endIndex,
             rows = outRows,

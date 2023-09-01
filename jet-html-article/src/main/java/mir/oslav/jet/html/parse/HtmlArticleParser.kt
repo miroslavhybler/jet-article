@@ -157,7 +157,7 @@ object HtmlArticleParser {
                         when (tagName) {
                             "address" -> {
                                 listener.onAddress(
-                                    HtmlElement.Address(
+                                    HtmlElement.Parsed.Address(
                                         startIndex = startingTagEndIndex,
                                         endIndex = lastContentIndex,
                                         span = config.spanCount,
@@ -179,7 +179,7 @@ object HtmlArticleParser {
 
                             "blockquote" -> {
                                 listener.onQuote(
-                                    quote = HtmlElement.Quote(
+                                    quote = HtmlElement.Parsed.Quote(
                                         text = tagBody,
                                         startIndex = startingTagEndIndex + 1,
                                         endIndex = closingTagStart,
@@ -190,7 +190,7 @@ object HtmlArticleParser {
 
                             else -> {
                                 listener.onTextBlock(
-                                    textBlock = HtmlElement.TextBlock(
+                                    textBlock = HtmlElement.Parsed.TextBlock(
                                         text = tagBody,
                                         startIndex = startingTagEndIndex + 1,
                                         endIndex = closingTagStart,

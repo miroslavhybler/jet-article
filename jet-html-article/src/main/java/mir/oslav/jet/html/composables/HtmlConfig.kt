@@ -10,5 +10,18 @@ package mir.oslav.jet.html.composables
  */
 data class HtmlConfig constructor(
     val spanCount: Int = 1,
+    val topBarConfig: TopBarConfig = TopBarConfig.SIMPLE
 ){
+
+
+    /**
+     * @since 1.0.0
+     */
+    enum class TopBarConfig {
+        NONE,
+        SIMPLE,
+        APPEARING,
+        COLLAPSING
+    }
+
 }

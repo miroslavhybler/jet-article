@@ -21,7 +21,7 @@ import mir.oslav.jet.html.toHtml
 @Composable
 fun HtmlAddress(
     modifier: Modifier = Modifier,
-    address: HtmlElement.Address
+    address: HtmlElement.Parsed.Address
 ) {
 
     val dimensions = LocalHtmlDimensions.current

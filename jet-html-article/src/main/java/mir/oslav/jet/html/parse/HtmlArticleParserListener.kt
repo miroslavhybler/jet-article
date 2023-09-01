@@ -16,16 +16,15 @@ abstract class HtmlArticleParserListener constructor() {
 
     open fun onTitle(title: String): Unit = Unit
 
-    open fun onImage(image: HtmlElement.Image): Unit = Unit
+    open fun onImage(image: HtmlElement.Parsed.Image): Unit = Unit
 
-    open fun onQuote(quote: HtmlElement.Quote): Unit = Unit
+    open fun onQuote(quote: HtmlElement.Parsed.Quote): Unit = Unit
 
-    open fun onTextBlock(textBlock: HtmlElement.TextBlock): Unit = Unit
+    open fun onTextBlock(textBlock: HtmlElement.Parsed.TextBlock): Unit = Unit
 
-    open fun onTable(table: HtmlElement.Table): Unit = Unit
+    open fun onTable(table: HtmlElement.Parsed.Table): Unit = Unit
 
-
-    open fun onAddress(address: HtmlElement.Address): Unit = Unit
+    open fun onAddress(address: HtmlElement.Parsed.Address): Unit = Unit
 
     abstract fun onDataRequested(config: HtmlConfig, monitoring: Monitoring): HtmlData.Success
 

@@ -37,7 +37,7 @@ import mir.oslav.jet.html.toHtml
 @Composable
 fun HtmlQuoete(
     modifier: Modifier = Modifier,
-    data: HtmlElement.Quote
+    data: HtmlElement.Parsed.Quote
 ) {
 
     val colorScheme = MaterialTheme.colorScheme
@@ -86,7 +86,7 @@ fun HtmlQuoete(
 @Preview(showBackground = true)
 private fun QuotePreview() {
     HtmlQuoete(
-        data = HtmlElement.Quote(
+        data = HtmlElement.Parsed.Quote(
             text = "Hello There! This is famous quote of me, general Kenobi from the Star Wars",
             startIndex = 0,
             endIndex = 0,

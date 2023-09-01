@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -158,11 +159,14 @@ fun JetHtmlArticleScreen(
         LocalHtmlDimensions provides dimensions
     ) {
 
-        Box(
+        Scaffold(
             modifier = modifier
                 .fillMaxSize()
                 .nestedScroll(connection = nestedScrollConnection),
-        ) {
+            topBar = {
+                HtmlTopBar(data = data, navHostController = navHostController, config = config)
+            }
+        ) { paddingValues ->
             val original = with(density) {
                 (topBarHeight.toDp() - dimensions.collapsingTopBar.maxHeight).toPx()
             }
@@ -184,10 +188,10 @@ fun JetHtmlArticleScreen(
             LazyVerticalGrid(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = with(density) { topBarHeight.toDp() })
-                    .navigationBarsPadding(),
+                    .padding(top = with(density) { topBarHeight.toDp() }),
                 state = gridState,
                 columns = GridCells.Fixed(count = config.spanCount),
+                contentPadding = paddingValues,
                 content = {
                     when (data) {
                         is HtmlData.Empty -> {
@@ -229,11 +233,11 @@ fun JetHtmlArticleScreen(
                                 key = { index, element -> index }
                             ) { index, element ->
                                 when (element) {
-                                    is HtmlElement.Image -> HtmlImage(data = element)
-                                    is HtmlElement.Quote -> HtmlQuoete(data = element)
-                                    is HtmlElement.Table -> HtmlTable(data = element)
-                                    is HtmlElement.Address -> HtmlAddress(address = element)
-                                    is HtmlElement.TextBlock -> {
+                                    is HtmlElement.Parsed.Image -> HtmlImage(data = element)
+                                    is HtmlElement.Parsed.Quote -> HtmlQuoete(data = element)
+                                    is HtmlElement.Parsed.Table -> HtmlTable(data = element)
+                                    is HtmlElement.Parsed.Address -> HtmlAddress(address = element)
+                                    is HtmlElement.Parsed.TextBlock -> {
                                         Text(
                                             text = remember {
                                                 element.text.toHtml()
@@ -244,7 +248,8 @@ fun JetHtmlArticleScreen(
                                         )
                                     }
 
-                                    is HtmlElement.Gallery -> {
+                                    // TODO split parsed and constructed
+                                    is HtmlElement.Constructed.Gallery -> {
                                         HtmlPhotoGallery(gallery = element)
                                     }
 
@@ -264,50 +269,72 @@ fun JetHtmlArticleScreen(
                     }
                 }
             )
+        }
+    }
+}
 
-            when (data) {
-                is HtmlData.Success -> {
-                    when (data.header) {
-                        is HtmlHeader.TopBarHeader -> {
 
+@Composable
+private fun HtmlTopBar(
+    modifier: Modifier = Modifier,
+    data: HtmlData,
+    navHostController: NavHostController,
+    config: HtmlConfig,
+) {
+    when (data) {
+        is HtmlData.Success -> {
+            when (data.header) {
+                is HtmlHeader.TopBarHeader -> {
+
+                    when (config.topBarConfig) {
+                        HtmlConfig.TopBarConfig.SIMPLE -> {
                             HtmlTopBarSimple(
                                 navHostController = navHostController,
                                 title = data.title,
                                 shadow = 4.dp,
-                                backgroundAlpha = 1f
+                                backgroundAlpha = 1f,
+                                modifier = modifier
                             )
-
-                            /*
-                            HtmlCollapsingTopbar(
-                                navHostController = navHostController,
-                                title = data.title,
-                                shadow = elevation,
-                                //    backgroundAlpha = backgroundAlpha,
-                                scrollOffset = scrollOffset,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentHeight()
-                                    .onSizeChanged { size ->
-                                        topBarHeight = size.height
-                                    },
-                                state = topBarState
-                            )
-                            */
                         }
 
-                        is HtmlHeader.FullScreenHeader -> {
+                        HtmlConfig.TopBarConfig.NONE -> return
+                        else -> throw IllegalStateException("Not implemented yet!")
+                        /*
+                    HtmlConfig.TopBarConfig.COLLAPSING -> {
+
+        HtmlCollapsingTopbar(
+            navHostController = navHostController,
+            title = data.title,
+            shadow = elevation,
+            //    backgroundAlpha = backgroundAlpha,
+            scrollOffset = scrollOffset,
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .onSizeChanged { size ->
+                    topBarHeight = size.height
+                },
+            state = topBarState
+        )
 
                         }
 
-                        HtmlHeader.None -> {}
+                         */
                     }
                 }
 
-                else -> {}
+                is HtmlHeader.FullScreenHeader -> {
+
+                }
+
+                HtmlHeader.None -> {}
             }
         }
+
+        else -> {}
     }
 }
+
 
 /*
 CompositionLocalProvider(

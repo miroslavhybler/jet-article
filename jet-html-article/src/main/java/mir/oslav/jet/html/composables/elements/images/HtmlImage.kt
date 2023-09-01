@@ -35,7 +35,7 @@ import mir.oslav.jet.html.data.HtmlElement
 @Composable
 fun HtmlImage(
     modifier: Modifier = Modifier,
-    data: HtmlElement.Image
+    data: HtmlElement.Parsed.Image
 ) {
 
     val isInspectionMode = LocalInspectionMode.current

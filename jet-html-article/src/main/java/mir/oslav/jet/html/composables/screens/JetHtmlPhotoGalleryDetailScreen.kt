@@ -59,7 +59,7 @@ import mir.oslav.jet.html.data.HtmlElement
 @Composable
 fun JetHtmlPhotoGalleryDetailScreen(
     modifier: Modifier = Modifier,
-    gallery: HtmlElement.Gallery,
+    gallery: HtmlElement.Constructed.Gallery,
     navHostController: NavHostController
 ) {
 
@@ -105,10 +105,10 @@ fun JetHtmlPhotoGalleryDetailScreen(
 @Composable
 private fun GridGallery(
     modifier: Modifier = Modifier,
-    gallery: HtmlElement.Gallery
+    gallery: HtmlElement.Constructed.Gallery
 ) {
     LazyVerticalGrid(
-        modifier=modifier,
+        modifier = modifier,
         columns = GridCells.Fixed(count = 5),
         content = {
             itemsIndexed(
@@ -133,7 +133,7 @@ private fun GridGallery(
 @Composable
 private fun HorizontalPagerGallery(
     modifier: Modifier = Modifier,
-    gallery: HtmlElement.Gallery,
+    gallery: HtmlElement.Constructed.Gallery,
     paddingValues: PaddingValues
 ) {
     val pagerState = rememberPagerState(initialPage = 0) {
