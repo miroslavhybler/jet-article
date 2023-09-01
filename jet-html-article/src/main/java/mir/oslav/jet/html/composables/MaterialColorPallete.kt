@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mir.oslav.jet.html.HtmlDimensions
+import mir.oslav.jet.html.LocalHtmlDimensions
 
 
 /**
@@ -104,10 +105,13 @@ private fun ColorRow(
     title: String,
     colors: List<Color>
 ) {
+
+    val dimensions = LocalHtmlDimensions.current
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = HtmlDimensions.sidePadding, vertical = 2.dp)
+            .padding(horizontal = dimensions.sidePadding, vertical = 2.dp)
     ) {
 
         Text(

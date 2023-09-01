@@ -15,8 +15,8 @@ android {
         applicationId = "jet.html.article.example"
         minSdk = 21
         targetSdk = 34
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 4
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -44,16 +44,29 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    kotlin {
+        jvmToolchain(jdkVersion = 8)
+    }
     kotlinOptions {
         jvmTarget = "1.8"
-        //Supressing Jet warnings
         freeCompilerArgs += listOf(
+            //Suppressing Jet Warnings
             "-Xopt-in=mir.oslav.jet.annotations.JetExperimental",
             "-Xopt-in=mir.oslav.jet.annotations.JetBenchmark",
+
+            //Suppresing Material 3 Warnings
+            "-Xopt-in=androidx.compose.material.ExperimentalMaterialApi",
+            "-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi",
+            "-Xopt-in=androidx.compose.ui.ExperimentalComposeUiApi",
+            "-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi",
+            "-Xopt-in=androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi",
+            "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi",
+            "-Xopt-in=com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi"
         )
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.0"
@@ -87,8 +100,11 @@ dependencies {
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.navigation:navigation-compose:2.7.0")
+    implementation("androidx.compose.animation:animation-graphics:1.5.0")
+    implementation("androidx.compose.material:material:1.6.0-alpha04")
+    implementation("androidx.compose.material3:material3:1.1.1")
+    implementation("androidx.compose.material3:material3-window-size-class:1.1.1")
+    implementation("androidx.navigation:navigation-compose:2.7.1")
 
 
     testImplementation("junit:junit:4.13.2")

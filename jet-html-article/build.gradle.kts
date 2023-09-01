@@ -24,11 +24,24 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
+        freeCompilerArgs += listOf(
+            "-Xcontext-receivers",
+            "-Xopt-in=androidx.compose.material.ExperimentalMaterialApi",
+            "-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi",
+            "-Xopt-in=androidx.compose.ui.ExperimentalComposeUiApi",
+            "-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi",
+            "-Xopt-in=androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi",
+            "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi",
+            "-Xopt-in=com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi"
+        )
+    }
+    kotlin {
+        jvmToolchain(jdkVersion = 11)
     }
     buildFeatures {
         compose = true
@@ -47,17 +60,14 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.7.2")
 
     /** Compose */
-    val composeVersion = "1.5.0"
-    implementation("androidx.compose.ui:ui:$composeVersion")
-    implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
-    implementation("androidx.activity:activity-compose:1.7.2")
-    implementation("androidx.compose.material:material:1.5.0")
-    implementation("androidx.compose.material3:material3:1.2.0-alpha05")
-    implementation("androidx.compose.material3:material3-window-size-class:1.1.1")
-    implementation("androidx.navigation:navigation-compose:2.7.0")
-    implementation("androidx.paging:paging-compose:3.2.0")
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-graphics")
+    implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.animation:animation-graphics:1.5.0")
-    implementation("androidx.paging:paging-compose:3.2.0")
+    implementation("androidx.compose.material:material:1.6.0-alpha04")
+    implementation("androidx.compose.material3:material3:1.1.1")
+    implementation("androidx.compose.material3:material3-window-size-class:1.1.1")
+    implementation("androidx.navigation:navigation-compose:2.7.1")
 
 
     /** Accompanist & Experimental */

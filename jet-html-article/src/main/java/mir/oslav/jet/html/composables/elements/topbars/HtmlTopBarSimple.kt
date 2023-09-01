@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import mir.oslav.jet.html.HtmlDimensions
+import mir.oslav.jet.html.LocalHtmlDimensions
 import mir.oslav.jet.html.R
 
 
@@ -45,7 +46,7 @@ fun HtmlTopBarSimple(
     shadow: Dp,
     backgroundAlpha: Float
 ) {
-
+    val dimensions = LocalHtmlDimensions.current
     Box(
         modifier = Modifier.shadow(
             elevation = shadow,
@@ -62,7 +63,7 @@ fun HtmlTopBarSimple(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .statusBarsPadding()
-                .padding(horizontal = HtmlDimensions.sidePadding, vertical = 8.dp),
+                .padding(horizontal = dimensions.sidePadding, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
 
@@ -71,10 +72,10 @@ fun HtmlTopBarSimple(
                 painter = painterResource(id = R.drawable.ic_html_arrow_back),
                 contentDescription = stringResource(id = R.string.jet_html_back_button_content_description),
                 modifier = Modifier
-                    .size(size = HtmlDimensions.clickableIconSize)
+                    .size(size = dimensions.clickableIconSize)
                     .clip(shape = CircleShape)
                     .clickable(onClick = navHostController::popBackStack)
-                    .padding(all = HtmlDimensions.clickableIconPadding),
+                    .padding(all = dimensions.clickableIconPadding),
                 tint = colorScheme.onBackground
             )
 

@@ -77,6 +77,21 @@ sealed class HtmlElement private constructor(
 
 
     /**
+     * @since 1.0.0
+     */
+    data class Address constructor(
+        val content: String,
+        override val startIndex: Int,
+        override val endIndex: Int,
+        override val span: Int
+    ) : HtmlElement(
+        startIndex = startIndex,
+        endIndex = endIndex,
+        span = span
+    )
+
+
+    /**
      * TODO split original html from constructed items
      * @since 1.0.0
      */

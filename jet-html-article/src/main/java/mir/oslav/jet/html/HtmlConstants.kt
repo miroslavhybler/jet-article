@@ -32,7 +32,8 @@ object HtmlConstants {
         "u",
         "blockquote",
         "table",
-        "title"
+        "title",
+        "address",
     )
 
 

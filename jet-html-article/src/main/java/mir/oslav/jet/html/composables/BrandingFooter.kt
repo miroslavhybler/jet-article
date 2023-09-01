@@ -27,11 +27,14 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import mir.oslav.jet.html.HtmlDimensions
+import mir.oslav.jet.html.LocalHtmlDimensions
 import mir.oslav.jet.html.R
+import mir.oslav.jet.html.isExtraLarge
 import mir.oslav.jet.html.isLandScape
 
 
@@ -50,12 +53,27 @@ fun BrandingFooter(
 
     val items = remember {
         listOf(
+
+            FooterItem(
+                title = "Created with Kotlin",
+                iconRes = R.mipmap.img_logo_kotlin,
+                link = "https://https://kotlinlang.org/",
+                iconTint = null
+            ),
             FooterItem(
                 title = "Using Jetpack Compose",
                 iconRes = R.mipmap.img_jetpack_compose_logo,
                 link = "https://developer.android.com/jetpack/compose",
                 iconTint = null
             ),
+            FooterItem(
+                title = "Designed with Material You",
+                link = "https://m3.material.io/",
+                iconRes = R.mipmap.img_logo_material,
+                iconTint = colorScheme.onBackground
+            ),
+
+
             //TODO repo url
             FooterItem(
                 title = "Github: https://github.com/miroslavhybler",
@@ -67,7 +85,11 @@ fun BrandingFooter(
     }
 
     if (configuration.isLandScape) {
-        BrandingFooterLandscape(modifier = modifier, footerItems = items)
+       if (configuration.isExtraLarge) {
+           BrandingFooterLandscapeExtraLarge(modifier = modifier, footerItems = items)
+       } else {
+           BrandingFooterLandscape(modifier = modifier, footerItems = items)
+       }
     } else {
         BrandingFooterPortrait(modifier = modifier, footerItems = items)
     }
@@ -85,12 +107,13 @@ private fun BrandingFooterPortrait(
     modifier: Modifier,
     footerItems: List<FooterItem>
 ) {
+    val dimensions = LocalHtmlDimensions.current
 
     Column(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(horizontal = HtmlDimensions.sidePadding, vertical = 12.dp),
+            .padding(horizontal = dimensions.sidePadding, vertical = 12.dp),
     ) {
 
         footerItems.forEach { item ->
@@ -100,16 +123,45 @@ private fun BrandingFooterPortrait(
     }
 }
 
+
 @Composable
 private fun BrandingFooterLandscape(
     modifier: Modifier,
     footerItems: List<FooterItem>
 ) {
+    val dimensions = LocalHtmlDimensions.current
+
+    //TODO use Grid
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(horizontal = dimensions.sidePadding, vertical = 12.dp),
+    ) {
+        footerItems.forEach { item ->
+            FooterRow(
+                title = item.title,
+                iconRes = item.iconRes,
+                clickableLink = item.link,
+                iconTint = item.iconTint
+            )
+        }
+    }
+}
+
+
+@Composable
+private fun BrandingFooterLandscapeExtraLarge(
+    modifier: Modifier,
+    footerItems: List<FooterItem>
+) {
+    val dimensions = LocalHtmlDimensions.current
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(horizontal = HtmlDimensions.sidePadding, vertical = 12.dp),
+            .padding(horizontal = dimensions.sidePadding, vertical = 12.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -168,6 +220,8 @@ private fun FooterRow(
             text = title,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onBackground,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 

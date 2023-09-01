@@ -16,14 +16,13 @@ class GalleryGroupingListener constructor() : LinearListener() {
 
     override fun onDataRequested(config: HtmlConfig, monitoring: Monitoring): HtmlData.Success {
         val images = elements.filterIsInstance<HtmlElement.Image>()
-        val otherData = elements.filter { element -> element !is HtmlElement.Image }
         val gallery = HtmlElement.Gallery(images = images, span = config.spanCount)
 
         return HtmlData.Success(
             title = title,
             htmlElements = ArrayList<HtmlElement>().apply {
                 add(gallery)
-                addAll(otherData)
+                addAll(elements)
             },
             header = if (images.isNotEmpty()) {
                 HtmlHeader.TopBarHeader(

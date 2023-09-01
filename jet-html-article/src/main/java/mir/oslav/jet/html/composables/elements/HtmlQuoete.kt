@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.text.toSpannable
 import mir.oslav.jet.html.HtmlDimensions
+import mir.oslav.jet.html.LocalHtmlDimensions
 import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.toAnnotatedString
 import mir.oslav.jet.html.toHtml
@@ -42,6 +42,7 @@ fun HtmlQuoete(
 
     val colorScheme = MaterialTheme.colorScheme
     val density = LocalDensity.current
+    val dimensions = LocalHtmlDimensions.current
 
     var dividerHeight by remember { mutableStateOf(0.dp) }
 
@@ -51,14 +52,16 @@ fun HtmlQuoete(
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
-        VerticalDivider(
+        //TODO add width to dimens
+        Divider(
             modifier = Modifier
-                .height(height = dividerHeight),
+                .height(height = dividerHeight)
+                .width(width = 5.dp),
             color = MaterialTheme.colorScheme.tertiary,
             thickness = 5.dp,
         )
 
-        Spacer(modifier = Modifier.width(width = HtmlDimensions.sidePadding - 5.dp))
+        Spacer(modifier = Modifier.width(width = dimensions.sidePadding - 5.dp))
 
         Text(
             text = remember {
@@ -68,7 +71,7 @@ fun HtmlQuoete(
             },
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier
-                .padding(vertical = 8.dp, horizontal = HtmlDimensions.sidePadding)
+                .padding(vertical = 8.dp, horizontal = dimensions.sidePadding)
                 .onSizeChanged { intSize ->
                     with(density) {
                         dividerHeight = intSize.height.toDp() + 16.dp

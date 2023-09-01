@@ -155,6 +155,17 @@ object HtmlArticleParser {
                         }
 
                         when (tagName) {
+                            "address" -> {
+                                listener.onAddress(
+                                    HtmlElement.Address(
+                                        startIndex = startingTagEndIndex,
+                                        endIndex = lastContentIndex,
+                                        span = config.spanCount,
+                                        content = tagBody
+                                    )
+                                )
+                            }
+
                             "table" -> {
                                 listener.onTable(
                                     table = CoreHtmlArticleParser.parseTableFromText(

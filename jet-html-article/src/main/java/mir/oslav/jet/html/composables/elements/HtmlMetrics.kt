@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mir.oslav.jet.html.HtmlDimensions
+import mir.oslav.jet.html.LocalHtmlDimensions
 import mir.oslav.jet.html.data.Monitoring
 
 
@@ -61,10 +62,12 @@ private fun ValueRow(
     value: String
 ) {
 
+    val dimensions = LocalHtmlDimensions.current
+
     Row(
         modifier = Modifier
             .then(other = modifier)
-            .padding(horizontal = HtmlDimensions.sidePadding, vertical = 2.dp)
+            .padding(horizontal = dimensions.sidePadding, vertical = 2.dp)
             .then(other = modifier)
     ) {
         Text(

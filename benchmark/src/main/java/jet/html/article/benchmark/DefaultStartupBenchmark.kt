@@ -17,6 +17,8 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class DefaultStartupBenchmark constructor() {
+
+
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 

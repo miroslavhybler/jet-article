@@ -14,10 +14,9 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Card
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -38,14 +37,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import mir.oslav.jet.html.HtmlDimensions
+import mir.oslav.jet.html.LocalHtmlDimensions
 import mir.oslav.jet.html.data.HtmlElement
 
-
-private val minCellWidth: Dp = 96.dp
-private val minCellHeight: Dp = 32.dp
-
-private val maxCellWidth: Dp = 192.dp
-private val maxCellHeight: Dp = 32.dp
 
 /**
  * @since 1.0.0
@@ -58,9 +52,13 @@ fun HtmlTable(
     modifier: Modifier = Modifier,
     data: HtmlElement.Table,
 ) {
-    val typography = MaterialTheme.typography
     val density = LocalDensity.current
+    val dimensions = LocalHtmlDimensions.current.table
+
+
     val textMeasurer = rememberTextMeasurer()
+    val typography = MaterialTheme.typography
+
     val cellWidthsForColumns: SnapshotStateMap<Int, Dp> = remember { mutableStateMapOf() }
 
     val fullRowWidth by remember {
@@ -78,7 +76,7 @@ fun HtmlTable(
         modifier = modifier
             .fillMaxWidth()
             .horizontalScroll(state = rememberScrollState())
-            .padding(horizontal = HtmlDimensions.sidePadding)
+            .padding(horizontal = LocalHtmlDimensions.current.sidePadding)
             .clip(MaterialTheme.shapes.small),
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer),
     ) {
@@ -104,13 +102,13 @@ fun HtmlTable(
                             if (widthForColumn != null) {
                                 if (widthDp > widthForColumn) {
                                     cellWidthsForColumns[columnIndex] = widthDp
-                                        .coerceAtLeast(minimumValue = minCellWidth)
-                                        .coerceAtMost(maximumValue = maxCellWidth)
+                                        .coerceAtLeast(minimumValue = dimensions.minCellWidth)
+                                        .coerceAtMost(maximumValue = dimensions.maxCellWidth)
                                 }
                             } else {
                                 cellWidthsForColumns[columnIndex] = widthDp
-                                    .coerceAtLeast(minimumValue = minCellWidth)
-                                    .coerceAtMost(maximumValue = maxCellWidth)
+                                    .coerceAtLeast(minimumValue = dimensions.minCellWidth)
+                                    .coerceAtMost(maximumValue = dimensions.maxCellWidth)
                             }
                         })
 
@@ -120,14 +118,14 @@ fun HtmlTable(
                             rowIndex = rowIndex,
                             rowCount = rowValues.size,
                             modifier = Modifier.size(
-                                width = widthForColumn ?: minCellWidth,
-                                height = maxCellHeight
+                                width = widthForColumn ?: dimensions.minCellWidth,
+                                height = dimensions.maxCellHeight
                             )
                         )
                     }
                 }
 
-                HorizontalDivider(
+                Divider(
                     modifier = Modifier.width(width = with(density) {
                         fullRowWidth.toFloat().toDp() + 1.dp * columnCount
                     }),
@@ -148,13 +146,16 @@ private fun TableCell(
     rowIndex: Int,
     rowCount: Int,
 ) {
+
+    val dimensions = LocalHtmlDimensions.current.table
+
     Box(
         modifier = modifier
             .sizeIn(
-                minWidth = minCellWidth,
-                maxWidth = maxCellWidth,
-                minHeight = minCellHeight,
-                maxHeight = maxCellHeight
+                minWidth = dimensions.minCellWidth,
+                maxWidth = dimensions.maxCellWidth,
+                minHeight = dimensions.minCellHeight,
+                maxHeight = dimensions.maxCellHeight
             )
     ) {
         Text(
@@ -177,9 +178,9 @@ private fun TableCell(
 
     if (columnIndex < (rowCount - 1)) {
 
-        VerticalDivider(
+        Divider(
             modifier = Modifier
-                .size(width = 1.dp, height = maxCellHeight),
+                .size(width = 1.dp, height = dimensions.maxCellHeight),
             color = Color.Black,
             thickness = 1.dp
         )

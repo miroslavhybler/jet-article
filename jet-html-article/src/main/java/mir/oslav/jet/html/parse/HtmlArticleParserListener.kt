@@ -24,6 +24,9 @@ abstract class HtmlArticleParserListener constructor() {
 
     open fun onTable(table: HtmlElement.Table): Unit = Unit
 
+
+    open fun onAddress(address: HtmlElement.Address): Unit = Unit
+
     abstract fun onDataRequested(config: HtmlConfig, monitoring: Monitoring): HtmlData.Success
 
     abstract fun clear(): Unit

@@ -1,4 +1,4 @@
-package mir.oslav.jet.html.composables.elements
+package mir.oslav.jet.html.composables.elements.images
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -24,7 +24,6 @@ import coil.request.ImageRequest
 import coil.size.Size
 import mir.oslav.jet.html.HtmlDataSamples
 import mir.oslav.jet.html.R
-import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 
 
@@ -62,9 +61,9 @@ fun HtmlImage(
         )
     } else {
         val painter = rememberAsyncImagePainter(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(data.url)
-                .size(Size.ORIGINAL)
+            model = ImageRequest.Builder(context = LocalContext.current)
+                .data(data = data.url)
+                .size(size = Size.ORIGINAL)
                 .build()
         )
         when (painter.state) {
@@ -92,8 +91,8 @@ fun HtmlImage(
 
                     CircularProgressIndicator(
                         modifier = Modifier
-                            .size(24.dp)
-                            .align(Alignment.Center)
+                            .size(size = 24.dp)
+                            .align(alignment = Alignment.Center)
                     )
                 }
             }

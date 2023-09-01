@@ -44,6 +44,12 @@ open class LinearListener constructor() : HtmlArticleParserListener() {
         this.title = title
     }
 
+    override fun onAddress(address: HtmlElement.Address) {
+        if (!elements.contains(address)) {
+            elements.add(address)
+        }
+    }
+
 
     override fun onDataRequested(config: HtmlConfig, monitoring: Monitoring): HtmlData.Success {
         return HtmlData.Success(
