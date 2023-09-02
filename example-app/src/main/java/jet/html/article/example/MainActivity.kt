@@ -10,10 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -155,7 +152,9 @@ private fun ArticleScreen(
 
     var data: HtmlData? by remember { mutableStateOf(value = null) }
 
-    val config = remember { HtmlConfig(spanCount = 3) }
+    val config = remember {
+        HtmlConfig(spanCount = 3, topBarConfig = HtmlConfig.TopBarConfig.APPEARING)
+    }
 
     LaunchedEffect(key1 = Unit, block = {
         data = HtmlArticleParser.parse(
@@ -197,7 +196,7 @@ private fun GalleryPage(
 
 
     (data as? HtmlData.Success)?.let { htmlData ->
-        htmlData.htmlElements.filterIsInstance<HtmlElement.Constructed.Gallery>()
+        htmlData.elements.filterIsInstance<HtmlElement.Constructed.Gallery>()
             .firstOrNull()
             ?.let { gallery ->
                 JetHtmlPhotoGalleryDetailScreen(

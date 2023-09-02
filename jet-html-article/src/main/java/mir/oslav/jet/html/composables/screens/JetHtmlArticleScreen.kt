@@ -2,16 +2,9 @@ package mir.oslav.jet.html.composables.screens
 
 import android.app.Activity
 import android.util.Log
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.annotation.FloatRange
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -25,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +34,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.text.toSpannable
 import androidx.core.view.WindowCompat
@@ -56,20 +51,19 @@ import mir.oslav.jet.html.composables.BrandingFooter
 import mir.oslav.jet.html.composables.HtmlConfig
 import mir.oslav.jet.html.composables.MaterialColorPallete
 import mir.oslav.jet.html.composables.elements.HtmlAddress
-import mir.oslav.jet.html.composables.elements.images.HtmlImage
 import mir.oslav.jet.html.composables.elements.HtmlInvalid
 import mir.oslav.jet.html.composables.elements.HtmlMetrics
 import mir.oslav.jet.html.composables.elements.HtmlQuoete
 import mir.oslav.jet.html.composables.elements.HtmlTable
-import mir.oslav.jet.html.composables.elements.topbars.HtmlCollapsingTopbar
+import mir.oslav.jet.html.composables.elements.images.HtmlImage
 import mir.oslav.jet.html.composables.elements.images.HtmlPhotoGallery
 import mir.oslav.jet.html.composables.elements.topbars.HtmlTopBarSimple
 import mir.oslav.jet.html.composables.elements.topbars.rememberCollapsingTopBarState
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
-import mir.oslav.jet.html.data.HtmlHeader
 import mir.oslav.jet.html.toAnnotatedString
 import mir.oslav.jet.html.toHtml
+import kotlin.math.abs
 
 
 /**
@@ -106,6 +100,7 @@ fun JetHtmlArticleScreen(
     val topBarState = rememberCollapsingTopBarState()
 
     var elevation by remember { mutableStateOf(value = 0.dp) }
+    var alpha by remember { mutableFloatStateOf(value = 0f) }
     var topBarHeight by remember { mutableIntStateOf(value = 0) }
     var scrollOffset by remember { mutableStateOf(value = Offset.Zero) }
 
@@ -122,18 +117,39 @@ fun JetHtmlArticleScreen(
                     scrollOffset += available
                 }
 
-                val offsetDp = with(density) { scrollOffset.y.toDp() }
+                return when (config.topBarConfig) {
+                    HtmlConfig.TopBarConfig.APPEARING -> {
+                        if (topBarHeight != 0) {
+                            alpha = (abs(x = scrollOffset.y) / topBarHeight)
+                                .coerceIn(minimumValue = 0f, maximumValue = 1f)
 
-                val consumed = topBarState.collapse(
-                    available = available,
-                    scrollOffset = scrollOffset
-                )
+                            elevation = (abs(x = scrollOffset.y) / topBarHeight)
+                                .coerceIn(minimumValue = 0f, maximumValue = 6f).dp
 
-                return if (offsetDp <= dimensions.collapsingTopBar.minHeight) consumed else Offset.Zero
+                            Log.d(
+                                "mirek",
+                                "alpha: $alpha  shaddow: $elevation  scroll: ${scrollOffset.y}"
+                            )
+                        }
+                        super.onPreScroll(available = available, source = source)
+                    }
+
+                    HtmlConfig.TopBarConfig.COLLAPSING -> {
+                        val offsetDp = with(density) { scrollOffset.y.toDp() }
+
+                        val consumed = topBarState.collapse(
+                            available = available,
+                            scrollOffset = scrollOffset
+                        )
+                        return if (offsetDp <= dimensions.collapsingTopBar.minHeight) consumed else Offset.Zero
+                    }
+
+                    else -> super.onPreScroll(available = available, source = source)
+
+                }
             }
         }
     }
-
 
     LaunchedEffect(
         key1 = Unit,
@@ -162,9 +178,18 @@ fun JetHtmlArticleScreen(
         Scaffold(
             modifier = modifier
                 .fillMaxSize()
-                .nestedScroll(connection = nestedScrollConnection),
+                .nestedScroll(nestedScrollConnection),
             topBar = {
-                HtmlTopBar(data = data, navHostController = navHostController, config = config)
+                HtmlTopBar(
+                    data = data,
+                    navHostController = navHostController,
+                    config = config,
+                    backgroundAlpha = alpha,
+                    shaddow = elevation,
+                    modifier = Modifier.onSizeChanged { newSize ->
+                        topBarHeight = newSize.height
+                    }
+                )
             }
         ) { paddingValues ->
             val original = with(density) {
@@ -187,8 +212,7 @@ fun JetHtmlArticleScreen(
 
             LazyVerticalGrid(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = with(density) { topBarHeight.toDp() }),
+                    .fillMaxSize(),
                 state = gridState,
                 columns = GridCells.Fixed(count = config.spanCount),
                 contentPadding = paddingValues,
@@ -228,7 +252,7 @@ fun JetHtmlArticleScreen(
 
                             itemsIndexed(
                                 span = { index, item -> GridItemSpan(currentLineSpan = item.span) },
-                                items = data.htmlElements,
+                                items = data.elements,
                                 contentType = { intex, element -> element },
                                 key = { index, element -> index }
                             ) { index, element ->
@@ -280,203 +304,39 @@ private fun HtmlTopBar(
     data: HtmlData,
     navHostController: NavHostController,
     config: HtmlConfig,
+    @FloatRange(from = 0.0, to = 1.0) backgroundAlpha: Float = 1f,
+    shaddow: Dp = 4.dp
 ) {
     when (data) {
         is HtmlData.Success -> {
-            when (data.header) {
-                is HtmlHeader.TopBarHeader -> {
-
-                    when (config.topBarConfig) {
-                        HtmlConfig.TopBarConfig.SIMPLE -> {
-                            HtmlTopBarSimple(
-                                navHostController = navHostController,
-                                title = data.title,
-                                shadow = 4.dp,
-                                backgroundAlpha = 1f,
-                                modifier = modifier
-                            )
-                        }
-
-                        HtmlConfig.TopBarConfig.NONE -> return
-                        else -> throw IllegalStateException("Not implemented yet!")
-                        /*
-                    HtmlConfig.TopBarConfig.COLLAPSING -> {
-
-        HtmlCollapsingTopbar(
-            navHostController = navHostController,
-            title = data.title,
-            shadow = elevation,
-            //    backgroundAlpha = backgroundAlpha,
-            scrollOffset = scrollOffset,
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .onSizeChanged { size ->
-                    topBarHeight = size.height
-                },
-            state = topBarState
-        )
-
-                        }
-
-                         */
+            if (data.topBar != null) {
+                when (config.topBarConfig) {
+                    HtmlConfig.TopBarConfig.SIMPLE -> {
+                        HtmlTopBarSimple(
+                            navHostController = navHostController,
+                            title = data.title,
+                            shadow = shaddow,
+                            backgroundAlpha = backgroundAlpha,
+                            modifier = modifier
+                        )
                     }
+
+                    HtmlConfig.TopBarConfig.APPEARING -> {
+                        HtmlTopBarSimple(
+                            navHostController = navHostController,
+                            title = data.title,
+                            shadow = shaddow,
+                            backgroundAlpha = backgroundAlpha,
+                            modifier = modifier
+                        )
+                    }
+
+                    HtmlConfig.TopBarConfig.NONE -> return
+                    else -> throw IllegalStateException("Not implemented yet!")
                 }
-
-                is HtmlHeader.FullScreenHeader -> {
-
-                }
-
-                HtmlHeader.None -> {}
             }
         }
 
         else -> {}
     }
 }
-
-
-/*
-CompositionLocalProvider(
-LocalRippleTheme provides jetRippleTheme,
-LocalHtmlDimensions provides dimensions
-) {
-    Scaffold(
-        modifier = modifier
-            .fillMaxSize(),
-        topBar = {
-            when (data) {
-                is HtmlData.Success -> {
-                    when (data.header) {
-                        is HtmlHeader.TopBarHeader -> {
-                            HtmlCollapsingTopbar(
-                                navHostController = navHostController,
-                                title = data.title,
-                                shadow = elevation,
-                                //    backgroundAlpha = backgroundAlpha,
-                                scrollOffset = scrollOffset,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentHeight()
-                                    .onSizeChanged { size ->
-                                        topBarHeight = size.height
-                                    },
-                                state = topBarState
-                            )
-                        }
-                        is HtmlHeader.FullScreenHeader -> {
-
-                        }
-                        HtmlHeader.None -> {}
-                    }
-                }
-                else -> {}
-            }
-        },
-
-        content = { paddingValues ->
-
-
-            val original = with(density) {
-                (dimensions.collapsingTopBar.maxHeight - topBarHeight.toDp()).toPx()
-            }
-
-            val topPaddingExtra = with(density) {
-                original
-                    .coerceAtLeast(minimumValue = 0f)
-                    .toDp()
-            }
-
-            Log.d(
-                "mirek",
-                "extra: $topPaddingExtra  " +
-                        "original: $original  " +
-                        "maxH: ${dimensions.collapsingTopBar.maxHeight}  " +
-                        "h: ${with(density) { topBarHeight.toDp() }}"
-            )
-
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .nestedScroll(connection = nestedScrollConnection)
-                    .padding(top = topPaddingExtra) ,
-                state = listState,
-                columns = GridCells.Fixed(count = config.spanCount),
-                contentPadding = paddingValues,
-                content = {
-                    when (data) {
-                        is HtmlData.Empty -> {
-                            item(
-                                span = { GridItemSpan(currentLineSpan = config.spanCount) }
-                            ) {
-                                Text(text = "TODO empty")
-                            }
-                        }
-
-                        is HtmlData.Invalid -> {
-                            item(
-                                span = { GridItemSpan(currentLineSpan = config.spanCount) }
-                            ) {
-                                HtmlInvalid(data = data)
-                            }
-                        }
-
-                        is HtmlData.Success -> {
-                            item(
-                                span = { GridItemSpan(currentLineSpan = config.spanCount) },
-                            ) {
-                                HtmlMetrics(monitoring = data.monitoring)
-                            }
-
-                            item(
-                                span = { GridItemSpan(currentLineSpan = config.spanCount) }
-                            ) {
-                                MaterialColorPallete()
-                            }
-
-                            itemsIndexed(
-                                span = { index, item -> GridItemSpan(currentLineSpan = item.span) },
-                                items = data.htmlElements,
-                                contentType = { intex, element -> element },
-                                key = { index, element -> index }
-                            ) { index, element ->
-                                when (element) {
-                                    is HtmlElement.Image -> HtmlImage(data = element)
-                                    is HtmlElement.Quote -> HtmlQuoete(data = element)
-                                    is HtmlElement.Table -> HtmlTable(data = element)
-                                    is HtmlElement.TextBlock -> {
-                                        Text(
-                                            text = remember {
-                                                element.text.toHtml()
-                                                    .toSpannable()
-                                                    .toAnnotatedString(primaryColor = colorScheme.primary)
-                                            },
-                                            modifier = Modifier.padding(horizontal = 16.dp)
-                                        )
-                                    }
-
-                                    is HtmlElement.Gallery -> {
-                                        HtmlPhotoGallery(gallery = element)
-                                    }
-
-                                    else -> throw IllegalStateException(
-                                        "Element ${element.javaClass.simpleName} not supported yet!"
-                                    )
-                                }
-                            }
-
-
-                            item(
-                                span = { GridItemSpan(currentLineSpan = config.spanCount) }
-                            ) {
-                                BrandingFooter()
-                            }
-                        }
-                    }
-                }
-            )
-        }
-    )
-}
-
-*/

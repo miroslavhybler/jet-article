@@ -3,7 +3,6 @@ package mir.oslav.jet.html.parse.listeners
 import mir.oslav.jet.html.composables.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
-import mir.oslav.jet.html.data.HtmlHeader
 import mir.oslav.jet.html.data.Monitoring
 import mir.oslav.jet.html.parse.HtmlArticleParserListener
 
@@ -51,14 +50,18 @@ open class LinearListener constructor() : HtmlArticleParserListener() {
     }
 
 
-    override fun onDataRequested(config: HtmlConfig, monitoring: Monitoring): HtmlData.Success {
+    override fun onDataRequested(
+        config: HtmlConfig,
+        monitoring: Monitoring
+    ): HtmlData.Success {
         return HtmlData.Success(
             title = title,
-            htmlElements = ArrayList(elements),
+            elements = ArrayList(elements),
             monitoring = monitoring,
-            header = HtmlHeader.TopBarHeader(
+            topBar = HtmlElement.Constructed.TopBarHeader(
                 title = title,
-                image = elements.filterIsInstance<HtmlElement.Parsed.Image>().first()
+                image = elements.filterIsInstance<HtmlElement.Parsed.Image>().first(),
+                span = config.spanCount
             )
         )
     }

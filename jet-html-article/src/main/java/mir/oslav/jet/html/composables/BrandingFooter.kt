@@ -73,23 +73,21 @@ fun BrandingFooter(
                 iconTint = colorScheme.onBackground
             ),
 
-
-            //TODO repo url
             FooterItem(
-                title = "Github: https://github.com/miroslavhybler",
+                title = "Source Repository",
                 iconRes = R.drawable.ic_logo_github,
-                link = "https://github.com/miroslavhybler",
+                link = "https://github.com/miroslavhybler/jet-html-article",
                 iconTint = colorScheme.onBackground
             )
         )
     }
 
     if (configuration.isLandScape) {
-       if (configuration.isExtraLarge) {
-           BrandingFooterLandscapeExtraLarge(modifier = modifier, footerItems = items)
-       } else {
-           BrandingFooterLandscape(modifier = modifier, footerItems = items)
-       }
+        if (configuration.isExtraLarge) {
+            BrandingFooterLandscapeExtraLarge(modifier = modifier, footerItems = items)
+        } else {
+            BrandingFooterLandscape(modifier = modifier, footerItems = items)
+        }
     } else {
         BrandingFooterPortrait(modifier = modifier, footerItems = items)
     }
@@ -131,6 +129,10 @@ private fun BrandingFooterLandscape(
 ) {
     val dimensions = LocalHtmlDimensions.current
 
+    val gridItems = remember {
+        footerItems.chunked(size = 2)
+    }
+
     //TODO use Grid
     Column(
         modifier = modifier
@@ -138,13 +140,28 @@ private fun BrandingFooterLandscape(
             .wrapContentHeight()
             .padding(horizontal = dimensions.sidePadding, vertical = 12.dp),
     ) {
-        footerItems.forEach { item ->
-            FooterRow(
-                title = item.title,
-                iconRes = item.iconRes,
-                clickableLink = item.link,
-                iconTint = item.iconTint
-            )
+        gridItems.forEach { list ->
+            Row(modifier = Modifier.fillMaxWidth()) {
+                list.getOrNull(index = 0)?.let { item ->
+                    FooterRow(
+                        title = item.title,
+                        iconRes = item.iconRes,
+                        clickableLink = item.link,
+                        iconTint = item.iconTint,
+                        modifier = Modifier.weight(weight = 1f)
+                    )
+                }
+
+                list.getOrNull(index = 1)?.let { item ->
+                    FooterRow(
+                        title = item.title,
+                        iconRes = item.iconRes,
+                        clickableLink = item.link,
+                        iconTint = item.iconTint,
+                        modifier = Modifier.weight(weight = 1f)
+                    )
+                }
+            }
         }
     }
 }

@@ -1,5 +1,7 @@
 package mir.oslav.jet.html.data
 
+import androidx.core.text.buildSpannedString
+
 
 /**
  * @since 1.0.0
@@ -103,7 +105,7 @@ sealed class HtmlElement private constructor(
 
 
     /**
-     * TODO docs
+     * TODO docs, alternative data constructed from the parsed elements
      * @since 1.0.0
      */
     sealed class Constructed private constructor(
@@ -117,5 +119,15 @@ sealed class HtmlElement private constructor(
             val images: List<Parsed.Image>,
             override val span: Int,
         ) : Constructed(span = span)
+
+
+        /**
+         * @since 1.0.0
+         */
+        data class TopBarHeader constructor(
+            val title: String,
+            val image: Parsed.Image?,
+            override val span: Int,
+            ) : Constructed(span = span)
     }
 }

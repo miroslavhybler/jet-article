@@ -3,7 +3,6 @@ package mir.oslav.jet.html.parse.listeners
 import mir.oslav.jet.html.composables.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
-import mir.oslav.jet.html.data.HtmlHeader
 import mir.oslav.jet.html.data.Monitoring
 
 
@@ -20,16 +19,15 @@ class GalleryGroupingListener constructor() : LinearListener() {
 
         return HtmlData.Success(
             title = title,
-            htmlElements = ArrayList<HtmlElement>().apply {
+            elements = ArrayList<HtmlElement>().apply {
                 add(gallery)
                 addAll(elements)
             },
-            header = if (images.isNotEmpty()) {
-                HtmlHeader.TopBarHeader(
-                    title = title,
-                    image = images.first()
-                )
-            } else HtmlHeader.None,
+            topBar = HtmlElement.Constructed.TopBarHeader(
+                title = title,
+                image = images.firstOrNull(),
+                span = config.spanCount
+            ),
             monitoring = monitoring
         )
     }
