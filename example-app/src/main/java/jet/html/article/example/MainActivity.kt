@@ -2,6 +2,7 @@ package jet.html.article.example
 
 import android.os.Bundle
 import android.view.View
+import android.view.WindowInsets.Side
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +17,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,15 +25,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.updatePadding
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import jet.html.article.example.ui.theme.JetHtmlArticleExampleTheme
-import mir.oslav.jet.html.composables.HtmlConfig
+import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.composables.screens.JetHtmlArticleScreen
 import mir.oslav.jet.html.composables.screens.JetHtmlPhotoGalleryDetailScreen
 import mir.oslav.jet.html.data.HtmlData
@@ -46,9 +52,46 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //  WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
+            val view = LocalView.current
+            requestInsets(view = view)
+
+
+            SideEffect {
+                requestInsets(view = view)
+                ViewCompat.setOnApplyWindowInsetsListener(view) { view, insets ->
+                    if (view.findFocus() == null) {
+                        val bottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+                        view.updatePadding(bottom = bottom)
+                    }
+                    insets
+                }
+                ViewCompat.setWindowInsetsAnimationCallback(
+                    view, object : WindowInsetsAnimationCompat.Callback(
+                        DISPATCH_MODE_STOP
+                    ) {
+                        override fun onStart(
+                            animation: WindowInsetsAnimationCompat,
+                            bounds: WindowInsetsAnimationCompat.BoundsCompat
+                        ): WindowInsetsAnimationCompat.BoundsCompat {
+                            return super.onStart(animation, bounds)
+                        }
+
+                        override fun onProgress(
+                            insets: WindowInsetsCompat,
+                            runningAnimations: MutableList<WindowInsetsAnimationCompat>,
+                        ): WindowInsetsCompat {
+                            val bottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+                            view.updatePadding(bottom = bottom)
+                            return insets
+                        }
+                    }
+                )
+
+            }
+
             JetHtmlArticleExampleTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -90,7 +133,6 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, view)
             .show(WindowInsetsCompat.Type.systemBars())
-
     }
 }
 
@@ -153,7 +195,10 @@ private fun ArticleScreen(
     var data: HtmlData? by remember { mutableStateOf(value = null) }
 
     val config = remember {
-        HtmlConfig(spanCount = 3, topBarConfig = HtmlConfig.TopBarConfig.APPEARING)
+        HtmlConfig(
+            spanCount = 3,
+            topBarConfig = HtmlConfig.TopBarConfig.COLLAPSING
+        )
     }
 
     LaunchedEffect(key1 = Unit, block = {

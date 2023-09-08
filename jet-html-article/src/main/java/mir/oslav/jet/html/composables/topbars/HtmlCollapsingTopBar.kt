@@ -1,10 +1,11 @@
-package mir.oslav.jet.html.composables.elements.topbars
+package mir.oslav.jet.html.composables.topbars
 
 import android.util.Log
 import androidx.annotation.FloatRange
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.layout.Box
@@ -15,13 +16,11 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,10 +28,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,7 +45,11 @@ import androidx.navigation.compose.rememberNavController
 import mir.oslav.jet.html.HtmlDimensions
 import mir.oslav.jet.html.LocalHtmlDimensions
 import mir.oslav.jet.html.R
-import kotlin.math.roundToInt
+import mir.oslav.jet.utils.pxToDp
+import mir.oslav.jet.utils.statusBarsPadding
+import kotlin.math.absoluteValue
+import kotlin.math.max
+import kotlin.math.min
 
 
 /**
@@ -56,12 +58,10 @@ import kotlin.math.roundToInt
  * created on 27.08.2023
  */
 @Composable
-fun HtmlCollapsingTopbar(
+fun HtmlCollapsingTopBar(
     modifier: Modifier = Modifier,
     navHostController: NavHostController,
     title: String,
-    shadow: Dp,
-    scrollOffset: Offset,
     state: CollapsingTopBarState,
 ) {
     val typography = MaterialTheme.typography
@@ -83,7 +83,7 @@ fun HtmlCollapsingTopbar(
     val topbarDimens = dimensions.collapsingTopBar
 
 
-    val maxTitleOffset = dimensions.collapsingTopBar.maxHeight + (textHeight * 4)
+    val maxTitleOffset = dimensions.collapsingTopBar.maxHeight - (textHeight * 2) - 16.dp
     val maxTitleOffsetPx = with(density) { maxTitleOffset.toPx() }
 
 
@@ -94,14 +94,17 @@ fun HtmlCollapsingTopbar(
                 min = dimensions.collapsingTopBar.minHeight,
                 max = dimensions.collapsingTopBar.maxHeight
             )
-            .statusBarsPadding()
-            .background(color = Color.Blue.copy(alpha = 0.4f))
-            .padding(horizontal = dimensions.sidePadding)
             .shadow(
-                elevation = shadow,
-                spotColor = MaterialTheme.colorScheme.onBackground
+                elevation = 4.dp,
+                spotColor = MaterialTheme.colorScheme.onBackground,
+                shape = RectangleShape
             )
-            .clipToBounds()
+            .background(color = MaterialTheme.colorScheme.background)
+            .padding(
+                start = dimensions.sidePadding,
+                end = dimensions.sidePadding,
+                top = density.statusBarsPadding()
+            )
     ) {
         Box(
             modifier = Modifier
@@ -121,9 +124,6 @@ fun HtmlCollapsingTopbar(
             )
         }
 
-
-        Log.d("mirek", "Box: ${state.height}")
-
         Box(
             modifier = Modifier
                 .align(alignment = Alignment.Center)
@@ -131,18 +131,23 @@ fun HtmlCollapsingTopbar(
                 .height(height = state.height)
         ) {
 
+            val paddingFromIcon = dimensions.clickableIconSize * (state.progress)
+
             Text(
                 text = title,
                 style = MaterialTheme.typography.headlineSmall,
-                maxLines = 2,
+                maxLines = if (state.progress == 1f) 1 else 2,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
+                    .align(alignment = Alignment.Center)
                     .padding(
                         start = 8.dp,
-                        end = (dimensions.sidePadding)
-                            .coerceAtLeast(minimumValue = 0.dp)
+                        end = dimensions.sidePadding + paddingFromIcon
                     )
-                    .offset(y = state.height - textHeight * 2)
+                    .offset(
+                        x = paddingFromIcon,
+                        y = 44.dp * (1f - state.progress)
+                    )
                     .fillMaxWidth()
 
             )
@@ -151,41 +156,97 @@ fun HtmlCollapsingTopbar(
 }
 
 
+/**
+ * @since 1.0.0
+ */
 class CollapsingTopBarState internal constructor(
     topBarDimens: HtmlDimensions.CollapsingTopBar,
     val density: Density,
-) {
+) : HtmlTopBarState, ScrollableState {
 
-    private val maxHeight = topBarDimens.maxHeight
-    private val minHeight = topBarDimens.minHeight
-    private val maxHeightPx = with(density) { maxHeight.toPx() }
-    private val minHeightPx = with(density) { minHeight.toPx() }
+    override val maxHeight = topBarDimens.maxHeight
+    override val minHeight = topBarDimens.minHeight
+    override val maxHeightPx = with(density) { maxHeight.toPx() }
+    override val minHeightPx = with(density) { minHeight.toPx() }
 
-    var height: Dp by mutableStateOf(value = maxHeight)
-    val heightPx: Float get() = with(density) { height.toPx() }
-
-
-    val progress: Float
-        @FloatRange(
-            from = 0.0,
-            to = 1.0
-        ) get() = (heightPx - minHeightPx) / (maxHeightPx - minHeightPx)
+    private var threshold: Float = 0f
 
 
-    fun collapse(scrollOffset: Offset, available: Offset): Offset {
-        height = with(density) {
-            (maxHeightPx + scrollOffset.y)
-                .coerceAtMost(maximumValue = maxHeightPx)
-                .coerceAtLeast(minimumValue = minHeightPx)
-                .toDp()
+    override var height: Dp by mutableStateOf(value = maxHeight)
+    override val heightPx: Float get() = with(density) { height.toPx() }
+
+
+    /**
+     * Progress of collapsing, 0f when topBar has max height, 1f when collapse is complete and topBar
+     * has min height
+     * @since 1.0.0
+     */
+    @FloatRange(from = 0.0, to = 1.0)
+    var progress: Float = 0f
+        private set
+
+    override val isScrollInProgress: Boolean
+        get() = scrollableState.isScrollInProgress
+
+
+    private val scrollableState = ScrollableState { value ->
+        val toConsume = if (value < 0) {
+            max(a = minHeightPx - heightPx, b = value)
+        } else {
+            min(a = maxHeightPx - heightPx, b = value)
         }
-        val consumed = if (heightPx < minHeightPx) available else Offset.Zero
 
-        return consumed
+        val current = toConsume + threshold
+        val currentInt = current.toInt()
+
+        if (current.absoluteValue > 0) {
+            height += density.pxToDp(px = currentInt)
+            threshold = current - currentInt
+        }
+
+        val ratio = (heightPx - minHeightPx) / (maxHeightPx - minHeightPx)
+        val rawProgress = 1f - ratio
+        val coercesProgress = rawProgress.coerceIn(
+            minimumValue = 0f,
+            maximumValue = 1f
+        )
+
+        progress = if (coercesProgress < 0.001f) 0f else coercesProgress
+        toConsume
+    }
+
+
+    override suspend fun scroll(
+        scrollPriority: MutatePriority,
+        block: suspend ScrollScope.() -> Unit
+    ) {
+        scrollableState.scroll(scrollPriority = scrollPriority, block = block)
+    }
+
+    override fun dispatchRawDelta(delta: Float): Float {
+        return scrollableState.dispatchRawDelta(delta = delta)
+    }
+
+
+    suspend fun fling(
+        flingBehavior: FlingBehavior,
+        velocity: Float
+    ): Float {
+        var left = velocity
+        scroll {
+            with(flingBehavior) {
+                left = performFling(left)
+            }
+        }
+
+        return left
     }
 }
 
 
+/**
+ * @since 1.0.0
+ */
 @Composable
 fun rememberCollapsingTopBarState(): CollapsingTopBarState {
     val density = LocalDensity.current
@@ -200,24 +261,24 @@ fun rememberCollapsingTopBarState(): CollapsingTopBarState {
     }
 }
 
+
+/**
+ * @since 1.0.0
+ */
 @Composable
 @Preview(showBackground = true)
 private fun SimplePreview() {
 
     Column {
-        HtmlCollapsingTopbar(
+        HtmlCollapsingTopBar(
             title = "Build better apps faster with Jetpack Compose and androidX",
             navHostController = rememberNavController(),
-            shadow = Dp.Unspecified,
-            scrollOffset = Offset.Zero,
             state = rememberCollapsingTopBarState()
         )
 
-        HtmlCollapsingTopbar(
+        HtmlCollapsingTopBar(
             title = "Build better apps faster with Jetpack Compose and androidX",
             navHostController = rememberNavController(),
-            shadow = Dp.Unspecified,
-            scrollOffset = Offset.Zero,
             state = rememberCollapsingTopBarState()
         )
     }

@@ -20,6 +20,7 @@ sealed class HtmlData private constructor(
     /**
      * @since 1.0.0
      */
+    //TODO maybe background support
     data class Success constructor(
         override val title: String,
         val elements: List<HtmlElement>,

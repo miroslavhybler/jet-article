@@ -3,12 +3,11 @@ package mir.oslav.jet.html.parse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mir.oslav.jet.html.HtmlConstants
-import mir.oslav.jet.html.composables.HtmlConfig
+import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.data.IgnoreOptions
 import mir.oslav.jet.html.data.Monitoring
-import mir.oslav.jet.html.normalizedUrl
 import mir.oslav.jet.html.parse.CoreHtmlArticleParser.indexOfSubstring
 import mir.oslav.jet.html.parse.listeners.GalleryGroupingListener
 

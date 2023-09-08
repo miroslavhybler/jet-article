@@ -1,4 +1,4 @@
-package mir.oslav.jet.html.composables.elements.images
+package mir.oslav.jet.html.composables.elements
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box

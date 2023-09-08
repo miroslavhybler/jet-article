@@ -1,6 +1,6 @@
 package mir.oslav.jet.html.parse.listeners
 
-import mir.oslav.jet.html.composables.HtmlConfig
+import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.data.Monitoring

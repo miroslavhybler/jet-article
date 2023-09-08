@@ -8,10 +8,31 @@ package mir.oslav.jet.html
 object HtmlConstants {
 
 
+
+    /**
+     * List of supported pair html tags that are styling text, others are ignored.
+     * @since 1.0.0
+     */
+    val styledTags: List<String> = listOf(
+        "b",
+        "strong",
+        "i",
+        "a",
+        "u",
+    )
+
+
     /**
      * List of supported pair html tags. Other tags are ignored.
      * @since 1.0.0
      */
+    //TODO try code
+    //TODO try area
+    //TODO cite
+    //TODO try details
+    //TODO mark
+
+    //TODO check s (stroke)
     val pairTags: List<String> = listOf(
 
         /*
@@ -25,29 +46,11 @@ object HtmlConstants {
         */
 
         "p",
-        "b",
-        "strong",
-        "i",
-        "a",
-        "u",
         "blockquote",
         "table",
         "title",
         "address",
-    )
-
-
-    /**
-     * List of pair html tags that are styling text, others are ignored.
-     * @since 1.0.0
-     */
-    val styledTags: List<String> = listOf(
-        "b",
-        "strong",
-        "i",
-        "a",
-        "u",
-    )
+    ) + styledTags
 
 
     /**

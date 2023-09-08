@@ -42,6 +42,9 @@ internal class HtmlDimensions constructor() {
     //Holding dimensions for CollapsingTopBar
     val collapsingTopBar: CollapsingTopBar = CollapsingTopBar()
 
+    //
+    val simpleTopBar: SimpleTopBar = SimpleTopBar()
+
     val table: Table = Table()
 
 
@@ -98,6 +101,12 @@ internal class HtmlDimensions constructor() {
         var minHeight: Dp = 56.dp,
         var maxHeight: Dp = 226.dp,
     )
+
+    internal data class SimpleTopBar constructor(
+        var minHeight: Dp = 56.dp,
+        var maxHeight: Dp = 56.dp,
+    )
+
 
     internal data class Table constructor(
         val minCellWidth: Dp = 96.dp,

@@ -1,4 +1,4 @@
-package mir.oslav.jet.html.composables.elements.images
+package mir.oslav.jet.html.composables
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -14,8 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import mir.oslav.jet.html.HtmlDimensions
 import mir.oslav.jet.html.LocalHtmlDimensions
+import mir.oslav.jet.html.composables.elements.HtmlImage
 import mir.oslav.jet.html.data.HtmlElement
 
 

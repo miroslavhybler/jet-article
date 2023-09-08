@@ -1,9 +1,7 @@
 package mir.oslav.jet.html.parse
 
-import android.util.Log
-import mir.oslav.jet.html.composables.HtmlConfig
+import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlElement
-import mir.oslav.jet.html.normalizedAttributeValue
 import mir.oslav.jet.html.normalizedUrl
 
 
