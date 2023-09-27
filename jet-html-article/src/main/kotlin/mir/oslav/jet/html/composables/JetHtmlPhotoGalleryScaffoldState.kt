@@ -12,6 +12,7 @@ import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -125,7 +126,7 @@ data class JetHtmlPhotoGalleryScaffoldState internal constructor(
     public val heightPx: Float get() = density.dpToPx(dp = height)
 
     //TODO set sheeet height from this class and make private setter
-    var sheetHeight by mutableStateOf(
+    var sheetHeight by mutableIntStateOf(
         value = density.dpToPx(dp = 75.dp + navigationBarPadding).toInt()
     )
 
@@ -137,7 +138,7 @@ public fun rememberJetHtmlPhotoGalleryScaffoldState(
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     density: Density = LocalDensity.current,
     configuration: Configuration = LocalConfiguration.current,
-    dimensions: HtmlDimensions = LocalHtmlDimensions.current
+    dimensions: HtmlDimensions
 ): JetHtmlPhotoGalleryScaffoldState {
     val navigationBarPadding = density.navigationBarsPadding()
     val statusBarPadding = density.statusBarsPadding()

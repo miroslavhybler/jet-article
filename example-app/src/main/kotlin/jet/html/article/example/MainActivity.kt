@@ -2,7 +2,6 @@ package jet.html.article.example
 
 import android.os.Bundle
 import android.view.View
-import android.view.WindowInsets.Side
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -45,8 +44,9 @@ import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.parse.HtmlArticleParser
 
 /**
+ *
  * @author Miroslav Hýbler <br>
- * created on 25.08.2023
+ * created on 25.08.2023xc
  */
 class MainActivity : ComponentActivity() {
 
@@ -118,7 +118,7 @@ class MainActivity : ComponentActivity() {
 
                         composable(route = "article/default/gallery") {
                             GalleryPage(
-                                article = "gallery",
+                                article = "default",
                                 navHostController = navController
                             )
                         }
@@ -246,7 +246,8 @@ private fun GalleryPage(
             ?.let { gallery ->
                 JetHtmlPhotoGalleryDetailScreen(
                     gallery = gallery,
-                    navHostController = navHostController
+                    navHostController = navHostController,
+                    monitoring = htmlData.metrics
                 )
             }
     }

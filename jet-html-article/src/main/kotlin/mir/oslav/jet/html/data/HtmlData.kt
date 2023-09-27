@@ -25,7 +25,7 @@ sealed class HtmlData private constructor(
         override val title: String,
         val elements: List<HtmlElement>,
         val topBar: HtmlElement.Constructed.TopBarHeader?,
-        val monitoring: Monitoring,
+        val metrics: ParseMetrics,
     ) : HtmlData(title = title)
 
 

@@ -211,7 +211,11 @@ class CollapsingTopBarState internal constructor(
             maximumValue = 1f
         )
 
-        progress = if (coercesProgress < 0.001f) 0f else coercesProgress
+        progress = when {
+            coercesProgress < 0.007f -> 0f
+            coercesProgress > 0.993 -> 1f
+            else -> coercesProgress
+        }
         toConsume
     }
 

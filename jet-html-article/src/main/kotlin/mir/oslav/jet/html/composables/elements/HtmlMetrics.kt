@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,9 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import mir.oslav.jet.html.HtmlDimensions
 import mir.oslav.jet.html.LocalHtmlDimensions
-import mir.oslav.jet.html.data.Monitoring
+import mir.oslav.jet.html.data.ParseMetrics
 
 
 /**
@@ -24,10 +24,12 @@ import mir.oslav.jet.html.data.Monitoring
 @Composable
 fun HtmlMetrics(
     modifier: Modifier = Modifier,
-    monitoring: Monitoring
+    monitoring: ParseMetrics
 ) {
     Column(
         modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
             .background(color = MaterialTheme.colorScheme.secondaryContainer)
             .then(other = modifier)
     ) {
@@ -93,7 +95,7 @@ private fun ValueRow(
 private fun HtmlMetricsPreview() {
 
     HtmlMetrics(
-        monitoring = Monitoring(
+        monitoring = ParseMetrics(
             startTime = System.currentTimeMillis() - 3230L,
             endTime = System.currentTimeMillis(),
             usedTags = 100,

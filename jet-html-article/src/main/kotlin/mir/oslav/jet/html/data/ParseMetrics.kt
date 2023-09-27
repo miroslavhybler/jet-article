@@ -7,7 +7,7 @@ package mir.oslav.jet.html.data
  * @author Miroslav Hýbler <br>
  * created on 25.08.2023
  */
-data class Monitoring constructor(
+data class ParseMetrics constructor(
     val startTime: Long,
     val endTime: Long,
     val averageDurationPerTag: Double,

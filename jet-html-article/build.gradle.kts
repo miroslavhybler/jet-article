@@ -1,11 +1,12 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("com.google.devtools.ksp")
 }
 
 android {
     namespace = "mir.oslav.jet.html"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 21
@@ -47,14 +48,14 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.0"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
 }
 
 dependencies {
 
     implementation("mir.oslav.jet:annotations:1.0.0")
-    implementation("mir.oslav.jet:utils:1.0.0")
+    implementation("mir.oslav.jet:utils:1.0.1")
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
@@ -65,10 +66,10 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.animation:animation-graphics:1.5.1")
-    implementation("androidx.compose.material:material:1.6.0-alpha05")
-    implementation("androidx.compose.material3:material3:1.1.1")
-    implementation("androidx.compose.material3:material3-window-size-class:1.1.1")
-    implementation("androidx.navigation:navigation-compose:2.7.2")
+    implementation("androidx.compose.material:material:1.6.0-alpha06")
+    implementation("androidx.compose.material3:material3:1.1.2")
+    implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
+    implementation("androidx.navigation:navigation-compose:2.7.3")
 
 
     /** Accompanist & Experimental */
@@ -77,6 +78,8 @@ dependencies {
 
     implementation("io.coil-kt:coil-compose:2.4.0")
     implementation("com.google.android.material:material:1.9.0")
+    implementation("net.danlew:android.joda:2.12.5")
+
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

@@ -7,7 +7,7 @@ import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.data.IgnoreOptions
-import mir.oslav.jet.html.data.Monitoring
+import mir.oslav.jet.html.data.ParseMetrics
 import mir.oslav.jet.html.parse.CoreHtmlArticleParser.indexOfSubstring
 import mir.oslav.jet.html.parse.listeners.GalleryGroupingListener
 
@@ -246,7 +246,7 @@ object HtmlArticleParser {
             }
         }
 
-        val monitoring = Monitoring(
+        val monitoring = ParseMetrics(
             startTime = startTime,
             endTime = System.currentTimeMillis(),
             ignoredTags = ignoredTags,

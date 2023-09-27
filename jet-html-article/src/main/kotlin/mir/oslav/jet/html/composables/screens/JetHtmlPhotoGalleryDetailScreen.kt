@@ -56,7 +56,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -67,11 +66,12 @@ import mir.oslav.jet.html.LocalHtmlDimensions
 import mir.oslav.jet.html.composables.JetHtmlPhotoGalleryScaffold
 import mir.oslav.jet.html.composables.JetHtmlPhotoGalleryScaffoldState
 import mir.oslav.jet.html.composables.elements.HtmlImage
+import mir.oslav.jet.html.composables.elements.HtmlMetrics
 import mir.oslav.jet.html.composables.rememberJetHtmlPhotoGalleryScaffoldState
 import mir.oslav.jet.html.data.HtmlElement
+import mir.oslav.jet.html.data.ParseMetrics
 import mir.oslav.jet.utils.dpToPx
 import mir.oslav.jet.utils.navigationBarsPadding
-import mir.oslav.jet.utils.navigationBarsPaddingPx
 import mir.oslav.jet.utils.pxToDp
 import mir.oslav.jet.utils.statusBarsPadding
 
@@ -84,9 +84,10 @@ import mir.oslav.jet.utils.statusBarsPadding
 fun JetHtmlPhotoGalleryDetailScreen(
     modifier: Modifier = Modifier,
     gallery: HtmlElement.Constructed.Gallery,
+    monitoring: ParseMetrics,
     navHostController: NavHostController,
-
-    ) {
+    initialPage: Int = 0,
+) {
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
 
@@ -105,7 +106,7 @@ fun JetHtmlPhotoGalleryDetailScreen(
         }
     }
 
-    val scaffoldState = rememberJetHtmlPhotoGalleryScaffoldState()
+    val scaffoldState = rememberJetHtmlPhotoGalleryScaffoldState(dimensions = dimensions)
     val systemUiController = rememberSystemUiController()
     val coroutineScope = rememberCoroutineScope()
 
@@ -118,7 +119,7 @@ fun JetHtmlPhotoGalleryDetailScreen(
     val bottomSheetHeightPx by remember { derivedStateOf { scaffoldState.sheetHeight } }
     var sheetElevation: Dp by remember { mutableStateOf(value = 0.dp) }
 
-    val pagerState = rememberPagerState(initialPage = 0) {
+    val pagerState = rememberPagerState(initialPage = initialPage) {
         gallery.images.size
     }
 
@@ -219,14 +220,17 @@ private fun GridGallery(
                 //TODO disable drag under the status bar
                 detectDragGestures { change, dragAmount ->
                     isGalleryScrollEnabled = false
-                    change.consume()
                     state.sheetHeight = (state.sheetHeight + (dragAmount.y * -1f))
                         .coerceIn(
                             minimumValue = state.minSheetHeightPx,
                             maximumValue = state.maxSheetHeightPx
                         )
                         .toInt()
-                    isGalleryScrollEnabled = true
+                    isGalleryScrollEnabled = state.sheetHeight >= state.minSheetHeightPx
+
+                    if (isGalleryScrollEnabled) {
+                        change.consume()
+                    }
                 }
             }
     ) {
@@ -283,15 +287,13 @@ private fun GridGallery(
     }
 }
 
-
-//TODO initial page
 @Composable
 private fun HorizontalPagerGallery(
     modifier: Modifier = Modifier,
     gallery: HtmlElement.Constructed.Gallery,
     imageScale: Float,
     imageOffsetY: Float,
-    pagerState: PagerState
+    pagerState: PagerState,
 ) {
 
 
