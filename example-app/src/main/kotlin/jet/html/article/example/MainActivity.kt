@@ -36,9 +36,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import jet.html.article.example.ui.theme.JetHtmlArticleExampleTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import mir.oslav.jet.html.data.HtmlConfig
-import mir.oslav.jet.html.composables.screens.JetHtmlArticleScreen
-import mir.oslav.jet.html.composables.screens.JetHtmlPhotoGalleryDetailScreen
+import mir.oslav.jet.html.composables.screens.JetHtmlArticle
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.parse.HtmlArticleParser
@@ -104,24 +105,9 @@ class MainActivity : ComponentActivity() {
                         startDestination = "home",
                         modifier = Modifier.fillMaxSize()
                     ) {
-
-                        composable(route = "home") {
-                            HomePage(navHostController = navController)
-                        }
-
-                        composable(route = "article/default") {
-                            ArticleScreen(
-                                article = "default",
-                                navHostController = navController
-                            )
-                        }
-
-                        composable(route = "article/default/gallery") {
-                            GalleryPage(
-                                article = "default",
-                                navHostController = navController
-                            )
-                        }
+                        composable(route = "home") { HomePage(navHostController = navController) }
+                        composable(route = "default") { ArticleScreen(article = "default") }
+                        composable(route = "mapbox") { ArticleScreen(article = "mapbox") }
                     }
                 }
             }
@@ -149,17 +135,16 @@ private fun HomePage(navHostController: NavHostController) {
 
         Button(
             onClick = {
-                navHostController.navigate(route = "article/default")
+                navHostController.navigate(route = "default")
             }, content = {
                 Text(text = "Default")
             }
         )
-
         Button(
             onClick = {
-                navHostController.navigate(route = "article/default/gallery")
+                navHostController.navigate(route = "mapbox")
             }, content = {
-                Text(text = "Gallery")
+                Text(text = "Mapbox docs")
             }
         )
 
@@ -183,7 +168,6 @@ private fun HomePage(navHostController: NavHostController) {
 @Composable
 private fun ArticleScreen(
     article: String,
-    navHostController: NavHostController
 ) {
 
     val assets = LocalContext.current.assets
@@ -195,60 +179,22 @@ private fun ArticleScreen(
     var data: HtmlData? by remember { mutableStateOf(value = null) }
 
     val config = remember {
-        HtmlConfig(
-            spanCount = 3,
-            topBarConfig = HtmlConfig.TopBarConfig.COLLAPSING
-        )
+        HtmlConfig(spanCount = 3)
     }
 
     LaunchedEffect(key1 = Unit, block = {
-        data = HtmlArticleParser.parse(
-            content = getArticle(fileName = article),
-            config = config
-        )
+        data = withContext(Dispatchers.Default) {
+            HtmlArticleParser.parse(
+                content = getArticle(fileName = article),
+                config = config
+            )
+        }
     })
 
     data?.let {
-        JetHtmlArticleScreen(
+        JetHtmlArticle(
             data = it,
             config = config,
-            navHostController = navHostController
         )
-    }
-}
-
-@Composable
-private fun GalleryPage(
-    article: String,
-    navHostController: NavHostController
-) {
-    val assets = LocalContext.current.assets
-
-    fun getArticle(fileName: String): String {
-        return String(assets.open("simple-examples/${fileName}.html").readBytes())
-    }
-
-    var data: HtmlData? by remember { mutableStateOf(value = null) }
-
-    val config = remember { HtmlConfig(spanCount = 3) }
-
-    LaunchedEffect(key1 = Unit, block = {
-        data = HtmlArticleParser.parse(
-            content = getArticle(fileName = article),
-            config = config
-        )
-    })
-
-
-    (data as? HtmlData.Success)?.let { htmlData ->
-        htmlData.elements.filterIsInstance<HtmlElement.Constructed.Gallery>()
-            .firstOrNull()
-            ?.let { gallery ->
-                JetHtmlPhotoGalleryDetailScreen(
-                    gallery = gallery,
-                    navHostController = navHostController,
-                    monitoring = htmlData.metrics
-                )
-            }
     }
 }

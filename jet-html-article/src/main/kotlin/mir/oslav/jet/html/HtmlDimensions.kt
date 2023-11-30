@@ -40,45 +40,29 @@ class HtmlDimensions constructor() {
     var bottomLinePadding: Dp = 22.dp
 
 
-    //Holding dimensions for CollapsingTopBar
-    val collapsingTopBar: CollapsingTopBar = CollapsingTopBar()
-
-    //
-    val simpleTopBar: SimpleTopBar = SimpleTopBar()
-
-
-    val gallery: Gallery = Gallery()
-
-
     val table: Table = Table()
 
 
     /**
      * @since 1.0.0
      */
-    //TODO init table, tobpar, gallery
+    //TODO init table,
     fun init(
         configuration: Configuration,
         screenWidth: Dp,
         screenHeight: Dp,
-        statusBarHeight: Dp,
-        navigationBarHeight: Dp
     ) {
         if (configuration.isLandScape) {
             setupLandscapeValues(
                 configuration = configuration,
                 screenWidth = screenWidth,
                 screenHeight = screenHeight,
-                statusBarHeight = statusBarHeight,
-                navigationBarHeight = navigationBarHeight
             )
         } else {
             setupPortraitValues(
                 configuration = configuration,
                 screenWidth = screenWidth,
                 screenHeight = screenHeight,
-                statusBarHeight = statusBarHeight,
-                navigationBarHeight = navigationBarHeight
             )
         }
     }
@@ -91,8 +75,6 @@ class HtmlDimensions constructor() {
         configuration: Configuration,
         screenWidth: Dp,
         screenHeight: Dp,
-        statusBarHeight: Dp,
-        navigationBarHeight: Dp
     ) {
         when {
             configuration.isExtraLarge -> {
@@ -115,8 +97,6 @@ class HtmlDimensions constructor() {
         configuration: Configuration,
         screenWidth: Dp,
         screenHeight: Dp,
-        statusBarHeight: Dp,
-        navigationBarHeight: Dp
     ) {
         when {
             configuration.isExtraLarge -> {
@@ -128,12 +108,6 @@ class HtmlDimensions constructor() {
             else -> {
                 sidePadding = 16.dp
                 topLinePadding = 24.dp
-
-                gallery.run {
-                    val maxPhotosInRow = 4f
-                    sheetCollapsedHeight = 56.dp + navigationBarHeight
-                    sheetPartiallyExpandedHeight = sheetCollapsedHeight + (screenWidth / maxPhotosInRow)
-                }
             }
         }
     }

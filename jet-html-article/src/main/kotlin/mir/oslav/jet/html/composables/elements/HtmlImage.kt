@@ -89,11 +89,14 @@ fun HtmlImage(
                         .then(other = modifier)
                 ) {
 
+                    /*
                     CircularProgressIndicator(
                         modifier = Modifier
                             .size(size = 24.dp)
                             .align(alignment = Alignment.Center)
                     )
+
+                     */
                 }
             }
 

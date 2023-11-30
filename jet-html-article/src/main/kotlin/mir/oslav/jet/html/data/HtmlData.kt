@@ -37,4 +37,12 @@ sealed class HtmlData private constructor(
         val message: String,
         val exception: Exception,
     ) : HtmlData(title = title)
+
+
+    /**
+     * @since 1.0.0
+     */
+    data class Loading constructor(
+        val message: String,
+    ) : HtmlData(title = message)
 }

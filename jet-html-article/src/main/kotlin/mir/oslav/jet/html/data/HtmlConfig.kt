@@ -1,16 +1,11 @@
 package mir.oslav.jet.html.data
 
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import mir.oslav.jet.html.composables.AppearingTopBarScrollConnection
-import mir.oslav.jet.html.composables.CollapsingTopBarScrollConnection
-import mir.oslav.jet.html.composables.EmptyScrollConnection
-import mir.oslav.jet.html.composables.JetHtmlArticleScaffoldState
 
 
 /**
  * TODO docs
  * @param spanCount Defines the max span count (max column count)
- * @param topBarConfig Defines the look and behaviour of TopBar
  * @param domain Fallback domain name for loading resources
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
@@ -18,84 +13,7 @@ import mir.oslav.jet.html.composables.JetHtmlArticleScaffoldState
  */
 data class HtmlConfig constructor(
     val spanCount: Int = 1,
-    val topBarConfig: TopBarConfig = TopBarConfig.SIMPLE,
     val domain: String? = null
 ) {
-
-
-    /**
-     * @since 1.0.0
-     */
-    enum class TopBarConfig {
-
-
-        /**
-         * @since 1.0.0
-         */
-        NONE {
-            override fun createScrollConnection(
-                scaffoldState: JetHtmlArticleScaffoldState
-            ): NestedScrollConnection {
-                return EmptyScrollConnection
-            }
-        },
-
-
-        /**
-         * @since 1.0.0
-         */
-        SIMPLE {
-            override fun createScrollConnection(
-                scaffoldState: JetHtmlArticleScaffoldState
-            ): NestedScrollConnection {
-                return EmptyScrollConnection
-            }
-        },
-
-
-        /**
-         * @since 1.0.0
-         */
-        APPEARING {
-            override fun createScrollConnection(
-                scaffoldState: JetHtmlArticleScaffoldState
-            ): NestedScrollConnection {
-                return AppearingTopBarScrollConnection(scaffoldState = scaffoldState)
-            }
-        },
-
-
-        /**
-         * @since 1.0.0
-         */
-        COLLAPSING {
-            override fun createScrollConnection(
-                scaffoldState: JetHtmlArticleScaffoldState
-            ): NestedScrollConnection {
-                return CollapsingTopBarScrollConnection(scaffoldState = scaffoldState)
-            }
-        },
-
-
-        /**
-         * @since 1.0.0
-         */
-        FULLSCREEN {
-            override fun createScrollConnection(
-                scaffoldState: JetHtmlArticleScaffoldState
-            ): NestedScrollConnection {
-                return EmptyScrollConnection
-            }
-        };
-
-
-        /**
-         * @since 1.0.0
-         */
-        abstract fun createScrollConnection(
-            scaffoldState: JetHtmlArticleScaffoldState
-        ): NestedScrollConnection
-
-    }
 
 }
