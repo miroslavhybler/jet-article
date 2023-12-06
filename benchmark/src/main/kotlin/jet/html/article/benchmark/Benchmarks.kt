@@ -2,10 +2,14 @@
 
 package jet.html.article.benchmark
 
+import android.content.Context
+import androidx.benchmark.macro.FrameTimingMetric
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.StartupTimingMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import mir.oslav.jet.html.parse.HtmlArticleParser
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,7 +20,7 @@ import org.junit.runner.RunWith
  * created on 26.08.2023
  */
 @RunWith(AndroidJUnit4::class)
-class DefaultStartupBenchmark constructor() {
+class Benchmarks constructor() {
 
 
     @get:Rule
@@ -31,5 +35,6 @@ class DefaultStartupBenchmark constructor() {
     ) {
         pressHome()
         startActivityAndWait()
+
     }
 }

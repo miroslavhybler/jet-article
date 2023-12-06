@@ -24,46 +24,6 @@ import androidx.core.text.HtmlCompat
 /**
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
- * created on 17.07.2023
- */
-internal val Int.isDark: Boolean get() = ColorUtils.calculateLuminance(this) < 0.5
-
-
-/**
- * @since 1.0.0
- * @author Miroslav Hýbler <br>
- * created on 17.03.2023
- */
-internal val Configuration.isPortrait: Boolean get() = this.orientation == Configuration.ORIENTATION_PORTRAIT
-
-
-/**
- * @since 1.0.0
- * @author Miroslav Hýbler <br>
- * created on 17.03.2023
- */
-internal val Configuration.isLandScape: Boolean get() = this.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-
-/**
- * @since 1.0.0
- * @author Miroslav Hýbler <br>
- * created on 17.03.2023
- */
-internal val Configuration.isExtraLarge: Boolean get() = this.screenLayout and Configuration.SCREENLAYOUT_SIZE_MASK == Configuration.SCREENLAYOUT_SIZE_XLARGE
-
-
-/**
- * @since 1.0.0
- * @author Miroslav Hýbler <br>
- * created on 17.03.2023
- */
-internal val Configuration.isLarge: Boolean get() = this.screenLayout.and(other = Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE
-
-
-/**
- * @since 1.0.0
- * @author Miroslav Hýbler <br>
  * created on 25.08.2023
  */
 fun String.toHtml(): Spanned {
@@ -93,7 +53,7 @@ fun String.normalizedAttributeValue(): String = this
 fun Spannable.toAnnotatedString(primaryColor: Color): AnnotatedString {
     val builder = AnnotatedString.Builder(this.toString())
     val copierContext = CopierContext(primaryColor)
-    SpanCopier.values().forEach { copier ->
+    SpanCopier.entries.forEach { copier ->
         getSpans(0, length, copier.spanClass).forEach { span ->
             copier.copySpan(span, getSpanStart(span), getSpanEnd(span), builder, copierContext)
         }

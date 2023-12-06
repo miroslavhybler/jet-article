@@ -9,18 +9,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -36,12 +36,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import jet.html.article.example.ui.theme.JetHtmlArticleExampleTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.composables.screens.JetHtmlArticle
 import mir.oslav.jet.html.data.HtmlData
-import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.parse.HtmlArticleParser
 
 /**
@@ -108,6 +105,8 @@ class MainActivity : ComponentActivity() {
                         composable(route = "home") { HomePage(navHostController = navController) }
                         composable(route = "default") { ArticleScreen(article = "default") }
                         composable(route = "mapbox") { ArticleScreen(article = "mapbox") }
+                        composable(route = "android") { ArticleScreen(article = "android") }
+
                     }
                 }
             }
@@ -147,7 +146,13 @@ private fun HomePage(navHostController: NavHostController) {
                 Text(text = "Mapbox docs")
             }
         )
-
+        Button(
+            onClick = {
+                navHostController.navigate(route = "android")
+            }, content = {
+                Text(text = "Android docs")
+            }
+        )
         Spacer(modifier = Modifier.weight(weight = 1f))
 
 
@@ -176,25 +181,23 @@ private fun ArticleScreen(
         return String(assets.open("simple-examples/${fileName}.html").readBytes())
     }
 
-    var data: HtmlData? by remember { mutableStateOf(value = null) }
-
-    val config = remember {
-        HtmlConfig(spanCount = 3)
-    }
-
-    LaunchedEffect(key1 = Unit, block = {
-        data = withContext(Dispatchers.Default) {
-            HtmlArticleParser.parse(
-                content = getArticle(fileName = article),
-                config = config
-            )
-        }
-    })
-
-    data?.let {
-        JetHtmlArticle(
-            data = it,
+    val config = remember { HtmlConfig(spanCount = 3) }
+    val parseFlow = remember {
+        HtmlArticleParser.parse(
+            content = getArticle(fileName = article),
             config = config,
         )
     }
+    val data: HtmlData by parseFlow.collectAsState(initial = HtmlData.Empty)
+
+
+    Scaffold { paddingValues ->
+        JetHtmlArticle(
+            data = data,
+            config = config,
+            modifier = Modifier,
+            contentPadding = paddingValues
+        )
+    }
+
 }

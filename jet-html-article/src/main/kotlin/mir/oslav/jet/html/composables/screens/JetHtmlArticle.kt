@@ -3,12 +3,19 @@
 package mir.oslav.jet.html.composables.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -54,7 +61,9 @@ import mir.oslav.jet.html.data.HtmlElement
 fun JetHtmlArticle(
     modifier: Modifier = Modifier,
     data: HtmlData,
-    config: HtmlConfig = HtmlConfig(),
+    config: HtmlConfig = remember { HtmlConfig() },
+    gridState: LazyGridState = rememberLazyGridState(),
+    contentPadding: PaddingValues = PaddingValues(all = 0.dp)
 ) {
 
     val configuration = LocalConfiguration.current
@@ -74,7 +83,9 @@ fun JetHtmlArticle(
         JetHtmlArticleContent(
             modifier = modifier,
             data = data,
-            config = config
+            config = config,
+            gridState = gridState,
+            contentPadding = contentPadding
         )
     }
 }
@@ -84,17 +95,27 @@ fun JetHtmlArticle(
 fun JetHtmlArticleContent(
     modifier: Modifier = Modifier,
     data: HtmlData,
-    config: HtmlConfig
+    config: HtmlConfig = remember { HtmlConfig() },
+    gridState: LazyGridState = rememberLazyGridState(),
+    loading: @Composable () -> Unit = { JetHtmlArticleDefaults.DefaultLoading() },
+    contentPadding: PaddingValues = PaddingValues(all = 0.dp)
 ) {
-    val gridState = rememberLazyGridState()
+
+
+    if (data is HtmlData.Loading) {
+        loading()
+        return
+    }
 
     LazyVerticalGrid(
         modifier = modifier
             .fillMaxSize()
-            .safeContentPadding(),
+            .safeContentPadding()
+            .safeDrawingPadding(),
         state = gridState,
         columns = GridCells.Fixed(count = config.spanCount),
         content = {
+            @Suppress("KotlinConstantConditions")
             when (data) {
                 is HtmlData.Empty -> {
                     item(
@@ -102,23 +123,6 @@ fun JetHtmlArticleContent(
                     ) {
                         Text(text = "TODO empty")
                     }
-                }
-
-                is HtmlData.Loading -> {
-
-                    item(span = { GridItemSpan(currentLineSpan = config.spanCount) }) {
-                        Box(modifier = Modifier.fillMaxWidth()) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.align(alignment = Alignment.Center)
-                            )
-                            Text(
-                                text = "Loading",
-                                modifier = Modifier.align(alignment = Alignment.Center)
-                            )
-                        }
-                    }
-
-
                 }
 
                 is HtmlData.Invalid -> {
@@ -135,7 +139,7 @@ fun JetHtmlArticleContent(
                     ) {
                         HtmlMetrics(
                             monitoring = data.metrics,
-                            modifier = Modifier
+                            modifier = Modifier.statusBarsPadding()
                         )
                     }
 
@@ -146,6 +150,7 @@ fun JetHtmlArticleContent(
                         key = { index, element -> index }
                     ) { index, element ->
                         when (element) {
+                            //TODO handle links
                             is HtmlElement.Parsed.Image -> HtmlImage(data = element)
                             is HtmlElement.Parsed.Quote -> HtmlQuoete(data = element)
                             is HtmlElement.Parsed.Table -> HtmlTable(data = element)
@@ -164,7 +169,37 @@ fun JetHtmlArticleContent(
                         }
                     }
                 }
+
+                is HtmlData.Loading -> {
+                    //Never reachable but requires to be here because data is recevier of when
+                }
             }
-        }
+        },
+        contentPadding = contentPadding
     )
+}
+
+
+object JetHtmlArticleDefaults {
+
+
+    @Composable
+    fun DefaultLoading() {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .safeContentPadding()
+                .padding(top = 64.dp, bottom = 128.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier
+            )
+            Text(
+                text = "Loading",
+                modifier = Modifier
+            )
+        }
+    }
 }

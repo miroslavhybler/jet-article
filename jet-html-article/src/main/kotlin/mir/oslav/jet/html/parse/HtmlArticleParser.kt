@@ -1,7 +1,11 @@
 package mir.oslav.jet.html.parse
 
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
 import mir.oslav.jet.html.HtmlConstants
 import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
@@ -17,6 +21,7 @@ import mir.oslav.jet.html.parse.listeners.GalleryGroupingListener
  * @author Miroslav Hýbler <br>
  * created on 26.08.2023
  */
+//TODO refactor
 object HtmlArticleParser {
 
 
@@ -27,13 +32,13 @@ object HtmlArticleParser {
      * otherwise.
      * @since 1.0.0
      */
-    suspend fun parse(
+    fun parse(
         content: String,
         listener: HtmlArticleParserListener = GalleryGroupingListener(),
         ignoreOptions: IgnoreOptions = IgnoreOptions(),
         config: HtmlConfig = HtmlConfig(),
-    ): HtmlData = withContext(context = Dispatchers.IO) {
-        return@withContext try {
+    ): Flow<HtmlData> {
+        return try {
             parseHtmlArticle(
                 content = content,
                 ignoreOptions = ignoreOptions,
@@ -42,10 +47,12 @@ object HtmlArticleParser {
             )
         } catch (exception: Exception) {
             exception.printStackTrace()
-            HtmlData.Invalid(
-                title = "TODO",
-                message = "No message",
-                exception = exception
+            flowOf(
+                value = HtmlData.Invalid(
+                    title = "TODO",
+                    message = "No message",
+                    exception = exception
+                )
             )
         }
     }
@@ -54,20 +61,22 @@ object HtmlArticleParser {
     /**
      * @since 1.0.0
      */
+    //TODO needs complete refactor
     private fun parseHtmlArticle(
         content: String,
         ignoreOptions: IgnoreOptions,
         listener: HtmlArticleParserListener,
         config: HtmlConfig,
-    ): HtmlData.Success {
+    ): Flow<HtmlData> = flow {
         //start time for monitoring
         val startTime = System.currentTimeMillis()
         val tagDurations: ArrayList<Long> = ArrayList()
 
+        emit(value = HtmlData.Loading(message = "Loading core"))
+
         //preventing duplicates
         val styledMap: HashMap<Pair<Int, Int>, String> = HashMap()
         var index = 0
-        var imagesCount = 0
         var totalTags = 0
         var ignoredTags = 0
         var usedTags = 0
@@ -135,10 +144,7 @@ object HtmlArticleParser {
                                 endIndex = startingTagEndIndex,
                                 config = config,
                                 rawTagWithAttributes = rawTagWithAttributes
-                            )?.let { image ->
-                                listener.onImage(image)
-                                imagesCount += 1
-                            }
+                            )?.let(listener::onImage)
 
                             index = startingTagEndIndex + 1
                             continue
@@ -254,9 +260,11 @@ object HtmlArticleParser {
             totalTags = totalTags,
             averageDurationPerTag = tagDurations.average()
         )
-        return listener.onDataRequested(
-            config = config,
-            monitoring = monitoring
+        emit(
+            value = listener.onDataRequested(
+                config = config,
+                monitoring = monitoring
+            )
         )
     }
 }

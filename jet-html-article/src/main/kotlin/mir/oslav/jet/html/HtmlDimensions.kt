@@ -4,6 +4,8 @@ import android.content.res.Configuration
 import android.util.Log
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import mir.oslav.jet.utils.isExtraLargeScreen
+import mir.oslav.jet.utils.isLandScape
 
 
 /**
@@ -77,7 +79,7 @@ class HtmlDimensions constructor() {
         screenHeight: Dp,
     ) {
         when {
-            configuration.isExtraLarge -> {
+            configuration.isExtraLargeScreen -> {
                 sidePadding = 32.dp
                 topLinePadding = 42.dp
             }
@@ -99,7 +101,7 @@ class HtmlDimensions constructor() {
         screenHeight: Dp,
     ) {
         when {
-            configuration.isExtraLarge -> {
+            configuration.isExtraLargeScreen -> {
                 sidePadding = 20.dp
                 topLinePadding = 42.dp
 

@@ -13,7 +13,9 @@ import mir.oslav.jet.html.normalizedUrl
 internal object CoreHtmlArticleParser {
 
 
-    private val ignoreCaseOpt: Set<RegexOption> = setOf(RegexOption.IGNORE_CASE)
+    private val ignoreCaseOpt: Set<RegexOption> = setOf(
+        RegexOption.IGNORE_CASE
+    )
 
 
     /**
@@ -32,56 +34,11 @@ internal object CoreHtmlArticleParser {
     internal fun String.indexOfSubstring(
         requestedString: String,
         fromIndex: Int
-    ): Int? = requestedString.toRegex(ignoreCaseOpt(true))
+    ): Int? = requestedString.toRegex(options = ignoreCaseOpt(ignoreCase = true))
         .findAll(input = this)
         .filter { it.range.first >= fromIndex }
         .map { it.range.first }
         .firstOrNull()
-
-
-    /**
-     * @since 1.0.0
-     */
-    private fun parsePairTagBody(
-        content: String,
-        searchedTag: String
-    ): List<String> {
-        val outList = ArrayList<String>()
-
-        var index = 0
-
-        while (index in content.indices) {
-            val char = content[index]
-
-            if (char == '<') {
-                val startingTagEndIndex = content.indexOf(
-                    char = '>',
-                    startIndex = index
-                )
-                val rawTag = content.substring(
-                    startIndex = index + 1,
-                    endIndex = startingTagEndIndex
-                )
-                var tag = rawTag
-
-                if (tag.contains(' ')) {
-                    tag = tag.split(' ').first()
-                }
-
-                if (tag == searchedTag) {
-                    val closingTagStart = content.indexOfSubstring(
-                        requestedString = "</$tag>",
-                        fromIndex = index
-                    ) ?: continue
-
-                    outList.add(content.substring(startingTagEndIndex + 1, closingTagStart))
-                    index = closingTagStart + 1
-
-                } else index += 1
-            } else index += 1
-        }
-        return outList
-    }
 
 
     /**
@@ -148,5 +105,50 @@ internal object CoreHtmlArticleParser {
             rows = outRows,
             span = config.spanCount
         )
+    }
+
+
+    /**
+     * @since 1.0.0
+     */
+    private fun parsePairTagBody(
+        content: String,
+        searchedTag: String
+    ): List<String> {
+        val outList = ArrayList<String>()
+
+        var index = 0
+
+        while (index in content.indices) {
+            val char = content[index]
+
+            if (char == '<') {
+                val startingTagEndIndex = content.indexOf(
+                    char = '>',
+                    startIndex = index
+                )
+                val rawTag = content.substring(
+                    startIndex = index + 1,
+                    endIndex = startingTagEndIndex
+                )
+                var tag = rawTag
+
+                if (tag.contains(' ')) {
+                    tag = tag.split(' ').first()
+                }
+
+                if (tag == searchedTag) {
+                    val closingTagStart = content.indexOfSubstring(
+                        requestedString = "</$tag>",
+                        fromIndex = index
+                    ) ?: continue
+
+                    outList.add(content.substring(startingTagEndIndex + 1, closingTagStart))
+                    index = closingTagStart + 1
+
+                } else index += 1
+            } else index += 1
+        }
+        return outList
     }
 }
