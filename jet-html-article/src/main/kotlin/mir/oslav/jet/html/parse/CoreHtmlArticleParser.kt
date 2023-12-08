@@ -31,14 +31,16 @@ internal object CoreHtmlArticleParser {
     /**
      * @since 1.0.0
      */
+    //TODO try to do better
     internal fun String.indexOfSubstring(
-        requestedString: String,
+        substring: String,
         fromIndex: Int
-    ): Int? = requestedString.toRegex(options = ignoreCaseOpt(ignoreCase = true))
+    ): Int = substring.toRegex(options = ignoreCaseOpt(ignoreCase = true))
         .findAll(input = this)
         .filter { it.range.first >= fromIndex }
         .map { it.range.first }
         .firstOrNull()
+        ?: -1
 
 
     /**
@@ -139,7 +141,7 @@ internal object CoreHtmlArticleParser {
 
                 if (tag == searchedTag) {
                     val closingTagStart = content.indexOfSubstring(
-                        requestedString = "</$tag>",
+                        substring = "</$tag>",
                         fromIndex = index
                     ) ?: continue
 

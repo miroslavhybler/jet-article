@@ -106,6 +106,7 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.1.2")
     implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
     implementation("androidx.navigation:navigation-compose:2.7.5")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.28.0")
 
 
     testImplementation("junit:junit:4.13.2")

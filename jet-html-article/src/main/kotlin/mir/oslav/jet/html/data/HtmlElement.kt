@@ -137,15 +137,5 @@ sealed class HtmlElement private constructor(
             val images: List<Parsed.Image>,
             override val span: Int,
         ) : Constructed(span = span)
-
-
-        /**
-         * @since 1.0.0
-         */
-        data class TopBarHeader constructor(
-            val title: String,
-            val image: Parsed.Image?,
-            override val span: Int,
-        ) : Constructed(span = span)
     }
 }

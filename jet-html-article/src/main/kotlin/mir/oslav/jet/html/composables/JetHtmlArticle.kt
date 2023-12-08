@@ -1,17 +1,15 @@
 @file:SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 
-package mir.oslav.jet.html.composables.screens
+package mir.oslav.jet.html.composables
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -27,13 +25,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import mir.oslav.jet.annotations.JetBenchmark
 import mir.oslav.jet.annotations.JetExperimental
 import mir.oslav.jet.html.HtmlDimensions
 import mir.oslav.jet.html.LocalHtmlDimensions
-import mir.oslav.jet.html.composables.HtmlPhotoGallery
 import mir.oslav.jet.html.composables.elements.HtmlAddress
 import mir.oslav.jet.html.composables.elements.HtmlImage
 import mir.oslav.jet.html.composables.elements.HtmlInvalid
@@ -98,6 +94,11 @@ fun JetHtmlArticleContent(
     config: HtmlConfig = remember { HtmlConfig() },
     gridState: LazyGridState = rememberLazyGridState(),
     loading: @Composable () -> Unit = { JetHtmlArticleDefaults.DefaultLoading() },
+    image: @Composable (HtmlElement.Parsed.Image) -> Unit = { HtmlImage(data = it) },
+    quoete: @Composable (HtmlElement.Parsed.Quote) -> Unit = { HtmlQuoete(data = it) },
+    table: @Composable (HtmlElement.Parsed.Table) -> Unit = { HtmlTable(data = it) },
+    address: @Composable (HtmlElement.Parsed.Address) -> Unit = { HtmlAddress(address = it) },
+    text: @Composable (HtmlElement.Parsed.TextBlock) -> Unit = { HtmlTextBlock(text = it) },
     contentPadding: PaddingValues = PaddingValues(all = 0.dp)
 ) {
 
@@ -109,9 +110,7 @@ fun JetHtmlArticleContent(
 
     LazyVerticalGrid(
         modifier = modifier
-            .fillMaxSize()
-            .safeContentPadding()
-            .safeDrawingPadding(),
+            .fillMaxSize(),
         state = gridState,
         columns = GridCells.Fixed(count = config.spanCount),
         content = {
@@ -151,11 +150,11 @@ fun JetHtmlArticleContent(
                     ) { index, element ->
                         when (element) {
                             //TODO handle links
-                            is HtmlElement.Parsed.Image -> HtmlImage(data = element)
-                            is HtmlElement.Parsed.Quote -> HtmlQuoete(data = element)
-                            is HtmlElement.Parsed.Table -> HtmlTable(data = element)
-                            is HtmlElement.Parsed.Address -> HtmlAddress(address = element)
-                            is HtmlElement.Parsed.TextBlock -> HtmlTextBlock(text = element)
+                            is HtmlElement.Parsed.Image -> image(element)
+                            is HtmlElement.Parsed.Quote -> quoete(element)
+                            is HtmlElement.Parsed.Table -> table(element)
+                            is HtmlElement.Parsed.Address -> address(element)
+                            is HtmlElement.Parsed.TextBlock -> text(element)
                             is HtmlElement.Parsed.Title -> HtmlTitle(title = element)
 
                             // TODO split parsed and constructed

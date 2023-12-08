@@ -41,14 +41,6 @@ fun HtmlImage(
     val isInspectionMode = LocalInspectionMode.current
 
 
-    /*
-    val transition by animateFloatAsState(
-        targetValue = if (state is AsyncImagePainter.State.Success) 1f else 0f,
-        label = "",
-        animationSpec = tween(durationMillis = 4000)
-    )
-     */
-
     if (isInspectionMode) {
         Image(
             painter = painterResource(id = HtmlDataSamples.images.random()),
@@ -67,17 +59,13 @@ fun HtmlImage(
                 .build()
         )
         when (painter.state) {
+            //TODO animate?
             is AsyncImagePainter.State.Success -> {
                 Image(
                     painter = painter,
                     contentDescription = null,
                     modifier = modifier,
                     contentScale = ContentScale.Crop
-                    //       .alpha(transition)
-                    //       .scale(transition)
-                    //       .animateContentSize(
-                    //           animationSpec = tween(durationMillis = 800)
-                    //       )
                 )
             }
 

@@ -7,14 +7,13 @@ package mir.oslav.jet.html.data
  * created on 15.07.2023
  */
 sealed class HtmlData private constructor(
-    open val title: String
 ) {
 
 
     /**
      * @since 1.0.0
      */
-    data object Empty : HtmlData(title = "")
+    data object Empty : HtmlData()
 
 
     /**
@@ -22,21 +21,19 @@ sealed class HtmlData private constructor(
      */
     //TODO maybe background support
     data class Success constructor(
-        override val title: String,
         val elements: List<HtmlElement>,
-        val topBar: HtmlElement.Constructed.TopBarHeader?,
         val metrics: ParseMetrics,
-    ) : HtmlData(title = title)
+        val headData: HtmlHeadData?
+    ) : HtmlData()
 
 
     /**
      * @since 1.0.0
      */
     data class Invalid constructor(
-        override val title: String,
         val message: String,
         val exception: Exception,
-    ) : HtmlData(title = title)
+    ) : HtmlData()
 
 
     /**
@@ -44,5 +41,5 @@ sealed class HtmlData private constructor(
      */
     data class Loading constructor(
         val message: String,
-    ) : HtmlData(title = message)
+    ) : HtmlData()
 }

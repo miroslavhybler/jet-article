@@ -3,6 +3,7 @@ package mir.oslav.jet.html.parse.listeners
 import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
+import mir.oslav.jet.html.data.HtmlHeadData
 import mir.oslav.jet.html.data.ParseMetrics
 import mir.oslav.jet.html.parse.HtmlArticleParserListener
 
@@ -15,7 +16,6 @@ import mir.oslav.jet.html.parse.HtmlArticleParserListener
 open class LinearListener constructor() : HtmlArticleParserListener() {
 
 
-    protected var title: String = ""
     protected val elements: MutableSet<HtmlElement> = mutableSetOf()
 
 
@@ -44,7 +44,7 @@ open class LinearListener constructor() : HtmlArticleParserListener() {
     }
 
     override fun onTitle(title: String) {
-        this.title = title
+
     }
 
     override fun onAddress(address: HtmlElement.Parsed.Address) {
@@ -56,22 +56,17 @@ open class LinearListener constructor() : HtmlArticleParserListener() {
 
     override fun onDataRequested(
         config: HtmlConfig,
-        monitoring: ParseMetrics
+        monitoring: ParseMetrics,
+        headData: HtmlHeadData?
     ): HtmlData.Success {
         return HtmlData.Success(
-            title = title,
             elements = ArrayList(elements),
             metrics = monitoring,
-            topBar = HtmlElement.Constructed.TopBarHeader(
-                title = title,
-                image = elements.filterIsInstance<HtmlElement.Parsed.Image>().first(),
-                span = config.spanCount
-            )
+            headData = headData
         )
     }
 
     override fun clear() {
         elements.clear()
-        title = ""
     }
 }

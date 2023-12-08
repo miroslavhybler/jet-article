@@ -10,6 +10,7 @@ import mir.oslav.jet.html.HtmlConstants
 import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
+import mir.oslav.jet.html.data.HtmlHeadData
 import mir.oslav.jet.html.data.IgnoreOptions
 import mir.oslav.jet.html.data.ParseMetrics
 import mir.oslav.jet.html.parse.CoreHtmlArticleParser.indexOfSubstring
@@ -22,6 +23,7 @@ import mir.oslav.jet.html.parse.listeners.GalleryGroupingListener
  * created on 26.08.2023
  */
 //TODO refactor
+//TODO eliminate using substring() to minimum
 object HtmlArticleParser {
 
 
@@ -49,7 +51,6 @@ object HtmlArticleParser {
             exception.printStackTrace()
             flowOf(
                 value = HtmlData.Invalid(
-                    title = "TODO",
                     message = "No message",
                     exception = exception
                 )
@@ -58,213 +59,293 @@ object HtmlArticleParser {
     }
 
 
-    /**
-     * @since 1.0.0
-     */
-    //TODO needs complete refactor
+    //TODO add metrics
     private fun parseHtmlArticle(
         content: String,
         ignoreOptions: IgnoreOptions,
         listener: HtmlArticleParserListener,
         config: HtmlConfig,
     ): Flow<HtmlData> = flow {
-        //start time for monitoring
-        val startTime = System.currentTimeMillis()
-        val tagDurations: ArrayList<Long> = ArrayList()
+        emit(value = HtmlData.Loading(message = "TODO started"))
 
-        emit(value = HtmlData.Loading(message = "Loading core"))
-
-        //preventing duplicates
-        val styledMap: HashMap<Pair<Int, Int>, String> = HashMap()
         var index = 0
-        var totalTags = 0
-        var ignoredTags = 0
-        var usedTags = 0
-        var tagStartTime = 0L
-        //holds the raw content that is not wrapped in tags
-        var rawContentText: String = ""
-        var rawContentStartIndex: Int = 0
-
-        //helps to determine if we are parsing tag that's inside another one
-        var enclosingTag: String? = null
+        var headData: HtmlHeadData? = null
 
         while (index in content.indices) {
             val char = content[index]
 
-            if (char == '<') {
+            if (char != '<') {
+                index += 1
+                continue
+            }
 
-                /*
-                if (rawContentText.isNotBlank()) {
-                    listener.onTextBlock(
-                        textBlock = HtmlElement.Parsed.TextBlock(
-                            text = rawContentText,
-                            startIndex = rawContentStartIndex,
-                            endIndex = index,
-                            span = config.spanCount
-                        )
-                    )
-                    rawContentText = ""
+            //Comment check
+            if (index + 3 < content.length) {
+                val substring = content.substring(startIndex = index, endIndex = index + 3)
+                if (substring == "<!--") {
+                    //Html comment, skipping to the next char after the comment
+                    index = content.indexOfSubstring(substring = "-->", fromIndex = index) + 1
+                    continue
                 }
-                 */
+            }
 
-                tagStartTime = System.currentTimeMillis()
-                val startingTagEndIndex = content.indexOf(
-                    char = '>',
-                    startIndex = index
-                )
-                val rawTagWithAttributes = content.substring(
-                    startIndex = index + 1,
-                    endIndex = startingTagEndIndex
-                )
-                var tagName = rawTagWithAttributes
+            //Actual char is start of tag '<'
+            val eIndex = content.indexOf(char = '>', startIndex = index)
+            //Tag body within <...>
+            val tagBody = content.substring(startIndex = index + 1, endIndex = eIndex)
 
-                if (tagName.contains(char = ' ')) {
-                    tagName = tagName.split(' ').first()
-                }
-
-                val isTagIgnored = ignoreOptions.tags.contains(tagName)
-                val isKeywordIgnored = ignoreOptions.keywords.contains(tagName)
-
-                //Continue when tag should be ignored
-                if (isTagIgnored || isKeywordIgnored) {
-                    index += content.indexOf(char = '>', startIndex = index)
-                    ignoredTags += 1
-                    totalTags += 1
+            when (val tag = extractTagName(tagBody = tagBody)) {
+                "head" -> {
+                    //Tag content with starting and closing tag <>...</>
+                    val ceIndex = content.indexOfSubstring(substring = "</head>", fromIndex = index)
+                    //Plus one because startIndex is inclusive and would include '<' char
+                    val tagContent = content.substring(startIndex = eIndex + 1, endIndex = ceIndex)
+                    headData = parseHeadData(content = tagContent)
+                    index = ceIndex + 7
                     continue
                 }
 
-                val isPairTag = HtmlConstants.pairTags.contains(tagName)
-                val isSingeTag = HtmlConstants.singleTags.contains(tagName)
+                "body" -> {
+                    //Tag content with starting and closing tag <>...</>
+                    val ceIndex = content.indexOfSubstring(substring = "</body>", fromIndex = index)
+                    //Plus one because startIndex is inclusive and would include '<' char
+                    val tagContent = content.substring(startIndex = eIndex + 1, endIndex = ceIndex)
+                    index = ceIndex + 7
+                    parseBody(
+                        content = tagContent,
+                        listener = listener,
+                        config = config
+                    )
 
-                when {
-                    isSingeTag -> {
-                        if (tagName == "img") {
-                            CoreHtmlArticleParser.parseImageFromText(
-                                startIndex = index,
-                                endIndex = startingTagEndIndex,
-                                config = config,
-                                rawTagWithAttributes = rawTagWithAttributes
-                            )?.let(listener::onImage)
-
-                            index = startingTagEndIndex + 1
-                            continue
-                        }
-                    }
-
-                    isPairTag -> {
-                        val closingTagStart = content.indexOfSubstring(
-                            requestedString = "</$tagName>",
-                            fromIndex = index
-                        ) ?: continue
-
-                        val firstContentIndex = startingTagEndIndex + 1
-                        val lastContentIndex = closingTagStart - 1
-                        val tagBody = content.substring(firstContentIndex, closingTagStart)
-
-                        if (tagName == "title") {
-                            listener.onTitle(title = tagBody)
-                        }
-
-                        if (HtmlConstants.styledTags.contains(tagName)) {
-                            styledMap[Pair(startingTagEndIndex + 1, closingTagStart - 1)] = tagBody
-                        }
-
-                        if (styledMap.values.contains(tagBody)) {
-                            val pair = Pair(startingTagEndIndex + 1, closingTagStart - 1)
-                            if (styledMap.keys.contains(pair)) {
-                                index = startingTagEndIndex + 1
-                                continue
-                            }
-                        }
-
-                        when (tagName) {
-                            "address" -> {
-                                listener.onAddress(
-                                    HtmlElement.Parsed.Address(
-                                        startIndex = startingTagEndIndex,
-                                        endIndex = lastContentIndex,
-                                        span = config.spanCount,
-                                        content = tagBody
-                                    )
-                                )
-                            }
-
-                            "table" -> {
-                                listener.onTable(
-                                    table = CoreHtmlArticleParser.parseTableFromText(
-                                        startIndex = startingTagEndIndex,
-                                        endIndex = lastContentIndex,
-                                        content = tagBody,
-                                        config = config
-                                    )
-                                )
-                            }
-
-                            "blockquote" -> {
-                                listener.onQuote(
-                                    quote = HtmlElement.Parsed.Quote(
-                                        text = tagBody,
-                                        startIndex = startingTagEndIndex + 1,
-                                        endIndex = closingTagStart,
-                                        span = config.spanCount
-                                    )
-                                )
-                            }
-
-                            "h1", "h2", "h3", "h4", "h5", "h6", "h7" -> {
-                                listener.onTitle(
-                                    title = HtmlElement.Parsed.Title(
-                                        text = tagBody,
-                                        startIndex = startingTagEndIndex + 1,
-                                        endIndex = closingTagStart,
-                                        span = config.spanCount,
-                                        titleTag = tagName
-                                    )
-                                )
-                            }
-
-                            else -> {
-                                //Handles text elements like p, h1, h2, ...
-                                listener.onTextBlock(
-                                    textBlock = HtmlElement.Parsed.TextBlock(
-                                        text = tagBody,
-                                        startIndex = startingTagEndIndex + 1,
-                                        endIndex = closingTagStart,
-                                        span = config.spanCount
-                                    )
-                                )
-                            }
-                        }
-                    }
+                    emit(
+                        value = listener.onDataRequested(
+                            config = config,
+                            monitoring = ParseMetrics(
+                                0, 0,
+                                0.0,
+                                0,
+                                0,
+                                0
+                            ),
+                            headData = headData
+                        )
+                    )
+                    return@flow
                 }
-                usedTags += 1
-                totalTags += 1
-                index = startingTagEndIndex + 1
-                tagDurations.add(System.currentTimeMillis() - tagStartTime)
-            } else {
-                //rawContentText += char
 
-                //    if (rawContentStartIndex == 0) {
-                //        rawContentStartIndex = index
-                //    }
-
-                index += 1
+                else -> {
+                    index = eIndex + 1
+                    continue
+                }
             }
         }
+    }.flowOn(context = Dispatchers.Default)
 
-        val monitoring = ParseMetrics(
-            startTime = startTime,
-            endTime = System.currentTimeMillis(),
-            ignoredTags = ignoredTags,
-            usedTags = usedTags,
-            totalTags = totalTags,
-            averageDurationPerTag = tagDurations.average()
-        )
-        emit(
-            value = listener.onDataRequested(
-                config = config,
-                monitoring = monitoring
+
+    /**
+     * @since 1.0.0
+     */
+    //TODO this is old function
+    private fun parseBody(
+        content: String,
+        config: HtmlConfig,
+        listener: HtmlArticleParserListener
+    ) {
+        var index = 0
+
+        while (index in content.indices) {
+            val char = content[index]
+
+            if (char != '<') {
+                index += 1
+                continue
+            }
+
+            //Char is starting tag '<'
+            //Actual char is start of tag '<'
+            val seIndex = content.indexOf(char = '>', startIndex = index)
+            //Tag body within <...>
+            val tagBody = content.substring(startIndex = index + 1, endIndex = seIndex)
+
+            if (index + 3 < content.length) {
+                val substring = content.substring(startIndex = index, endIndex = index + 4)
+                if (substring == "<!--") {
+                    //Html comment, skipping to the next char after the comment
+                    index = content.indexOfSubstring(substring = "-->", fromIndex = index) + 1
+                    continue
+                }
+            }
+
+            when (val tag = extractTagName(tagBody = tagBody)) {
+                "img" -> {
+                    CoreHtmlArticleParser.parseImageFromText(
+                        startIndex = index,
+                        endIndex = seIndex,
+                        config = config,
+                        rawTagWithAttributes = tagBody
+                    )?.let(listener::onImage)
+
+                    index = seIndex + 1
+                    continue
+                }
+
+                else -> {
+                    //TODO /p
+                    //TODO padá protože hledá //p
+                    //TODO proč to hledá "/img"
+                    val closingTag = "</$tag>"
+                    val cleIndex = content.indexOfSubstring(
+                        substring = closingTag,
+                        fromIndex = seIndex
+                    )
+
+                    //Plus one because startIndex is inclusive and would include '<' char
+                    val tagContent = try {
+                        content.substring(
+                            startIndex = seIndex + 1,
+                            endIndex = cleIndex
+                        )
+                    } catch (exception: Exception) {
+                        Log.e("mirek", "bug for $tag with closing $closingTag")
+                        throw exception
+                    }
+
+                    processPairTag(
+                        tag = tag,
+                        listener = listener,
+                        config = config,
+                        content = tagContent,
+                        startContentIndex = seIndex,
+                        endContentIndex = cleIndex
+                    )
+
+                    index = cleIndex + closingTag.length + 1
+                }
+            }
+        }
+    }
+
+
+    private fun processPairTag(
+        tag: String,
+        content: String,
+        listener: HtmlArticleParserListener,
+        config: HtmlConfig,
+        startContentIndex: Int,
+        endContentIndex: Int,
+    ) {
+        when (tag) {
+            "address" -> {
+                listener.onAddress(
+                    HtmlElement.Parsed.Address(
+                        startIndex = startContentIndex,
+                        endIndex = endContentIndex,
+                        span = config.spanCount,
+                        content = content
+                    )
+                )
+            }
+
+            "table" -> {
+                listener.onTable(
+                    table = CoreHtmlArticleParser.parseTableFromText(
+                        startIndex = startContentIndex,
+                        endIndex = endContentIndex,
+                        content = content,
+                        config = config
+                    )
+                )
+            }
+
+            "blockquote" -> {
+                listener.onQuote(
+                    quote = HtmlElement.Parsed.Quote(
+                        text = content,
+                        startIndex = startContentIndex + 1,
+                        endIndex = startContentIndex,
+                        span = config.spanCount
+                    )
+                )
+            }
+
+            "h1", "h2", "h3", "h4", "h5", "h6", "h7" -> {
+                listener.onTitle(
+                    title = HtmlElement.Parsed.Title(
+                        text = content,
+                        startIndex = endContentIndex + 1,
+                        endIndex = startContentIndex,
+                        span = config.spanCount,
+                        titleTag = tag
+                    )
+                )
+            }
+
+            else -> {
+                //paragraph
+                listener.onTextBlock(
+                    textBlock = HtmlElement.Parsed.TextBlock(
+                        text = content,
+                        startIndex = startContentIndex + 1,
+                        endIndex = endContentIndex,
+                        span = config.spanCount
+                    )
+                )
+            }
+        }
+    }
+
+
+    private fun parseHeadData(
+        content: String
+    ): HtmlHeadData {
+
+        var title: String? = null
+        var base: String? = null
+        var index = 0
+
+        while (index in content.indices) {
+            val char = content[index]
+            if (char != '<') {
+                index += 1
+                continue
+            }
+
+            //Char is starting tag '<'
+            //Actual char is start of tag '<'
+            val seIndex = content.indexOf(char = '>', startIndex = index)
+            //Tag body within <...>
+            if (index + 3 < content.length) {
+                val substring = content.substring(startIndex = index, endIndex = index + 4)
+                if (substring == "<!--") {
+                    //Html comment, skipping to the next char after the comment
+                    index = content.indexOfSubstring(substring = "-->", fromIndex = index) + 1
+                    continue
+                }
+            }
+
+            val tagBody = content.substring(startIndex = index + 1, endIndex = seIndex)
+            val tag = extractTagName(tagBody = tagBody)
+            val closingTag = "</$tag>"
+            val clIndex = content.indexOfSubstring(substring = closingTag, fromIndex = index)
+            val tagContent = content.substring(
+                startIndex = index,
+                endIndex = clIndex
             )
-        )
+            when (tag) {
+                "title" -> title = tagContent
+                "base" -> base = tagContent
+            }
+            index = clIndex + closingTag.length + 1
+
+        }
+        return HtmlHeadData(title = title, baseUrl = base)
+    }
+
+
+    private fun extractTagName(tagBody: String): String {
+        return if (tagBody.contains(char = ' ')) {
+            val tagEIndex = tagBody.indexOfFirst { tagChar -> tagChar == ' ' }
+            tagBody.substring(startIndex = 0, endIndex = tagEIndex)
+        } else tagBody
     }
 }

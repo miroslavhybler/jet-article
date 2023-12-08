@@ -38,23 +38,13 @@ fun HtmlPhotoGallery(
 
     Column(
         modifier = modifier
-            .clickable(
-                onClick = {
-                //TODO navigate to gallery somehow
-            }
-            )
             .padding(horizontal = dimensions.sidePadding)
     ) {
         HtmlImage(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(height = 256.dp)
-                .clip(shape = RoundedCornerShape(size = 24.dp))
-                .clickable(
-                    onClick = {
-                        //TODO open detail
-                    }
-                ),
+                .clip(shape = RoundedCornerShape(size = 24.dp)),
             data = gallery.images.first()
         )
 
@@ -72,12 +62,7 @@ fun HtmlPhotoGallery(
                     modifier = Modifier
                         .weight(weight = 1f)
                         .height(height = 86.dp)
-                        .clip(shape = RoundedCornerShape(size = 12.dp))
-                        .clickable(
-                            onClick = {
-                                //TODO open detail
-                            }
-                        ),
+                        .clip(shape = RoundedCornerShape(size = 12.dp)),
                     data = image
                 )
 
@@ -93,7 +78,6 @@ fun HtmlPhotoGallery(
 @Composable
 @Preview(showBackground = true)
 private fun HtmlGalleryPreview() {
-
     HtmlPhotoGallery(
         gallery = HtmlElement.Constructed.Gallery(
             span = 1,

@@ -3,6 +3,7 @@ package mir.oslav.jet.html.parse
 import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
+import mir.oslav.jet.html.data.HtmlHeadData
 import mir.oslav.jet.html.data.ParseMetrics
 
 
@@ -59,7 +60,11 @@ abstract class HtmlArticleParserListener constructor() {
     /**
      * @since 1.0.0
      */
-    abstract fun onDataRequested(config: HtmlConfig, monitoring: ParseMetrics): HtmlData.Success
+    abstract fun onDataRequested(
+        config: HtmlConfig,
+        monitoring: ParseMetrics,
+        headData: HtmlHeadData?
+    ): HtmlData.Success
 
 
     /**

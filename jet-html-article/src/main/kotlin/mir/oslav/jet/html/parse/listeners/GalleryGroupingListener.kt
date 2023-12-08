@@ -3,6 +3,7 @@ package mir.oslav.jet.html.parse.listeners
 import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
+import mir.oslav.jet.html.data.HtmlHeadData
 import mir.oslav.jet.html.data.ParseMetrics
 
 
@@ -13,22 +14,21 @@ import mir.oslav.jet.html.data.ParseMetrics
 class GalleryGroupingListener constructor() : LinearListener() {
 
 
-    override fun onDataRequested(config: HtmlConfig, monitoring: ParseMetrics): HtmlData.Success {
+    override fun onDataRequested(
+        config: HtmlConfig,
+        monitoring: ParseMetrics,
+        headData: HtmlHeadData?
+    ): HtmlData.Success {
         val images = elements.filterIsInstance<HtmlElement.Parsed.Image>()
         val gallery = HtmlElement.Constructed.Gallery(images = images, span = config.spanCount)
 
         return HtmlData.Success(
-            title = title,
             elements = ArrayList<HtmlElement>().apply {
                 add(gallery)
                 addAll(elements)
             },
-            topBar = HtmlElement.Constructed.TopBarHeader(
-                title = title,
-                image = images.firstOrNull(),
-                span = config.spanCount
-            ),
-            metrics = monitoring
+            metrics = monitoring,
+            headData = headData
         )
     }
 }
