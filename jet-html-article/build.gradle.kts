@@ -55,8 +55,6 @@ dependencies {
 
     implementation("mir.oslav.jet:annotations:1.0.0")
     implementation("mir.oslav.jet:utils:1.0.2")
-    implementation("mir.oslav.jet:animated-icons:1.0.0-alpha02")
-
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")

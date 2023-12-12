@@ -2,7 +2,7 @@ package mir.oslav.jet.html.data
 
 
 /**
- * @author Miroslav Hýbler (Peko Studio s.r.o)<br>
+ * @author Miroslav Hýbler <br>
  * created on 08.12.2023
  */
 data class HtmlHeadData constructor(

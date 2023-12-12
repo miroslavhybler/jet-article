@@ -13,6 +13,7 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven(url = "https://jitpack.io")
     }
 }
 dependencyResolutionManagement {
@@ -20,18 +21,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        gradlePluginPortal()
+        maven(url = "https://jitpack.io")
         maven(url = "https://maven.pkg.github.com/miroslavhybler/Maven")
-//        {
-//            val githubProperties = Properties()
-//            githubProperties.load(FileInputStream(File(rootDir, "github.properties")))
-//            val username = githubProperties["github.username"].toString()
-//            val token = githubProperties["github.token"].toString()
-//
-//            credentials {
-//                this.username = username
-//                this.password = token
-//            }
-//        }
     }
 }
 

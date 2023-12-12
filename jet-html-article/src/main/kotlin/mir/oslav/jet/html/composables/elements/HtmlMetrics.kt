@@ -37,22 +37,6 @@ fun HtmlMetrics(
             title = "Duration (Millis)",
             value = monitoring.duration.toString()
         )
-        ValueRow(
-            title = "Average duration per tag (Millis)",
-            value = String.format("%.3f", monitoring.averageDurationPerTag)
-        )
-        ValueRow(
-            title = "Total Tags",
-            value = monitoring.totalTags.toString()
-        )
-        ValueRow(
-            title = "Ignored Tags",
-            value = monitoring.ignoredTags.toString()
-        )
-        ValueRow(
-            title = "Used Tags",
-            value = monitoring.usedTags.toString()
-        )
     }
 }
 
@@ -98,10 +82,6 @@ private fun HtmlMetricsPreview() {
         monitoring = ParseMetrics(
             startTime = System.currentTimeMillis() - 3230L,
             endTime = System.currentTimeMillis(),
-            usedTags = 100,
-            ignoredTags = 20,
-            totalTags = 120,
-            averageDurationPerTag = 3.0
         )
     )
 }

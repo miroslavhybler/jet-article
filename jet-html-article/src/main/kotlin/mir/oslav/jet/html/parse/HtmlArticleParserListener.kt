@@ -12,6 +12,7 @@ import mir.oslav.jet.html.data.ParseMetrics
  * @author Miroslav Hýbler <br>
  * created on 26.08.2023
  */
+//TODO refactor
 abstract class HtmlArticleParserListener constructor() {
 
 

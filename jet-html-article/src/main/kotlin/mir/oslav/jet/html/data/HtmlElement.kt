@@ -121,21 +121,4 @@ sealed class HtmlElement private constructor(
         )
     }
 
-
-    /**
-     * TODO docs, alternative data constructed from the parsed elements
-     * @since 1.0.0
-     */
-    sealed class Constructed private constructor(
-        override val span: Int
-    ) : HtmlElement(span = span) {
-
-        /**
-         * @since 1.0.0
-         */
-        data class Gallery constructor(
-            val images: List<Parsed.Image>,
-            override val span: Int,
-        ) : Constructed(span = span)
-    }
 }

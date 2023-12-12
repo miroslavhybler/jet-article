@@ -156,12 +156,6 @@ fun JetHtmlArticleContent(
                             is HtmlElement.Parsed.Address -> address(element)
                             is HtmlElement.Parsed.TextBlock -> text(element)
                             is HtmlElement.Parsed.Title -> HtmlTitle(title = element)
-
-                            // TODO split parsed and constructed
-                            is HtmlElement.Constructed.Gallery -> {
-                                HtmlPhotoGallery(gallery = element)
-                            }
-
                             else -> throw IllegalStateException(
                                 "Element ${element.javaClass.simpleName} not supported yet!"
                             )

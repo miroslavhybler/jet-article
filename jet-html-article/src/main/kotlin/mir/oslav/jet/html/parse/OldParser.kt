@@ -74,10 +74,9 @@ object OldParser {
                 }
 
                 val isTagIgnored = ignoreOptions.tags.contains(tagName)
-                val isKeywordIgnored = ignoreOptions.keywords.contains(tagName)
 
                 //Continue when tag should be ignored
-                if (isTagIgnored || isKeywordIgnored) {
+                if (isTagIgnored) {
                     index += content.indexOf(char = '>', startIndex = index)
                     ignoredTags += 1
                     totalTags += 1
@@ -206,10 +205,6 @@ object OldParser {
         val monitoring = ParseMetrics(
             startTime = startTime,
             endTime = System.currentTimeMillis(),
-            ignoredTags = ignoredTags,
-            usedTags = usedTags,
-            totalTags = totalTags,
-            averageDurationPerTag = tagDurations.average()
         )
         emit(
             value = listener.onDataRequested(

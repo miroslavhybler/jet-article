@@ -10,10 +10,6 @@ package mir.oslav.jet.html.data
 data class ParseMetrics constructor(
     val startTime: Long,
     val endTime: Long,
-    val averageDurationPerTag: Double,
-    val totalTags: Int,
-    val ignoredTags: Int,
-    val usedTags: Int,
 ) {
 
     val duration: Long = endTime - startTime
