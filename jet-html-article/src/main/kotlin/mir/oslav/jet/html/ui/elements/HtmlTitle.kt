@@ -1,4 +1,4 @@
-package mir.oslav.jet.html.composables.elements
+package mir.oslav.jet.html.ui.elements
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import mir.oslav.jet.html.LocalHtmlDimensions
 import mir.oslav.jet.html.data.HtmlElement
 
@@ -43,7 +44,7 @@ fun HtmlTitle(
         text = title.text,
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = dimensions.sidePadding),
+            .padding(start = dimensions.sidePadding, end = dimensions.sidePadding, top = 12.dp),
         style = textStyle
     )
 }

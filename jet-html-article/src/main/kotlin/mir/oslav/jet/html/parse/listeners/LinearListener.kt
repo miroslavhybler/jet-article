@@ -4,7 +4,7 @@ import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.data.HtmlHeadData
-import mir.oslav.jet.html.data.ParseMetrics
+import mir.oslav.jet.html.data.HtmlParseMetering
 import mir.oslav.jet.html.parse.HtmlArticleParserListener
 
 
@@ -16,7 +16,7 @@ import mir.oslav.jet.html.parse.HtmlArticleParserListener
 open class LinearListener constructor() : HtmlArticleParserListener() {
 
 
-    protected val elements: MutableSet<HtmlElement> = mutableSetOf()
+    protected val elements: MutableList<HtmlElement> = mutableListOf()
 
 
     override fun onImage(image: HtmlElement.Parsed.Image) {
@@ -27,6 +27,10 @@ open class LinearListener constructor() : HtmlArticleParserListener() {
 
     override fun onQuote(quote: HtmlElement.Parsed.Quote) {
         elements.add(quote)
+    }
+
+    override fun onCode(code: HtmlElement.Parsed.Code) {
+        elements.add(code)
     }
 
     override fun onTable(table: HtmlElement.Parsed.Table) {
@@ -56,13 +60,17 @@ open class LinearListener constructor() : HtmlArticleParserListener() {
 
     override fun onDataRequested(
         config: HtmlConfig,
-        monitoring: ParseMetrics,
-        headData: HtmlHeadData?
-    ): HtmlData.Success {
-        return HtmlData.Success(
-            elements = ArrayList(elements),
-            metrics = monitoring,
-            headData = headData
+        metering: HtmlParseMetering?,
+        headData: HtmlHeadData?,
+        loadingStates: HtmlData.LoadingStates,
+    ): HtmlData {
+        //TODO loading states
+        return HtmlData(
+            elements = elements,
+            metering = metering,
+            headData = headData,
+            error = null,
+            loadingStates =loadingStates
         )
     }
 

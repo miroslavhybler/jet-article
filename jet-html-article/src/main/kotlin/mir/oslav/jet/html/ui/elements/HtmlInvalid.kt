@@ -1,4 +1,4 @@
-package mir.oslav.jet.html.composables.elements
+package mir.oslav.jet.html.ui.elements
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +19,7 @@ import mir.oslav.jet.html.data.HtmlData
 @Composable
 fun HtmlInvalid(
     modifier: Modifier = Modifier,
-    data: HtmlData.Invalid
+    error: HtmlData.HtmlDataError
 ) {
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -29,9 +29,8 @@ fun HtmlInvalid(
                 text = "Invalid",
                 style = MaterialTheme.typography.titleLarge
             )
-            Text(text = data.message)
-
-            Text(text = data.exception.toString())
+            Text(text = error.message)
+            Text(text = error.cause.toString())
         }
     }
 }

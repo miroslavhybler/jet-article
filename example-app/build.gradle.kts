@@ -5,6 +5,8 @@ import com.android.build.api.dsl.ManagedVirtualDevice
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    kotlin("kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -108,6 +110,14 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.7.5")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.28.0")
 
+    /** Hilt DI */
+    val hiltVersion = "2.48"
+    val hiltCompilerVersion = "1.1.0"
+    implementation("com.google.dagger:hilt-android:$hiltVersion")
+    kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    implementation("androidx.hilt:hilt-common:$hiltCompilerVersion")
+    kapt("androidx.hilt:hilt-compiler:$hiltCompilerVersion")
+    implementation("androidx.hilt:hilt-navigation-compose:$hiltCompilerVersion")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

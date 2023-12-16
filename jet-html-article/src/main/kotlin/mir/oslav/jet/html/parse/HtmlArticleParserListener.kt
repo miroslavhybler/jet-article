@@ -4,7 +4,7 @@ import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.data.HtmlHeadData
-import mir.oslav.jet.html.data.ParseMetrics
+import mir.oslav.jet.html.data.HtmlParseMetering
 
 
 /**
@@ -34,6 +34,9 @@ abstract class HtmlArticleParserListener constructor() {
     open fun onQuote(quote: HtmlElement.Parsed.Quote): Unit = Unit
 
 
+    open fun onCode(code: HtmlElement.Parsed.Code): Unit = Unit
+
+
     /**
      * @since 1.0.0
      */
@@ -55,6 +58,12 @@ abstract class HtmlArticleParserListener constructor() {
     /**
      * @since 1.0.0
      */
+    open fun onBasicList(basicList: HtmlElement.Parsed.BasicList): Unit = Unit
+
+
+    /**
+     * @since 1.0.0
+     */
     open fun onAddress(address: HtmlElement.Parsed.Address): Unit = Unit
 
 
@@ -63,9 +72,10 @@ abstract class HtmlArticleParserListener constructor() {
      */
     abstract fun onDataRequested(
         config: HtmlConfig,
-        monitoring: ParseMetrics,
-        headData: HtmlHeadData?
-    ): HtmlData.Success
+        metering: HtmlParseMetering?,
+        headData: HtmlHeadData?,
+        loadingStates: HtmlData.LoadingStates,
+    ): HtmlData
 
 
     /**

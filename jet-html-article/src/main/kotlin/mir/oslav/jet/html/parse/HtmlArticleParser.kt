@@ -1,8 +1,14 @@
+@file:Suppress("RedundantVisibilityModifier")
+
 package mir.oslav.jet.html.parse
 
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
@@ -11,9 +17,10 @@ import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.data.HtmlHeadData
 import mir.oslav.jet.html.data.IgnoreOptions
-import mir.oslav.jet.html.data.ParseMetrics
-import mir.oslav.jet.html.parse.CoreHtmlArticleParser.indexOfSubstring
+import mir.oslav.jet.html.data.HtmlParseMetering
+import mir.oslav.jet.html.parse.DedicatedTagParser.indexOfSubstring
 import mir.oslav.jet.html.parse.listeners.LinearListener
+import kotlin.jvm.Throws
 
 
 /**
@@ -23,22 +30,33 @@ import mir.oslav.jet.html.parse.listeners.LinearListener
  */
 //TODO refactor
 //TODO eliminate using substring() to minimum
-object HtmlArticleParser {
+//TODO replace kotlin lists functions to increase performance
+//TODO </![cdata[>
+public object HtmlArticleParser {
 
+
+    private val tagsCounts: HashMap<String, Int> = HashMap()
+    private var totalBodyTagsCount: Int = 0
+
+    private var isDoingMetering: Boolean = false
 
     /**
      * @param content Html content text to parse
-     * @param ignoreOptions Specifying elements that are going to be ingored in result
-     * @return [HtmlData.Success] when [content] was processed and parsed sucessfully, [HtmlData.Invalid]
+     * @param ignoreOptions Specifying elements that are going to be ignored in result
+     * @return [HtmlData]
      * otherwise.
      * @since 1.0.0
      */
-    fun parse(
+    public fun parse(
         content: String,
         listener: HtmlArticleParserListener = LinearListener(),
         ignoreOptions: IgnoreOptions = IgnoreOptions(),
         config: HtmlConfig = HtmlConfig(),
+        isDoingMetering: Boolean = false
     ): Flow<HtmlData> {
+        tagsCounts.clear()
+        totalBodyTagsCount = 0
+        this.isDoingMetering = isDoingMetering
         return try {
             parseHtmlArticle(
                 content = content,
@@ -49,27 +67,48 @@ object HtmlArticleParser {
         } catch (exception: Exception) {
             exception.printStackTrace()
             flowOf(
-                value = HtmlData.Invalid(
-                    message = "No message",
-                    exception = exception
+                value = HtmlData(
+                    error = HtmlData.HtmlDataError(
+                        message = "No message",
+                        cause = exception
+                    ),
+                    headData = null,
+                    elements = emptyList(),
+                    loadingStates = HtmlData.LoadingStates(
+                        isLoading = false,
+                        isAppending = false,
+                        message = null
+                    )
                 )
             )
         }
     }
 
 
-    //TODO add metrics
+    //TODO raw content text in any tag, like text in div <div>Text outside "p"</div>
+    @Throws(Exception::class)
     private fun parseHtmlArticle(
         content: String,
         ignoreOptions: IgnoreOptions,
         listener: HtmlArticleParserListener,
         config: HtmlConfig,
     ): Flow<HtmlData> = flow {
-        emit(value = HtmlData.Loading(message = "TODO started"))
+        emit(
+            value = HtmlData(
+                error = null,
+                elements = emptyList(),
+                loadingStates = HtmlData.LoadingStates(
+                    isLoading = true,
+                    isAppending = true,
+                    message = "Started",
+                ),
+                headData = null
+            )
+        )
 
         var index = 0
         var headData: HtmlHeadData? = null
-        val startTime = System.currentTimeMillis()
+        val startTime: Long? = if (isDoingMetering) System.currentTimeMillis() else null
         while (index in content.indices) {
             val char = content[index]
 
@@ -100,6 +139,19 @@ object HtmlArticleParser {
                     //Plus one because startIndex is inclusive and would include '<' char
                     val tagContent = content.substring(startIndex = eIndex + 1, endIndex = ceIndex)
                     headData = parseHeadData(content = tagContent)
+
+                    emit(
+                        value = listener.onDataRequested(
+                            config = config,
+                            metering = null,
+                            headData = headData,
+                            loadingStates = HtmlData.LoadingStates(
+                                isLoading = true,
+                                isAppending = true,
+                                message = null
+                            )
+                        )
+                    )
                     index = ceIndex + 7
                     continue
                 }
@@ -110,22 +162,34 @@ object HtmlArticleParser {
                     //Plus one because startIndex is inclusive and would include '<' char
                     val tagContent = content.substring(startIndex = eIndex + 1, endIndex = ceIndex)
                     index = ceIndex + 7
-                    parseBody(
+                    parseBodyTags(
                         content = tagContent,
                         listener = listener,
                         config = config,
-                        ignoreOptions=ignoreOptions
+                        ignoreOptions = ignoreOptions,
+                        upperFlow = this
                     )
+
+
+                    val metering = if (isDoingMetering && startTime != null) {
+                        HtmlParseMetering(
+                            startTime = startTime,
+                            endTime = System.currentTimeMillis(),
+                            tagsCount = totalBodyTagsCount,
+                            tags = tagsCounts
+                        )
+                    } else null
 
                     emit(
                         value = listener.onDataRequested(
                             config = config,
-                            monitoring = ParseMetrics(
-                                startTime = startTime,
-                                endTime = System.currentTimeMillis(),
-
-                                ),
-                            headData = headData
+                            metering = metering,
+                            headData = headData,
+                            HtmlData.LoadingStates(
+                                isLoading = false,
+                                isAppending = false,
+                                message = null
+                            )
                         )
                     )
                     return@flow
@@ -143,18 +207,20 @@ object HtmlArticleParser {
     /**
      * @since 1.0.0
      */
-    //TODO find a away how to solve invalid tags like <p></p></p>
-    private suspend fun parseBody(
+    @Throws(Exception::class)
+    private suspend fun parseBodyTags(
         content: String,
         config: HtmlConfig,
         listener: HtmlArticleParserListener,
-        ignoreOptions: IgnoreOptions
+        ignoreOptions: IgnoreOptions,
+        upperFlow: FlowCollector<HtmlData>
     ) {
         var index = 0
 
         while (index in content.indices) {
             val char = content[index]
 
+            //TODO text outside tags
             if (char != '<') {
                 index += 1
                 continue
@@ -175,7 +241,12 @@ object HtmlArticleParser {
             }
 
             //Tag body within <...>
-            val tagBody = content.substring(startIndex = index + 1, endIndex = seIndex)
+            val tagBody = try {
+                content.substring(startIndex = index + 1, endIndex = seIndex)
+            } catch (ignored: Exception) {
+                index = seIndex
+                continue
+            }
 
             if (index + 3 < content.length) {
                 val substring = content.substring(startIndex = index, endIndex = index + 4)
@@ -186,9 +257,44 @@ object HtmlArticleParser {
                 }
             }
 
-            when (val tag = extractTagName(tagBody = tagBody)) {
+            val classIndication = "class=\""
+            if (tagBody.contains(other = classIndication, ignoreCase = true)) {
+                val cis = tagBody.indexOfSubstring(substring = classIndication, fromIndex = 0)
+                val cie = tagBody.indexOfSubstring(substring = "\"", fromIndex = cis)
+                val tagClassesText = tagBody.substring(startIndex = cis, endIndex = cie)
+                val tagClasses = tagClassesText.split(' ')
+
+                if (tagClasses.isNotEmpty() && ignoreOptions.classes.isNotEmpty()) {
+                    var skipInMainCycle = false
+                    for (tagClass in tagClasses) {
+                        if (ignoreOptions.classes.contains(element = tagClass)) {
+                            skipInMainCycle = true
+                            break
+                        }
+                    }
+
+                    if (skipInMainCycle) {
+                        index = seIndex
+                        continue
+                    }
+                }
+            }
+
+            val tag = extractTagName(tagBody = tagBody)
+
+            if (isDoingMetering) {
+                if (tagsCounts.containsKey(key = tag)) {
+                    val value = tagsCounts[tag] ?: 0
+                    tagsCounts[tag] = value + 1
+                } else {
+                    tagsCounts[tag] = 1
+                }
+                totalBodyTagsCount += 1
+            }
+
+            when (tag) {
                 "img" -> {
-                    CoreHtmlArticleParser.parseImageFromText(
+                    DedicatedTagParser.parseImageFromText(
                         startIndex = index,
                         endIndex = seIndex,
                         config = config,
@@ -198,30 +304,70 @@ object HtmlArticleParser {
                     index = seIndex + 1
                     continue
                 }
+                //Pair tags
 
                 else -> {
-                    //TODO /p
-                    //TODO padá protože hledá //p
-                    //TODO proč to hledá "/img"
                     val closingTag = "</$tag>"
                     val cleIndex = content.indexOfSubstring(
                         substring = closingTag,
                         fromIndex = seIndex
                     )
 
-                    if (ignoreOptions.tags.contains(element = tag)) {
-                        index = cleIndex
-                        continue
+//                    if (ignoreOptions.tags.contains(element = tag)) {
+//                        Log.d("mirek", "ignoring tag: $tag")
+//                        index = cleIndex
+//                        continue
+//                    }
+
+                    if (tagBody.contains(other = classIndication, ignoreCase = true)) {
+                        val cis = tagBody.indexOfSubstring(
+                            substring = classIndication,
+                            fromIndex = 0
+                        )
+                        val cie = tagBody.indexOfSubstring(
+                            substring = "\"",
+                            fromIndex = cis + classIndication.length
+                        )
+                        val tagClassesText = tagBody.substring(
+                            startIndex = cis + classIndication.length,
+                            endIndex = cie
+                        )
+                        val tagClasses = tagClassesText
+                            .removePrefix(prefix = "\"")
+                            .removeSuffix(suffix = "\"")
+                            .split(' ')
+                            .filter { tagClass -> tagClass != "" }
+                            .mapAsync { tagClass -> tagClass.trim() }
+
+                        if (tagClasses.isNotEmpty() && ignoreOptions.classes.isNotEmpty()) {
+                            var skipInMainCycle = false
+                            for (tagClass in tagClasses) {
+                                if (ignoreOptions.classes.contains(element = tagClass)) {
+                                    Log.d("mirek", "ignoring class: $tagClass")
+                                    skipInMainCycle = true
+                                    break
+                                }
+                            }
+
+                            if (skipInMainCycle) {
+                                index = cleIndex
+                                continue
+                            }
+                        }
                     }
 
                     //Plus one because startIndex is inclusive and would include '<' char
+                    //TODO dont work for <div><div></div>
                     val tagContent = try {
                         content.substring(
                             startIndex = seIndex + 1,
                             endIndex = cleIndex
                         )
                     } catch (exception: Exception) {
-                        Log.e("mirek", "bug for $tag with closing $closingTag")
+                        Log.e(
+                            "mirek",
+                            "bug for $tag with closing $closingTag from contet:\n\n$content\n\n"
+                        )
                         return
                     }
 
@@ -231,7 +377,9 @@ object HtmlArticleParser {
                         config = config,
                         content = tagContent,
                         startContentIndex = seIndex,
-                        endContentIndex = cleIndex
+                        endContentIndex = cleIndex,
+                        upperFlow = upperFlow,
+                        ignoreOptions = ignoreOptions
                     )
 
                     index = cleIndex + closingTag.length + 1
@@ -240,17 +388,23 @@ object HtmlArticleParser {
         }
     }
 
-
-    private fun processPairTag(
+    @Throws(Exception::class)
+    private suspend fun processPairTag(
         tag: String,
         content: String,
         listener: HtmlArticleParserListener,
         config: HtmlConfig,
         startContentIndex: Int,
         endContentIndex: Int,
+        upperFlow: FlowCollector<HtmlData>,
+        ignoreOptions: IgnoreOptions,
     ) {
+
+        var canEmitNewTag = false
+        //Support pre
         when (tag) {
             "address" -> {
+                canEmitNewTag = true
                 listener.onAddress(
                     HtmlElement.Parsed.Address(
                         startIndex = startContentIndex,
@@ -262,8 +416,9 @@ object HtmlArticleParser {
             }
 
             "table" -> {
+                canEmitNewTag = true
                 listener.onTable(
-                    table = CoreHtmlArticleParser.parseTableFromText(
+                    table = DedicatedTagParser.parseTableFromText(
                         startIndex = startContentIndex,
                         endIndex = endContentIndex,
                         content = content,
@@ -272,18 +427,45 @@ object HtmlArticleParser {
                 )
             }
 
+            "ol", "ul" -> {
+                canEmitNewTag = true
+                listener.onBasicList(
+                    basicList = DedicatedTagParser.parseBasicListFromText(
+                        isOrdered = tag == "ol",
+                        content = content,
+                        startIndex = startContentIndex,
+                        endIndex = endContentIndex,
+                        config = config
+                    )
+                )
+            }
+
             "blockquote" -> {
+                canEmitNewTag = true
                 listener.onQuote(
                     quote = HtmlElement.Parsed.Quote(
                         text = content,
-                        startIndex = startContentIndex + 1,
+                        startIndex = startContentIndex,
                         endIndex = startContentIndex,
                         span = config.spanCount
                     )
                 )
             }
 
+            "code" -> {
+                canEmitNewTag = true
+                listener.onCode(
+                    code = HtmlElement.Parsed.Code(
+                        content = content,
+                        startIndex = startContentIndex,
+                        endIndex = endContentIndex,
+                        span = config.spanCount
+                    )
+                )
+            }
+
             "h1", "h2", "h3", "h4", "h5", "h6", "h7" -> {
+                canEmitNewTag = true
                 listener.onTitle(
                     title = HtmlElement.Parsed.Title(
                         text = content,
@@ -295,7 +477,8 @@ object HtmlArticleParser {
                 )
             }
 
-            else -> {
+            "p" -> {
+                canEmitNewTag = true
                 //paragraph
                 listener.onTextBlock(
                     textBlock = HtmlElement.Parsed.TextBlock(
@@ -306,10 +489,41 @@ object HtmlArticleParser {
                     )
                 )
             }
+
+            else -> {
+                //Other tags like div, span, section are consider to be a "wrapper" tags, trying
+                //To parse content from these tags
+                //TODO nebere v potaz vnořenost <div><div></div></div>
+                //TODO vyletí protože spojí první <div> a </div>
+                parseBodyTags(
+                    content = content,
+                    config = config,
+                    listener = listener,
+                    ignoreOptions = ignoreOptions,
+                    upperFlow = upperFlow
+                )
+            }
+        }
+
+
+        if (canEmitNewTag) {
+            upperFlow.emit(
+                value = listener.onDataRequested(
+                    config = config,
+                    metering = null,
+                    headData = null,
+                    HtmlData.LoadingStates(
+                        isLoading = true,
+                        isAppending = true,
+                        message = null
+                    )
+                )
+            )
         }
     }
 
 
+    @Throws(Exception::class)
     private fun parseHeadData(
         content: String
     ): HtmlHeadData {
@@ -343,22 +557,26 @@ object HtmlArticleParser {
             val closingTag = "</$tag>"
             val clIndex = content.indexOfSubstring(substring = closingTag, fromIndex = index)
 
-            //TODO bug z mapbox článku, brát prostě jen title a base
-            val tagContent = try {
-                content.substring(
-                    startIndex = index,
-                    endIndex = clIndex
-                )
-            } catch (e: Exception) {
-                Log.d("mirek", "bug for tag: $tag with closing $closingTag")
-                return HtmlHeadData(title = null, baseUrl = null)
-            }
-            when (tag) {
-                "title" -> title = tagContent
-                "base" -> base = tagContent
-            }
-            index = clIndex + closingTag.length + 1
+            if (tag == "title" || tag == "base") {
 
+                val tagContent = try {
+                    content.substring(
+                        startIndex = seIndex + 1,
+                        endIndex = clIndex
+                    )
+                } catch (ignored: Exception) {
+                    index = clIndex.takeIf { it != -1 } ?: (seIndex + 1)
+                    continue
+                }
+                when (tag) {
+                    "title" -> title = tagContent
+                    "base" -> base = tagContent
+                }
+                index = clIndex + closingTag.length + 1
+            } else {
+                index = clIndex
+                continue
+            }
         }
         return HtmlHeadData(title = title, baseUrl = base)
     }
@@ -375,4 +593,9 @@ object HtmlArticleParser {
 
         return rawTagName.trim().lowercase()
     }
+
+
+    private suspend fun <T, R> List<T>.mapAsync(
+        mapper: suspend (T) -> R
+    ): List<R> = coroutineScope { map { async { mapper(it) } }.awaitAll() }
 }

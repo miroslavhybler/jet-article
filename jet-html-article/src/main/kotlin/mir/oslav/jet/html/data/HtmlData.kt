@@ -6,40 +6,42 @@ package mir.oslav.jet.html.data
  * @author Miroslav Hýbler <br>
  * created on 15.07.2023
  */
-sealed class HtmlData private constructor(
+class HtmlData constructor(
+    val loadingStates: LoadingStates,
+    val elements: List<HtmlElement>,
+    val headData: HtmlHeadData?,
+    val error: HtmlDataError? = null,
+    val metering: HtmlParseMetering? = null
 ) {
 
-
-    /**
-     * @since 1.0.0
-     */
-    data object Empty : HtmlData()
-
-
-    /**
-     * @since 1.0.0
-     */
-    //TODO maybe background support
-    data class Success constructor(
-        val elements: List<HtmlElement>,
-        val metrics: ParseMetrics,
-        val headData: HtmlHeadData?
-    ) : HtmlData()
+    companion object {
+        val empty: HtmlData = HtmlData(
+            loadingStates = LoadingStates(
+                isLoading = false,
+                isAppending = false,
+                message = null
+            ),
+            elements = emptyList(),
+            error = null,
+            headData = null
+        )
+    }
 
 
-    /**
-     * @since 1.0.0
-     */
-    data class Invalid constructor(
+    val isEmpty: Boolean get() = elements.isEmpty()
+            && error == null
+            && !loadingStates.isLoading
+            && !loadingStates.isAppending
+
+
+    data class LoadingStates constructor(
+        val isLoading: Boolean,
+        val isAppending: Boolean,
+        val message: String?,
+    )
+
+    data class HtmlDataError constructor(
         val message: String,
-        val exception: Exception,
-    ) : HtmlData()
-
-
-    /**
-     * @since 1.0.0
-     */
-    data class Loading constructor(
-        val message: String,
-    ) : HtmlData()
+        val cause: Throwable
+    )
 }

@@ -27,6 +27,11 @@ sealed class HtmlElement private constructor(
     ) : HtmlElement(span = span) {
 
 
+        val positionKey = PositionKey(startIndex = startIndex, endIndex = endIndex)
+
+        data class PositionKey constructor(val startIndex: Int, val endIndex: Int)
+
+
         /**
          * @since 1.0.0
          */
@@ -109,7 +114,49 @@ sealed class HtmlElement private constructor(
         /**
          * @since 1.0.0
          */
+        data class BasicList(
+            val items: List<String>,
+            val isOrdered: Boolean,
+            override val startIndex: Int,
+            override val endIndex: Int,
+            override val span: Int
+        ) : Parsed(
+            startIndex = startIndex,
+            endIndex = endIndex,
+            span = span
+        )
+
+
+        /**
+         * @since 1.0.0
+         */
+        data class DescriptionList(
+            val items: List<String>,
+            val isOrdered: Boolean,
+            override val startIndex: Int,
+            override val endIndex: Int,
+            override val span: Int
+        ) : Parsed(
+            startIndex = startIndex,
+            endIndex = endIndex,
+            span = span
+        )
+
+        /**
+         * @since 1.0.0
+         */
         data class Address constructor(
+            val content: String,
+            override val startIndex: Int,
+            override val endIndex: Int,
+            override val span: Int
+        ) : Parsed(
+            startIndex = startIndex,
+            endIndex = endIndex,
+            span = span
+        )
+
+        data class Code constructor(
             val content: String,
             override val startIndex: Int,
             override val endIndex: Int,

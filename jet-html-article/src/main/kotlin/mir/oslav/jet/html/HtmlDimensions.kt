@@ -1,7 +1,6 @@
 package mir.oslav.jet.html
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import mir.oslav.jet.utils.isExtraLargeScreen
@@ -20,14 +19,6 @@ class HtmlDimensions constructor() {
     }
 
 
-    //Total size o clickable icons
-    val clickableIconSize: Dp = 42.dp
-
-
-    //Inner padding of clickable icons (for ripple effect)
-    val clickableIconPadding: Dp = 8.dp
-
-
     //Horizontal content padding from side of screen
     var sidePadding: Dp = 16.dp
         private set
@@ -38,17 +29,18 @@ class HtmlDimensions constructor() {
         private set
 
 
-    //Vertical content padding from bottom line of scaffold's content
-    var bottomLinePadding: Dp = 22.dp
+    //Vertical extra content padding from bottom line of scaffold's content
+    var baseLinePadding: Dp = 22.dp
 
 
+    //TODO  table cells size
     val table: Table = Table()
 
 
     /**
      * @since 1.0.0
      */
-    //TODO init table,
+    //TODO init table
     fun init(
         configuration: Configuration,
         screenWidth: Dp,
@@ -115,33 +107,6 @@ class HtmlDimensions constructor() {
     }
 
 
-    /**
-     * @since 1.0.0
-     */
-    data class CollapsingTopBar internal constructor(
-        var minHeight: Dp = 56.dp,
-        var maxHeight: Dp = 226.dp,
-    )
-
-
-    /**
-     * @since 1.0.0
-     */
-    data class SimpleTopBar internal constructor(
-        var minHeight: Dp = 56.dp,
-        var maxHeight: Dp = 56.dp,
-    )
-
-
-    /**
-     * @since 1.0.0
-     */
-    data class Gallery internal constructor(
-        var sheetCollapsedHeight: Dp = 0.dp,
-        var sheetPartiallyExpandedHeight: Dp = 0.dp,
-        var sheetMaxHeight: Dp = 0.dp,
-    )
-
 
     /**
      * @since 1.0.0
@@ -150,7 +115,7 @@ class HtmlDimensions constructor() {
         val minCellWidth: Dp = 96.dp,
         val minCellHeight: Dp = 32.dp,
 
-        val maxCellWidth: Dp = 192.dp,
-        val maxCellHeight: Dp = 32.dp,
+     //   val maxCellWidth: Dp = 192.dp,
+     //   val maxCellHeight: Dp = 32.dp,
     )
 }

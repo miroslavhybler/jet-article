@@ -10,7 +10,7 @@ import mir.oslav.jet.html.normalizedUrl
  * @author Miroslav Hýbler <br>
  * created on 25.08.2023
  */
-internal object CoreHtmlArticleParser {
+internal object DedicatedTagParser {
 
 
     private val ignoreCaseOpt: Set<RegexOption> = setOf(
@@ -92,11 +92,11 @@ internal object CoreHtmlArticleParser {
     ): HtmlElement.Parsed.Table {
         val outRows = ArrayList<List<String>>()
 
-        val rows = parsePairTagBody(content = content, searchedTag = "tr")
+        val rows = groupPairTagsContent(content = content, searchedTag = "tr")
 
         rows.forEach { rawTag ->
-            val headers = parsePairTagBody(content = rawTag, searchedTag = "th")
-            val cells = parsePairTagBody(content = rawTag, searchedTag = "td")
+            val headers = groupPairTagsContent(content = rawTag, searchedTag = "th")
+            val cells = groupPairTagsContent(content = rawTag, searchedTag = "td")
 
             outRows.add(headers + cells)
         }
@@ -110,10 +110,29 @@ internal object CoreHtmlArticleParser {
     }
 
 
+    internal fun parseBasicListFromText(
+        isOrdered: Boolean,
+        content: String,
+        startIndex: Int,
+        endIndex: Int,
+        config: HtmlConfig
+    ): HtmlElement.Parsed.BasicList {
+        val items = groupPairTagsContent(content = content, searchedTag = "li")
+
+        return HtmlElement.Parsed.BasicList(
+            isOrdered = isOrdered,
+            startIndex = startIndex,
+            endIndex = endIndex,
+            span = config.spanCount,
+            items = items
+        )
+    }
+
+
     /**
      * @since 1.0.0
      */
-    private fun parsePairTagBody(
+    private fun groupPairTagsContent(
         content: String,
         searchedTag: String
     ): List<String> {
@@ -153,4 +172,6 @@ internal object CoreHtmlArticleParser {
         }
         return outList
     }
+
+
 }

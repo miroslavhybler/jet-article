@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,22 +31,25 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import dagger.hilt.android.AndroidEntryPoint
 import jet.html.article.example.ui.theme.JetHtmlArticleExampleTheme
 import mir.oslav.jet.html.data.HtmlConfig
-import mir.oslav.jet.html.composables.JetHtmlArticle
+import mir.oslav.jet.html.ui.JetHtmlArticle
 import mir.oslav.jet.html.data.HtmlData
+import mir.oslav.jet.html.data.IgnoreOptions
 import mir.oslav.jet.html.parse.HtmlArticleParser
 
 /**
  *
  * @author Miroslav Hýbler <br>
- * created on 25.08.2023xc
+ * created on 25.08.2023
  */
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,22 +60,12 @@ class MainActivity : ComponentActivity() {
             val colorScheme = MaterialTheme.colorScheme
             val view = LocalView.current
 
-            val systemUiController = rememberSystemUiController()
-            val isSystemDark = isSystemInDarkTheme()
 
             JetHtmlArticleExampleTheme {
-
                 LaunchedEffect(key1 = Unit, block = {
                     requestInsets(view = view)
-                    systemUiController.setStatusBarColor(
-                        color = colorScheme.background,
-                        darkIcons = !isSystemDark
-                    )
-                    systemUiController.setNavigationBarColor(
-                        color = colorScheme.background.copy(alpha = 0.85f),
-                        darkIcons = !isSystemDark
-                    )
                 })
+
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -161,34 +153,32 @@ private fun HomePage(navHostController: NavHostController) {
 }
 
 
-@ExperimentalMaterial3Api
 @Composable
 private fun ArticleScreen(
     article: String,
+    ignoreOptions: IgnoreOptions = IgnoreOptions(),
+    viewModel: ArticleViewModel = hiltViewModel()
 ) {
 
-    val assets = LocalContext.current.assets
-
-    fun getArticle(fileName: String): String {
-        return String(assets.open("simple-examples/${fileName}.html").readBytes())
-    }
-
     val config = remember { HtmlConfig(spanCount = 3) }
-    val parseFlow = remember {
-        HtmlArticleParser.parse(
-            content = getArticle(fileName = article),
-            config = config,
-        )
-    }
-    val data: HtmlData by parseFlow.collectAsState(initial = HtmlData.Empty)
+    val data: HtmlData by viewModel.articleData.collectAsState()
 
+    LaunchedEffect(key1 = Unit, block = {
+       if (data.isEmpty) {
+            viewModel.parse(
+                config = config,
+                ignoreOptions = ignoreOptions,
+                article = article
+            )
+        }
+    })
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(text = remember(key1 = data) {
-                        (data as? HtmlData.Success)?.headData?.title ?: "No title"
+                        data.headData?.title ?: "No title"
                     })
                 }
             )
@@ -201,5 +191,4 @@ private fun ArticleScreen(
             contentPadding = paddingValues
         )
     }
-
 }

@@ -1,15 +1,15 @@
-package mir.oslav.jet.html.composables.elements
+package mir.oslav.jet.html.ui.elements
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -36,7 +36,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
-import mir.oslav.jet.html.HtmlDimensions
 import mir.oslav.jet.html.LocalHtmlDimensions
 import mir.oslav.jet.html.data.HtmlElement
 
@@ -103,12 +102,12 @@ fun HtmlTable(
                                 if (widthDp > widthForColumn) {
                                     cellWidthsForColumns[columnIndex] = widthDp
                                         .coerceAtLeast(minimumValue = dimensions.minCellWidth)
-                                        .coerceAtMost(maximumValue = dimensions.maxCellWidth)
+                                   //     .coerceAtMost(maximumValue = dimensions.maxCellWidth)
                                 }
                             } else {
                                 cellWidthsForColumns[columnIndex] = widthDp
                                     .coerceAtLeast(minimumValue = dimensions.minCellWidth)
-                                    .coerceAtMost(maximumValue = dimensions.maxCellWidth)
+                                 //   .coerceAtMost(maximumValue = dimensions.maxCellWidth)
                             }
                         })
 
@@ -117,9 +116,9 @@ fun HtmlTable(
                             columnIndex = columnIndex,
                             rowIndex = rowIndex,
                             rowCount = rowValues.size,
-                            modifier = Modifier.size(
-                                width = widthForColumn ?: dimensions.minCellWidth,
-                                height = dimensions.maxCellHeight
+                            modifier = Modifier.defaultMinSize(
+                                minWidth = widthForColumn ?: dimensions.minCellWidth,
+                            //    height = dimensions.maxCellHeight
                             )
                         )
                     }
@@ -153,9 +152,9 @@ private fun TableCell(
         modifier = modifier
             .sizeIn(
                 minWidth = dimensions.minCellWidth,
-                maxWidth = dimensions.maxCellWidth,
+          //      maxWidth = dimensions.maxCellWidth,
                 minHeight = dimensions.minCellHeight,
-                maxHeight = dimensions.maxCellHeight
+          //      maxHeight = dimensions.maxCellHeight
             )
     ) {
         Text(
@@ -180,7 +179,7 @@ private fun TableCell(
 
         Divider(
             modifier = Modifier
-                .size(width = 1.dp, height = dimensions.maxCellHeight),
+                .defaultMinSize(minWidth = 1.dp).fillMaxHeight(),
             color = Color.Black,
             thickness = 1.dp
         )
