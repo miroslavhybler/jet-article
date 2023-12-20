@@ -35,26 +35,26 @@ fun HtmlTextBlock(
     val dimensions = LocalHtmlDimensions.current
     val colorScheme = MaterialTheme.colorScheme
 
-    var initialAlpha by rememberSaveable { mutableFloatStateOf(value = 0f) }
-    val alpha = remember { Animatable(initialValue = initialAlpha) }
-
-    LaunchedEffect(key1 = text.positionKey, block = {
-        if (initialAlpha != 1f) {
-            alpha.animateTo(targetValue = 1f)
-        }
-        initialAlpha = 1f
-    })
+//    var initialAlpha by rememberSaveable { mutableFloatStateOf(value = 0f) }
+//    val alpha = remember { Animatable(initialValue = initialAlpha) }
+//
+//    LaunchedEffect(key1 = text.positionKey, block = {
+//        if (initialAlpha != 1f) {
+//            alpha.animateTo(targetValue = 1f)
+//        }
+//        initialAlpha = 1f
+//    })
 
     AnimatedVisibility(visible = true, enter = fadeIn()) {
         Text(
-            text = remember {
+            text = remember(key1 = text) {
                 text.text.toHtml()
                     .toSpannable()
                     .toAnnotatedString(primaryColor = colorScheme.primary)
             },
             modifier = modifier
                 .padding(horizontal = dimensions.sidePadding)
-                .alpha(alpha = alpha.value)
+            //    .alpha(alpha = alpha.value)
 
         )
     }

@@ -75,6 +75,7 @@ abstract class HtmlArticleParserListener constructor() {
         metering: HtmlParseMetering?,
         headData: HtmlHeadData?,
         loadingStates: HtmlData.LoadingStates,
+        isFullyLoaded:Boolean
     ): HtmlData
 
 

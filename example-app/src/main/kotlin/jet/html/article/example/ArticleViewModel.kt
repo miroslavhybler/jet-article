@@ -36,7 +36,8 @@ class ArticleViewModel @Inject constructor(
             HtmlArticleParser.parse(
                 content = getArticle(fileName = article),
                 config = config,
-                ignoreOptions = ignoreOptions
+                ignoreOptions = ignoreOptions,
+                isDoingMetering = true
             ).collect { newData ->
                 mArticleData.value = newData
             }

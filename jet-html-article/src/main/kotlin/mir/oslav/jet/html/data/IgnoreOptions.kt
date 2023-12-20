@@ -9,6 +9,7 @@ package mir.oslav.jet.html.data
  * @author Miroslav Hýbler <br>
  * created on 15.07.2023
  */
+//TODO use pair of tag and class to increase performance
 data class IgnoreOptions constructor(
     val classes: List<String> = emptyList(),
 ) {

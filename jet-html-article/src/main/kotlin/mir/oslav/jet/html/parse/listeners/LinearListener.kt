@@ -63,6 +63,7 @@ open class LinearListener constructor() : HtmlArticleParserListener() {
         metering: HtmlParseMetering?,
         headData: HtmlHeadData?,
         loadingStates: HtmlData.LoadingStates,
+        isFullyLoaded: Boolean
     ): HtmlData {
         //TODO loading states
         return HtmlData(
@@ -70,7 +71,8 @@ open class LinearListener constructor() : HtmlArticleParserListener() {
             metering = metering,
             headData = headData,
             error = null,
-            loadingStates =loadingStates
+            loadingStates =loadingStates,
+            isFullyLoaded = isFullyLoaded
         )
     }
 

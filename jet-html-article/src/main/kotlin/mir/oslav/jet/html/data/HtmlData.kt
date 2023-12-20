@@ -11,7 +11,8 @@ class HtmlData constructor(
     val elements: List<HtmlElement>,
     val headData: HtmlHeadData?,
     val error: HtmlDataError? = null,
-    val metering: HtmlParseMetering? = null
+    val metering: HtmlParseMetering? = null,
+    val isFullyLoaded: Boolean
 ) {
 
     companion object {
@@ -23,16 +24,17 @@ class HtmlData constructor(
             ),
             elements = emptyList(),
             error = null,
-            headData = null
+            headData = null,
+            isFullyLoaded=false
         )
     }
 
 
-    val isEmpty: Boolean get() = elements.isEmpty()
-            && error == null
-            && !loadingStates.isLoading
-            && !loadingStates.isAppending
-
+    val isEmpty: Boolean
+        get() = elements.isEmpty()
+                && error == null
+                && !loadingStates.isLoading
+                && !loadingStates.isAppending
 
     data class LoadingStates constructor(
         val isLoading: Boolean,

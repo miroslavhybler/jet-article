@@ -1,8 +1,6 @@
 package mir.oslav.jet.html
 
-import android.content.res.Configuration
 import android.graphics.Typeface
-import android.text.Html
 import android.text.Spannable
 import android.text.Spanned
 import android.text.style.CharacterStyle
@@ -10,14 +8,13 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.text.style.URLSpan
 import android.text.style.UnderlineSpan
-import androidx.annotation.ColorInt
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.core.graphics.ColorUtils
 import androidx.core.text.HtmlCompat
 
 
@@ -48,6 +45,54 @@ fun String.normalizedAttributeValue(): String = this
     .removePrefix(prefix = " ")
     .removeSuffix(suffix = "/")
     .removeSuffix(suffix = " ")
+
+
+fun String.sub(startIndex: Int, endIndex: Int): String = try {
+    this.substring(startIndex = startIndex, endIndex = endIndex)
+} catch (exception: StringIndexOutOfBoundsException) {
+    Log.e(
+        "mirek",
+        "failed to get substring f: $startIndex e: $endIndex from $this"
+    )
+    throw exception
+}
+
+fun String.iOf(char: Char, startIndex: Int): Int {
+    return try {
+        this.indexOf(char = char, startIndex = startIndex)
+            .takeIf { index -> index != -1 }
+            ?: throw StringIndexOutOfBoundsException()
+    } catch (exception: StringIndexOutOfBoundsException) {
+        val clipped = this.sub(startIndex = startIndex, endIndex = this.length)
+        Log.e(
+            "mirek",
+            "Failed to get index of char $char " +
+                    "because its not in content from start $startIndex!\n" +
+                    "Content:\n" +
+                    clipped
+        )
+        throw exception
+    }
+}
+
+
+fun String.iOf(string: String, startIndex: Int): Int {
+    return try {
+        this.indexOf(string = string, startIndex = startIndex)
+            .takeIf { index -> index != -1 }
+            ?: throw StringIndexOutOfBoundsException()
+    } catch (exception: StringIndexOutOfBoundsException) {
+        val clipped = this.sub(startIndex = startIndex, endIndex = this.length)
+        Log.e(
+            "mirek",
+            "Failed to get index of char $string " +
+                    "because its not in content from start $startIndex!\n" +
+                    "Content:\n" +
+                    clipped
+        )
+        throw exception
+    }
+}
 
 
 fun Spannable.toAnnotatedString(primaryColor: Color): AnnotatedString {
