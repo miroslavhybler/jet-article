@@ -28,7 +28,7 @@ import mir.oslav.jet.html.toHtml
 @Composable
 fun HtmlCode(
     modifier: Modifier = Modifier,
-    code: HtmlElement.Parsed.Code
+    code: HtmlElement.Code
 ) {
     val dimensions = LocalHtmlDimensions.current
     val colorScheme = MaterialTheme.colorScheme

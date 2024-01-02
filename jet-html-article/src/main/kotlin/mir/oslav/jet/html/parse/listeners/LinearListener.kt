@@ -1,6 +1,5 @@
 package mir.oslav.jet.html.parse.listeners
 
-import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.data.HtmlHeadData
@@ -19,31 +18,31 @@ open class LinearListener constructor() : HtmlArticleParserListener() {
     protected val elements: MutableList<HtmlElement> = mutableListOf()
 
 
-    override fun onImage(image: HtmlElement.Parsed.Image) {
+    override fun onImage(image: HtmlElement.Image) {
         if (!elements.contains(image)) {
             elements.add(image)
         }
     }
 
-    override fun onQuote(quote: HtmlElement.Parsed.Quote) {
+    override fun onQuote(quote: HtmlElement.Quote) {
         elements.add(quote)
     }
 
-    override fun onCode(code: HtmlElement.Parsed.Code) {
+    override fun onCode(code: HtmlElement.Code) {
         elements.add(code)
     }
 
-    override fun onTable(table: HtmlElement.Parsed.Table) {
+    override fun onTable(table: HtmlElement.Table) {
         elements.add(table)
     }
 
-    override fun onTextBlock(textBlock: HtmlElement.Parsed.TextBlock) {
+    override fun onTextBlock(textBlock: HtmlElement.TextBlock) {
         if (!elements.contains(textBlock)) {
             elements.add(textBlock)
         }
     }
 
-    override fun onTitle(title: HtmlElement.Parsed.Title) {
+    override fun onTitle(title: HtmlElement.Title) {
         elements.add(title)
     }
 
@@ -51,7 +50,7 @@ open class LinearListener constructor() : HtmlArticleParserListener() {
 
     }
 
-    override fun onAddress(address: HtmlElement.Parsed.Address) {
+    override fun onAddress(address: HtmlElement.Address) {
         if (!elements.contains(address)) {
             elements.add(address)
         }
@@ -59,7 +58,6 @@ open class LinearListener constructor() : HtmlArticleParserListener() {
 
 
     override fun onDataRequested(
-        config: HtmlConfig,
         metering: HtmlParseMetering?,
         headData: HtmlHeadData?,
         loadingStates: HtmlData.LoadingStates,

@@ -49,7 +49,7 @@ import mir.oslav.jet.html.data.HtmlElement
 @Composable
 fun HtmlTable(
     modifier: Modifier = Modifier,
-    data: HtmlElement.Parsed.Table,
+    data: HtmlElement.Table,
 ) {
     val density = LocalDensity.current
     val dimensions = LocalHtmlDimensions.current.table
@@ -191,7 +191,7 @@ private fun TableCell(
 @Preview(showBackground = true)
 private fun TablePreview() {
     HtmlTable(
-        data = HtmlElement.Parsed.Table(
+        data = HtmlElement.Table(
             rows = listOf(
                 listOf("id", "first name", "last name", "date of Birt"),
                 listOf("1", "General", "Kenobi", "1. 1. 2022"),
@@ -200,7 +200,6 @@ private fun TablePreview() {
             ),
             startIndex = 0,
             endIndex = 0,
-            span = 1
         )
     )
 }

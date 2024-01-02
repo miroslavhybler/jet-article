@@ -9,7 +9,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.IgnoreOptions
 import mir.oslav.jet.html.parse.JetHtmlArticleParser
@@ -30,11 +29,10 @@ class ArticleViewModel @Inject constructor(
     private val mArticleData: MutableStateFlow<HtmlData> = MutableStateFlow(value = HtmlData.empty)
     val articleData: StateFlow<HtmlData> get() = mArticleData
 
-    fun parse(config: HtmlConfig, ignoreOptions: IgnoreOptions, article: String) {
+    fun parse( ignoreOptions: IgnoreOptions, article: String) {
         viewModelScope.launch {
             JetHtmlArticleParser.parse(
                 content = getArticle(fileName = article),
-                config = config,
                 ignoreOptions = ignoreOptions,
                 isDoingMetering = true
             ).collect { newData ->

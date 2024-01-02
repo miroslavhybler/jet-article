@@ -1,6 +1,5 @@
 package mir.oslav.jet.html.parse
 
-import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.data.HtmlHeadData
@@ -25,53 +24,52 @@ abstract class HtmlArticleParserListener constructor() {
     /**
      * @since 1.0.0
      */
-    open fun onImage(image: HtmlElement.Parsed.Image): Unit = Unit
+    open fun onImage(image: HtmlElement.Image): Unit = Unit
 
 
     /**
      * @since 1.0.0
      */
-    open fun onQuote(quote: HtmlElement.Parsed.Quote): Unit = Unit
+    open fun onQuote(quote: HtmlElement.Quote): Unit = Unit
 
 
-    open fun onCode(code: HtmlElement.Parsed.Code): Unit = Unit
-
-
-    /**
-     * @since 1.0.0
-     */
-    open fun onTextBlock(textBlock: HtmlElement.Parsed.TextBlock): Unit = Unit
+    open fun onCode(code: HtmlElement.Code): Unit = Unit
 
 
     /**
      * @since 1.0.0
      */
-    open fun onTitle(title: HtmlElement.Parsed.Title): Unit = Unit
+    open fun onTextBlock(textBlock: HtmlElement.TextBlock): Unit = Unit
 
 
     /**
      * @since 1.0.0
      */
-    open fun onTable(table: HtmlElement.Parsed.Table): Unit = Unit
+    open fun onTitle(title: HtmlElement.Title): Unit = Unit
 
 
     /**
      * @since 1.0.0
      */
-    open fun onBasicList(basicList: HtmlElement.Parsed.BasicList): Unit = Unit
+    open fun onTable(table: HtmlElement.Table): Unit = Unit
 
 
     /**
      * @since 1.0.0
      */
-    open fun onAddress(address: HtmlElement.Parsed.Address): Unit = Unit
+    open fun onBasicList(basicList: HtmlElement.BasicList): Unit = Unit
+
+
+    /**
+     * @since 1.0.0
+     */
+    open fun onAddress(address: HtmlElement.Address): Unit = Unit
 
 
     /**
      * @since 1.0.0
      */
     abstract fun onDataRequested(
-        config: HtmlConfig,
         metering: HtmlParseMetering?,
         headData: HtmlHeadData?,
         loadingStates: HtmlData.LoadingStates,

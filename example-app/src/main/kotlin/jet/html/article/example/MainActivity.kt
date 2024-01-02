@@ -37,7 +37,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import jet.html.article.example.ui.theme.JetHtmlArticleExampleTheme
-import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.ui.JetHtmlArticle
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.IgnoreOptions
@@ -158,13 +157,11 @@ private fun ArticleScreen(
     viewModel: ArticleViewModel = hiltViewModel()
 ) {
 
-    val config = remember { HtmlConfig(spanCount = 3) }
     val data: HtmlData by viewModel.articleData.collectAsState()
 
     LaunchedEffect(key1 = Unit, block = {
        if (data.isEmpty) {
             viewModel.parse(
-                config = config,
                 ignoreOptions = ignoreOptions,
                 article = article
             )
@@ -184,7 +181,6 @@ private fun ArticleScreen(
     ) { paddingValues ->
         JetHtmlArticle(
             data = data,
-            config = config,
             modifier = Modifier,
             contentPadding = paddingValues
         )

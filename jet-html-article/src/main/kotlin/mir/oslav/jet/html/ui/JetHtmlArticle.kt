@@ -15,12 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import mir.oslav.jet.annotations.JetBenchmark
 import mir.oslav.jet.annotations.JetExperimental
 import mir.oslav.jet.html.HtmlDimensions
 import mir.oslav.jet.html.LocalHtmlDimensions
@@ -43,7 +41,6 @@ import mir.oslav.jet.html.ui.elements.HtmlQuoete
 import mir.oslav.jet.html.ui.elements.HtmlTable
 import mir.oslav.jet.html.ui.elements.HtmlTextBlock
 import mir.oslav.jet.html.ui.elements.HtmlTitle
-import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 
@@ -51,7 +48,6 @@ import mir.oslav.jet.html.data.HtmlElement
 /**
  * @param modifier
  * @param data
- * @param config
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
  * created on 25.08.2023
@@ -61,9 +57,10 @@ import mir.oslav.jet.html.data.HtmlElement
 fun JetHtmlArticle(
     modifier: Modifier = Modifier,
     data: HtmlData,
-    config: HtmlConfig = remember { HtmlConfig() },
-    gridState: LazyGridState = rememberLazyGridState(),
-    contentPadding: PaddingValues = PaddingValues(all = 0.dp)
+    listState: LazyListState = rememberLazyListState(),
+    contentPadding: PaddingValues = PaddingValues(all = 0.dp),
+    header: @Composable LazyItemScope.() -> Unit = {},
+    footer: @Composable LazyItemScope.() -> Unit = {}
 ) {
 
     val configuration = LocalConfiguration.current
@@ -83,9 +80,10 @@ fun JetHtmlArticle(
         JetHtmlArticleContent(
             modifier = modifier,
             data = data,
-            config = config,
-            gridState = gridState,
-            contentPadding = contentPadding
+            listState = listState,
+            contentPadding = contentPadding,
+            header = header,
+            footer = footer
         )
     }
 }
@@ -95,18 +93,18 @@ fun JetHtmlArticle(
 fun JetHtmlArticleContent(
     modifier: Modifier = Modifier,
     data: HtmlData,
-    config: HtmlConfig = remember { HtmlConfig() },
-    gridState: LazyGridState = rememberLazyGridState(),
+    listState: LazyListState = rememberLazyListState(),
     loading: @Composable () -> Unit = remember { { JetHtmlArticleDefaults.DefaultLoading() } },
-    image: @Composable (HtmlElement.Parsed.Image) -> Unit = remember { { HtmlImage(data = it) } },
-    quote: @Composable (HtmlElement.Parsed.Quote) -> Unit = remember { { HtmlQuoete(data = it) } },
-    table: @Composable (HtmlElement.Parsed.Table) -> Unit = remember { { HtmlTable(data = it) } },
-    address: @Composable (HtmlElement.Parsed.Address) -> Unit = remember { { HtmlAddress(address = it) } },
-    text: @Composable (HtmlElement.Parsed.TextBlock) -> Unit = remember { { HtmlTextBlock(text = it) } },
-    title: @Composable (HtmlElement.Parsed.Title) -> Unit = remember { { HtmlTitle(title = it) } },
-    code: @Composable (HtmlElement.Parsed.Code) -> Unit = remember { { HtmlCode(code = it) } },
+    image: @Composable (HtmlElement.Image) -> Unit = remember { { HtmlImage(data = it) } },
+    quote: @Composable (HtmlElement.Quote) -> Unit = remember { { HtmlQuoete(data = it) } },
+    table: @Composable (HtmlElement.Table) -> Unit = remember { { HtmlTable(data = it) } },
+    address: @Composable (HtmlElement.Address) -> Unit = remember { { HtmlAddress(address = it) } },
+    text: @Composable (HtmlElement.TextBlock) -> Unit = remember { { HtmlTextBlock(text = it) } },
+    title: @Composable (HtmlElement.Title) -> Unit = remember { { HtmlTitle(title = it) } },
+    code: @Composable (HtmlElement.Code) -> Unit = remember { { HtmlCode(code = it) } },
+    header: @Composable LazyItemScope. () -> Unit = {},
+    footer: @Composable LazyItemScope.() -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(all = 0.dp),
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     verticalArrangement: Arrangement.Vertical = Arrangement.Center
 ) {
 
@@ -123,17 +121,15 @@ fun JetHtmlArticleContent(
         return
     }
 
-    LazyVerticalGrid(
+    LazyColumn(
         modifier = modifier
             .fillMaxSize(),
-        state = gridState,
-        columns = GridCells.Fixed(count = config.spanCount),
+        state = listState,
         verticalArrangement = verticalArrangement,
-        horizontalArrangement = horizontalArrangement,
         content = {
-            item(
-                span = { GridItemSpan(currentLineSpan = config.spanCount) },
-            ) {
+            item(content = header)
+
+            item {
                 HtmlMetrics(
                     metering = data.metering,
                     modifier = Modifier.statusBarsPadding()
@@ -141,20 +137,19 @@ fun JetHtmlArticleContent(
             }
 
             itemsIndexed(
-                span = { index, item -> GridItemSpan(currentLineSpan = item.span) },
                 items = data.elements,
                 contentType = { intex, element -> element },
                 key = { index, element -> index }
             ) { index, element ->
                 when (element) {
                     //TODO handle links
-                    is HtmlElement.Parsed.Image -> image(element)
-                    is HtmlElement.Parsed.Quote -> quote(element)
-                    is HtmlElement.Parsed.Table -> table(element)
-                    is HtmlElement.Parsed.Address -> address(element)
-                    is HtmlElement.Parsed.TextBlock -> text(element)
-                    is HtmlElement.Parsed.Title -> title(element)
-                    is HtmlElement.Parsed.Code -> code(element)
+                    is HtmlElement.Image -> image(element)
+                    is HtmlElement.Quote -> quote(element)
+                    is HtmlElement.Table -> table(element)
+                    is HtmlElement.Address -> address(element)
+                    is HtmlElement.TextBlock -> text(element)
+                    is HtmlElement.Title -> title(element)
+                    is HtmlElement.Code -> code(element)
                     else -> throw IllegalStateException(
                         "Element ${element.javaClass.simpleName} not supported yet!"
                     )
@@ -162,7 +157,7 @@ fun JetHtmlArticleContent(
             }
 
             if (data.loadingStates.isAppending) {
-                item(span = { GridItemSpan(currentLineSpan = config.spanCount) }) {
+                item() {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -176,6 +171,8 @@ fun JetHtmlArticleContent(
                     }
                 }
             }
+
+            item(content = footer)
 
             item {
                 Spacer(modifier = Modifier.height(height = dimensions.baseLinePadding))

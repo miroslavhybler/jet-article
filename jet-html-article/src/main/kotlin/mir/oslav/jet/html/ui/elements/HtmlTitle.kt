@@ -32,7 +32,7 @@ import mir.oslav.jet.html.toHtml
 @Composable
 fun HtmlTitle(
     modifier: Modifier = Modifier,
-    title: HtmlElement.Parsed.Title
+    title: HtmlElement.Title
 ) {
 
     val dimensions = LocalHtmlDimensions.current
@@ -84,12 +84,11 @@ fun HtmlTitle(
 @Preview
 private fun HtmlTitlePreview() {
     HtmlTitle(
-        title = HtmlElement.Parsed.Title(
+        title = HtmlElement.Title(
             text = "Jetpack Compose rules!",
             startIndex = 0,
             endIndex = 0,
             titleTag = "h1",
-            span = 1
         )
     )
 }

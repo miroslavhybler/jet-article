@@ -33,7 +33,7 @@ import mir.oslav.jet.html.data.HtmlElement
 @Composable
 fun HtmlImage(
     modifier: Modifier = Modifier,
-    data: HtmlElement.Parsed.Image
+    data: HtmlElement.Image
 ) {
 
     val isInspectionMode = LocalInspectionMode.current
@@ -62,7 +62,10 @@ fun HtmlImage(
                 Image(
                     painter = painter,
                     contentDescription = null,
-                    modifier = modifier,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .then(other = modifier),
                     contentScale = ContentScale.Crop
                 )
             }
@@ -91,6 +94,7 @@ fun HtmlImage(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
+                        .then(other = modifier)
                 ) {
                     Column {
                         Icon(

@@ -29,7 +29,7 @@ import mir.oslav.jet.html.toHtml
 @Composable
 fun HtmlTextBlock(
     modifier: Modifier = Modifier,
-    text: HtmlElement.Parsed.TextBlock
+    text: HtmlElement.TextBlock
 ) {
 
     val dimensions = LocalHtmlDimensions.current
@@ -45,17 +45,16 @@ fun HtmlTextBlock(
 //        initialAlpha = 1f
 //    })
 
-    AnimatedVisibility(visible = true, enter = fadeIn()) {
-        Text(
-            text = remember(key1 = text) {
-                text.text.toHtml()
-                    .toSpannable()
-                    .toAnnotatedString(primaryColor = colorScheme.primary)
-            },
-            modifier = modifier
-                .padding(horizontal = dimensions.sidePadding)
-            //    .alpha(alpha = alpha.value)
+    Text(
+        text = remember(key1 = text) {
+            text.text.toHtml()
+                .toSpannable()
+                .toAnnotatedString(primaryColor = colorScheme.primary)
+        },
+        modifier = modifier
+            .padding(horizontal = dimensions.sidePadding)
+        //    .alpha(alpha = alpha.value)
 
-        )
-    }
+    )
+
 }

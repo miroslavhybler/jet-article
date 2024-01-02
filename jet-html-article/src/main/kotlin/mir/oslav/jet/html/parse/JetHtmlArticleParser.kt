@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
-import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.data.HtmlHeadData
@@ -33,6 +32,7 @@ import kotlin.jvm.Throws
 //TODO refactor
 //TODO eliminate using substring() to minimum
 //TODO replace kotlin lists functions to increase performance
+//TODO add something to recognize unwanted text, like menus and others
 public object JetHtmlArticleParser {
 
 
@@ -52,7 +52,6 @@ public object JetHtmlArticleParser {
         content: String,
         listener: HtmlArticleParserListener = LinearListener(),
         ignoreOptions: IgnoreOptions = IgnoreOptions(),
-        config: HtmlConfig = HtmlConfig(),
         isDoingMetering: Boolean = false
     ): Flow<HtmlData> {
         tagsCounts.clear()
@@ -63,7 +62,6 @@ public object JetHtmlArticleParser {
                 content = content,
                 ignoreOptions = ignoreOptions,
                 listener = listener,
-                config = config
             )
         } catch (exception: Exception) {
             exception.printStackTrace()
@@ -92,7 +90,6 @@ public object JetHtmlArticleParser {
         content: String,
         ignoreOptions: IgnoreOptions,
         listener: HtmlArticleParserListener,
-        config: HtmlConfig,
     ): Flow<HtmlData> = flow {
         emit(
             value = HtmlData(
@@ -158,7 +155,6 @@ public object JetHtmlArticleParser {
 
                     emit(
                         value = listener.onDataRequested(
-                            config = config,
                             metering = null,
                             headData = headData,
                             loadingStates = HtmlData.LoadingStates(
@@ -182,7 +178,6 @@ public object JetHtmlArticleParser {
                     parseBodyContainerTags(
                         content = content,
                         listener = listener,
-                        config = config,
                         ignoreOptions = ignoreOptions,
                         upperFlow = this,
                         fromIndex = stei + 1,
@@ -201,7 +196,6 @@ public object JetHtmlArticleParser {
 
                     emit(
                         value = listener.onDataRequested(
-                            config = config,
                             metering = metering,
                             headData = headData,
                             HtmlData.LoadingStates(
@@ -230,7 +224,6 @@ public object JetHtmlArticleParser {
     @Throws(Exception::class)
     private suspend fun parseBodyContainerTags(
         content: String,
-        config: HtmlConfig,
         listener: HtmlArticleParserListener,
         ignoreOptions: IgnoreOptions,
         upperFlow: FlowCollector<HtmlData>,
@@ -340,12 +333,12 @@ public object JetHtmlArticleParser {
                     Parser.parseImageFromText(
                         startIndex = index,
                         endIndex = steIndex,
-                        config = config,
                         rawTagWithAttributes = tagBody,
                         headData = null
                     )?.let(listener::onImage)
 
                     index = steIndex + 1
+                    Log.d("mirek" , "image")
                     continue
                 }
                 //Pair tags
@@ -428,7 +421,6 @@ public object JetHtmlArticleParser {
                     processPairTag(
                         tag = tag,
                         listener = listener,
-                        config = config,
                         content = tagContent,
                         startContentIndex = steIndex,
                         endContentIndex = ctei,
@@ -449,7 +441,6 @@ public object JetHtmlArticleParser {
         tag: String,
         content: String,
         listener: HtmlArticleParserListener,
-        config: HtmlConfig,
         startContentIndex: Int,
         endContentIndex: Int,
         upperFlow: FlowCollector<HtmlData>,
@@ -464,10 +455,9 @@ public object JetHtmlArticleParser {
             "address" -> {
                 canEmitNewTag = true
                 listener.onAddress(
-                    HtmlElement.Parsed.Address(
+                    HtmlElement.Address(
                         startIndex = startContentIndex,
                         endIndex = endContentIndex,
-                        span = config.spanCount,
                         content = content
                     )
                 )
@@ -480,7 +470,6 @@ public object JetHtmlArticleParser {
                         startIndex = startContentIndex,
                         endIndex = endContentIndex,
                         content = content,
-                        config = config
                     )
                 )
             }
@@ -493,7 +482,6 @@ public object JetHtmlArticleParser {
                         content = content,
                         startIndex = startContentIndex,
                         endIndex = endContentIndex,
-                        config = config
                     )
                 )
             }
@@ -501,11 +489,10 @@ public object JetHtmlArticleParser {
             "blockquote" -> {
                 canEmitNewTag = true
                 listener.onQuote(
-                    quote = HtmlElement.Parsed.Quote(
+                    quote = HtmlElement.Quote(
                         text = content,
                         startIndex = startContentIndex,
                         endIndex = startContentIndex,
-                        span = config.spanCount
                     )
                 )
             }
@@ -513,11 +500,10 @@ public object JetHtmlArticleParser {
             "code" -> {
                 canEmitNewTag = true
                 listener.onCode(
-                    code = HtmlElement.Parsed.Code(
+                    code = HtmlElement.Code(
                         content = content,
                         startIndex = startContentIndex,
                         endIndex = endContentIndex,
-                        span = config.spanCount
                     )
                 )
             }
@@ -525,11 +511,10 @@ public object JetHtmlArticleParser {
             "h1", "h2", "h3", "h4", "h5", "h6", "h7" -> {
                 canEmitNewTag = true
                 listener.onTitle(
-                    title = HtmlElement.Parsed.Title(
+                    title = HtmlElement.Title(
                         text = content,
                         startIndex = endContentIndex + 1,
                         endIndex = startContentIndex,
-                        span = config.spanCount,
                         titleTag = tag
                     )
                 )
@@ -539,11 +524,10 @@ public object JetHtmlArticleParser {
                 canEmitNewTag = true
                 //paragraph
                 listener.onTextBlock(
-                    textBlock = HtmlElement.Parsed.TextBlock(
+                    textBlock = HtmlElement.TextBlock(
                         text = content,
                         startIndex = startContentIndex + 1,
                         endIndex = endContentIndex,
-                        span = config.spanCount
                     )
                 )
             }
@@ -557,7 +541,6 @@ public object JetHtmlArticleParser {
                 Log.d("mirek", "recurse for: $content")
                 parseBodyContainerTags(
                     content = content,
-                    config = config,
                     listener = listener,
                     ignoreOptions = ignoreOptions,
                     upperFlow = upperFlow,
@@ -571,7 +554,6 @@ public object JetHtmlArticleParser {
         if (canEmitNewTag) {
             upperFlow.emit(
                 value = listener.onDataRequested(
-                    config = config,
                     metering = null,
                     headData = null,
                     HtmlData.LoadingStates(

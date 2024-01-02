@@ -1,7 +1,6 @@
 package mir.oslav.jet.html.parse
 
 import android.util.Log
-import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlElement
 import mir.oslav.jet.html.data.HtmlHeadData
 import mir.oslav.jet.html.iOf
@@ -50,9 +49,8 @@ internal object Parser {
         rawTagWithAttributes: String,
         startIndex: Int,
         endIndex: Int,
-        config: HtmlConfig,
         headData: HtmlHeadData?,
-    ): HtmlElement.Parsed.Image? {
+    ): HtmlElement.Image? {
         val rawUrl = rawTagWithAttributes.split("src=")
         var url = rawUrl.lastOrNull()?.normalizedLink()
 
@@ -86,11 +84,10 @@ internal object Parser {
             }
         }
 
-        return HtmlElement.Parsed.Image(
+        return HtmlElement.Image(
             url = url,
             startIndex = startIndex,
             endIndex = endIndex,
-            span = config.spanCount,
             description = null
         )
     }
@@ -107,8 +104,7 @@ internal object Parser {
         content: String,
         startIndex: Int,
         endIndex: Int,
-        config: HtmlConfig,
-    ): HtmlElement.Parsed.Table {
+    ): HtmlElement.Table {
         val outRows = ArrayList<List<String>>()
 
         val rows = groupPairTagsContent(
@@ -133,11 +129,10 @@ internal object Parser {
             outRows.add(headers + cells)
         }
 
-        return HtmlElement.Parsed.Table(
+        return HtmlElement.Table(
             startIndex = startIndex,
             endIndex = endIndex,
             rows = outRows,
-            span = config.spanCount
         )
     }
 
@@ -147,19 +142,17 @@ internal object Parser {
         content: String,
         startIndex: Int,
         endIndex: Int,
-        config: HtmlConfig
-    ): HtmlElement.Parsed.BasicList {
+    ): HtmlElement.BasicList {
         val items = groupPairTagsContent(
             content = content,
             searchedTag = "li",
             fromIndex = startIndex
         )
 
-        return HtmlElement.Parsed.BasicList(
+        return HtmlElement.BasicList(
             isOrdered = isOrdered,
             startIndex = startIndex,
             endIndex = endIndex,
-            span = config.spanCount,
             items = items
         )
     }
