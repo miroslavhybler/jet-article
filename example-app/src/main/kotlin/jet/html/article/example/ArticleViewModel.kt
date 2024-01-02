@@ -8,12 +8,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.IgnoreOptions
-import mir.oslav.jet.html.parse.HtmlArticleParser
+import mir.oslav.jet.html.parse.JetHtmlArticleParser
 import javax.inject.Inject
 
 
@@ -33,7 +32,7 @@ class ArticleViewModel @Inject constructor(
 
     fun parse(config: HtmlConfig, ignoreOptions: IgnoreOptions, article: String) {
         viewModelScope.launch {
-            HtmlArticleParser.parse(
+            JetHtmlArticleParser.parse(
                 content = getArticle(fileName = article),
                 config = config,
                 ignoreOptions = ignoreOptions,

@@ -5,7 +5,7 @@ import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import mir.oslav.jet.html.parse.HtmlArticleParser
+import mir.oslav.jet.html.parse.JetHtmlArticleParser
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +26,7 @@ class ParsingArticlesBenchmark {
         benchmarkRule.measureRepeated {
             val context: Context = ApplicationProvider.getApplicationContext()
             val article = String(context.assets.open("mapbox.html").readBytes())
-            HtmlArticleParser.parse(content = article)
+            JetHtmlArticleParser.parse(content = article)
         }
     }
 }

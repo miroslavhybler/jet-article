@@ -33,7 +33,7 @@ import kotlin.jvm.Throws
 //TODO refactor
 //TODO eliminate using substring() to minimum
 //TODO replace kotlin lists functions to increase performance
-public object HtmlArticleParser {
+public object JetHtmlArticleParser {
 
 
     private val tagsCounts: HashMap<String, Int> = HashMap()
@@ -86,6 +86,7 @@ public object HtmlArticleParser {
         }
     }
 
+
     @Throws(Exception::class)
     private fun parseHtmlArticle(
         content: String,
@@ -121,10 +122,21 @@ public object HtmlArticleParser {
 
             //Comment check
             if (index + 3 < content.length) {
-                val substring = content.sub(startIndex = index, endIndex = index + 3)
+                val substring = content.sub(s = index, e = index + 3)
                 if (substring == "<!--") {
                     //Html comment, skipping to the next char after the comment
                     index = content.indexOf(string = "-->", startIndex = index) + 1
+                    continue
+                }
+            }
+
+            //Doctype check
+            if (index + 15 < content.length) {
+                val substring = content.sub(s = index, e = index + 15)
+                val doctypeSub = "<!doctype html>"
+                if (substring.equals(other = doctypeSub, ignoreCase = true)) {
+                    //Plus one to skip to next char after >
+                    index += doctypeSub.length + 1
                     continue
                 }
             }
@@ -133,7 +145,7 @@ public object HtmlArticleParser {
             //Start tag end index
             val stei = content.iOf(char = '>', startIndex = index)
             //Tag body within <...>
-            val tagBody = content.sub(startIndex = index + 1, endIndex = stei)
+            val tagBody = content.sub(s = index + 1, e = stei)
             //Tag name lowercase
             val tag = Parser.extractTagName(tagBody = tagBody)
             when (tag) {
@@ -141,7 +153,7 @@ public object HtmlArticleParser {
                     //Tag content with starting and closing tag <>...</>
                     val ceIndex = content.indexOfSub(substring = "</head>", startIndex = index)
                     //Plus one because startIndex is inclusive and would include '<' char
-                    val tagContent = content.sub(startIndex = stei + 1, endIndex = ceIndex)
+                    val tagContent = content.sub(s = stei + 1, e = ceIndex)
                     headData = parseHeadData(content = tagContent)
 
                     emit(
@@ -173,7 +185,8 @@ public object HtmlArticleParser {
                         config = config,
                         ignoreOptions = ignoreOptions,
                         upperFlow = this,
-                        fromIndex = stei + 1
+                        fromIndex = stei + 1,
+                        headData = headData
                     )
 
 
@@ -221,7 +234,8 @@ public object HtmlArticleParser {
         listener: HtmlArticleParserListener,
         ignoreOptions: IgnoreOptions,
         upperFlow: FlowCollector<HtmlData>,
-        fromIndex: Int
+        fromIndex: Int,
+        headData: HtmlHeadData?,
     ) {
         var index = fromIndex
 
@@ -234,9 +248,9 @@ public object HtmlArticleParser {
                 continue
             }
 
-            //Char is starting tag '<'
             //Actual char is start of tag '<'
-            val seIndex = content.iOf(char = '>', startIndex = index)
+            //start tag ending index
+            val steIndex = content.iOf(char = '>', startIndex = index)
 
             if (index + 1 < content.length) {
                 //Checkout for invalid closing tag
@@ -250,17 +264,32 @@ public object HtmlArticleParser {
 
             //Tag body within <...>
             val tagBody = try {
-                content.sub(startIndex = index + 1, endIndex = seIndex)
+                content.sub(s = index + 1, e = steIndex)
             } catch (ignored: Exception) {
-                index = seIndex
+                index = steIndex
                 continue
             }
 
+            //Comment check
+            //TODO kurzy.cz html kód j v komentáři a clipped nelze najít -->
+            //TODO děje se to asi kvůli html kódu v komentáři, chybně se asi vezme zavírací tag
             if (index + 3 < content.length) {
-                val substring = content.sub(startIndex = index, endIndex = index + 4)
+                val substring = content.sub(s = index, e = index + 4)
                 if (substring == "<!--") {
                     //Html comment, skipping to the next char after the comment
                     index = content.indexOfSub(substring = "-->", startIndex = index) + 1
+                    continue
+                }
+            }
+
+            //Doctype check
+            //TODO mapbox docs, z nějakého důvodu se po rozparsování body vrací na začátek dokumentu a tam to vyletí na <!doctype html>
+            if (index + 15 < content.length) {
+                val sub = content.sub(s = index, e = index + 15)
+                val doctypeSub = "<!doctype html>"
+                if (sub.equals(other = doctypeSub, ignoreCase = true)) {
+                    //Plus one to skip to next char after >
+                    index += doctypeSub.length + 1
                     continue
                 }
             }
@@ -282,7 +311,7 @@ public object HtmlArticleParser {
                     }
 
                     if (skipInMainCycle) {
-                        index = seIndex
+                        index = steIndex
                         continue
                     }
                 }
@@ -301,15 +330,22 @@ public object HtmlArticleParser {
             }
 
             when (tag) {
+                "!doctype", "source", "input" -> {
+                    //TODO solve better
+                    index += tag.length + 1
+                    continue
+                }
+
                 "img" -> {
                     Parser.parseImageFromText(
                         startIndex = index,
-                        endIndex = seIndex,
+                        endIndex = steIndex,
                         config = config,
-                        rawTagWithAttributes = tagBody
+                        rawTagWithAttributes = tagBody,
+                        headData = null
                     )?.let(listener::onImage)
 
-                    index = seIndex + 1
+                    index = steIndex + 1
                     continue
                 }
                 //Pair tags
@@ -319,7 +355,16 @@ public object HtmlArticleParser {
                     //Closing tag end index
                     val ctei = Parser.findClosing(content = content, tag = tag, startIndex = index)
                     //last content index
-                    val cli =  ctei - closingTag.length
+                    val cli = ctei - closingTag.length
+
+                    if (cli <= steIndex + 1) {
+                        //Last contnent index is smaller that staring tag closing index
+                        //There is some weird bug, skipping
+
+                        index = steIndex + 1
+                        continue
+                    }
+
                     if (tag == "script" || tag == "noScript" || tag == "svg") {
                         index = ctei + 1
                         continue
@@ -348,8 +393,8 @@ public object HtmlArticleParser {
                             .removePrefix(prefix = "\"")
                             .removeSuffix(suffix = "\"")
                             .split(' ')
-                            .filter { tagClass -> tagClass != "" }
-                            .mapAsync { tagClass -> tagClass.trim() }
+                            .filter(String::isNotEmpty)
+                            .mapAsync(String::trim)
 
                         if (tagClasses.isNotEmpty() && ignoreOptions.classes.isNotEmpty()) {
                             var skipInMainCycle = false
@@ -369,13 +414,15 @@ public object HtmlArticleParser {
                     }
                     val tagContent = try {
                         //Plus one because startIndex is inclusive and would include '<' char
-                        content.sub(startIndex = seIndex + 1, endIndex = cli)
+                        content.sub(s = steIndex + 1, e = cli)
                     } catch (exception: Exception) {
                         Log.e(
                             "mirek",
-                            "bug for tag $tag with body $tagBody with closing $closingTag from content:\n\n$content\n\n"
+                            "Failed to get content for (probably pair or unknown) tag $tag with body $tagBody and with closing $closingTag from content:\n\n$content\n\n"
                         )
-                        return
+                        index += tagBody.length + 1
+                        continue
+                        //return
                     }
 
                     processPairTag(
@@ -383,10 +430,11 @@ public object HtmlArticleParser {
                         listener = listener,
                         config = config,
                         content = tagContent,
-                        startContentIndex = seIndex,
+                        startContentIndex = steIndex,
                         endContentIndex = ctei,
                         upperFlow = upperFlow,
-                        ignoreOptions = ignoreOptions
+                        ignoreOptions = ignoreOptions,
+                        headData = headData
                     )
 
                     index = ctei + 1
@@ -394,6 +442,7 @@ public object HtmlArticleParser {
             }
         }
     }
+
 
     @Throws(Exception::class)
     private suspend fun processPairTag(
@@ -405,8 +454,9 @@ public object HtmlArticleParser {
         endContentIndex: Int,
         upperFlow: FlowCollector<HtmlData>,
         ignoreOptions: IgnoreOptions,
+        headData: HtmlHeadData?,
     ) {
-        Log.d("mirek", "proccessing $tag with content: $content")
+          Log.d("mirek", "proccessing $tag with content: $content")
 
         var canEmitNewTag = false
         //Support pre
@@ -501,20 +551,18 @@ public object HtmlArticleParser {
             else -> {
                 //Other tags like div, span, section are consider to be a "wrapper" tags, trying
                 //To parse content from these tags
-
-                Log.d(
-                    "mirek",
-                    "recursive for $tag from:\n${content}"
-                )
-
                 //fromIndex is 0 becase content is not full content, just content within tag
+
+
+                Log.d("mirek", "recurse for: $content")
                 parseBodyContainerTags(
                     content = content,
                     config = config,
                     listener = listener,
                     ignoreOptions = ignoreOptions,
                     upperFlow = upperFlow,
-                    fromIndex =0
+                    fromIndex = 0,
+                    headData = headData
                 )
             }
         }
@@ -538,6 +586,13 @@ public object HtmlArticleParser {
     }
 
 
+    /**
+     * Tries to parse out page title and base url from [content], all other tags are ignored since they
+     * are not usefull for the library.
+     * @param content Html content within <head>...</head> tag
+     * @return HtmlHeadData, values can be null when title or base tags are not within [content]
+     * @since 1.0.0
+     */
     @Throws(Exception::class)
     private fun parseHeadData(
         content: String
@@ -559,7 +614,7 @@ public object HtmlArticleParser {
             val seIndex = content.iOf(char = '>', startIndex = index)
             //Tag body within <...>
             if (index + 3 < content.length) {
-                val substring = content.sub(startIndex = index, endIndex = index + 4)
+                val substring = content.sub(s = index, e = index + 4)
                 if (substring == "<!--") {
                     //Html comment, skipping to the next char after the comment
                     index = content.indexOfSub(substring = "-->", startIndex = index) + 1
@@ -568,7 +623,7 @@ public object HtmlArticleParser {
             }
 
             if (index + 12 < content.length) {
-                val substring = content.sub(startIndex = index, endIndex = index + 12)
+                val substring = content.sub(s = index, e = index + 12)
                 if (substring.equals(other = "</![cdata[//>", ignoreCase = true)) {
                     index = content.indexOfSub(
                         substring = "</![cdata[//>",
@@ -578,7 +633,7 @@ public object HtmlArticleParser {
                 }
             }
 
-            val tagBody = content.sub(startIndex = index + 1, endIndex = seIndex)
+            val tagBody = content.sub(s = index + 1, e = seIndex)
             val tag = Parser.extractTagName(tagBody = tagBody)
 
 
@@ -587,7 +642,7 @@ public object HtmlArticleParser {
                 val clIndex = content.indexOfSub(substring = closingTag, startIndex = index)
 
                 val tagContent = try {
-                    content.sub(startIndex = seIndex + 1, endIndex = clIndex)
+                    content.sub(s = seIndex + 1, e = clIndex)
                 } catch (ignored: Exception) {
                     index = clIndex.takeIf { it != -1 } ?: (seIndex + 1)
                     continue

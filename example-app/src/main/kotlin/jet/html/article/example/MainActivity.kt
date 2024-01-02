@@ -26,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -42,7 +41,6 @@ import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.ui.JetHtmlArticle
 import mir.oslav.jet.html.data.HtmlData
 import mir.oslav.jet.html.data.IgnoreOptions
-import mir.oslav.jet.html.parse.HtmlArticleParser
 
 /**
  *

@@ -23,7 +23,6 @@ dependencyResolutionManagement {
         mavenCentral()
         gradlePluginPortal()
         maven(url = "https://jitpack.io")
-        maven(url = "https://maven.pkg.github.com/miroslavhybler/Maven")
     }
 }
 

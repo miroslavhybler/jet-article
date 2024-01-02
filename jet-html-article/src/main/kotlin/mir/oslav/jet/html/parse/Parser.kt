@@ -3,8 +3,9 @@ package mir.oslav.jet.html.parse
 import android.util.Log
 import mir.oslav.jet.html.data.HtmlConfig
 import mir.oslav.jet.html.data.HtmlElement
+import mir.oslav.jet.html.data.HtmlHeadData
 import mir.oslav.jet.html.iOf
-import mir.oslav.jet.html.normalizedUrl
+import mir.oslav.jet.html.normalizedLink
 import mir.oslav.jet.html.sub
 import java.util.Stack
 
@@ -17,9 +18,7 @@ import java.util.Stack
 internal object Parser {
 
 
-    private val ignoreCaseOpt: Set<RegexOption> = setOf(
-        RegexOption.IGNORE_CASE
-    )
+    private val ignoreCaseOpt: Set<RegexOption> = setOf(RegexOption.IGNORE_CASE)
 
     /**
      * @since 1.0.0
@@ -36,12 +35,14 @@ internal object Parser {
         ?: throw IllegalStateException(
             "Unable to get index of $substring from clipped content!\n" +
                     "Content:\n" +
-                    this.sub(startIndex = startIndex, endIndex = this.length)
+                    this.sub(s = startIndex, e = this.length)
         )
 
 
     /**
      * @param rawTagWithAttributes E.g. <img src="https://www.example.com" alt="Photo"/>
+     * @param headData Optional, when url from src="..." is not full url, [HtmlHeadData.baseUrl] will
+     * be used as base url for the image
      * @since 1.0.0
      */
     //TODO support alt
@@ -50,18 +51,39 @@ internal object Parser {
         startIndex: Int,
         endIndex: Int,
         config: HtmlConfig,
+        headData: HtmlHeadData?,
     ): HtmlElement.Parsed.Image? {
         val rawUrl = rawTagWithAttributes.split("src=")
-        var url = rawUrl.lastOrNull()?.normalizedUrl()
+        var url = rawUrl.lastOrNull()?.normalizedLink()
 
         if (url?.contains(char = ' ') == true) {
             url = url.split(' ')
                 .firstOrNull()
-                ?.normalizedUrl()
+                ?.normalizedLink()
         }
 
         if (url == null) {
             return null
+        }
+
+        if (
+            !url.startsWith(prefix = "https://")
+            || !url.startsWith(prefix = "http://")
+            || !url.startsWith(prefix = "www")
+        ) {
+            val base = headData?.baseUrl
+            if (base != null) {
+                url = when {
+                    base.endsWith(char = '/') && url.endsWith(char = '/') -> {
+                        base.removeSuffix(suffix = "/") + url
+                    }
+                    base.endsWith(char = '/') || url.endsWith(char = '/') -> "$base$url"
+                    else -> "$base/$url"
+                }
+            } else {
+                //Trying to load image would result in error, null is returned instead
+                return null
+            }
         }
 
         return HtmlElement.Parsed.Image(
@@ -143,6 +165,7 @@ internal object Parser {
     }
 
 
+    //TODO check if closing tag is not within comment e.g. <div> <!-- </div> -->  </div>
     internal fun findClosing(content: String, tag: String, startIndex: Int): Int {
         val stack = Stack<Pair<String, Int>>()
         var index = startIndex
@@ -155,6 +178,15 @@ internal object Parser {
                 continue
             }
 
+            if (index + 3 < content.length) {
+                val substring = content.sub(s = index, e = index + 4)
+                if (substring == "<!--") {
+                    //Html comment, skipping to the next char after the comment
+                    index = content.indexOfSub(substring = "-->", startIndex = index) + 1
+                    continue
+                }
+            }
+
             val seIndex = content.iOf(char = '>', startIndex = index)
             if (seIndex == -1) {
                 Log.e(
@@ -163,7 +195,7 @@ internal object Parser {
                 )
                 return -1
             }
-            val tagBody = content.sub(startIndex = index + 1, endIndex = seIndex)
+            val tagBody = content.sub(s = index + 1, e = seIndex)
             val localTag = extractTagName(tagBody = tagBody)
             val isClosing = localTag.startsWith(char = '/')
             val isSearched = localTag
@@ -180,15 +212,15 @@ internal object Parser {
                     //index = /
                     //Plus one because of closing >
                     val finalIndex = index
-                    Log.d(
-                        "mirek",
-                        "end found, checking content:${
-                            content.sub(
-                                startIndex = startIndex,
-                                endIndex = finalIndex
-                            )
-                        }"
-                    )
+//                    Log.d(
+//                        "mirek",
+//                        "end found, checking content:${
+//                            content.sub(
+//                                startIndex = startIndex,
+//                                endIndex = finalIndex
+//                            )
+//                        }"
+//                    )
 
                     return finalIndex
                 }
@@ -212,7 +244,7 @@ internal object Parser {
     internal fun extractTagName(tagBody: String): String {
         val rawTagName = if (tagBody.contains(char = ' ')) {
             val tagEIndex = tagBody.indexOfFirst { tagChar -> tagChar == ' ' }
-            tagBody.sub(startIndex = 0, endIndex = tagEIndex)
+            tagBody.sub(s = 0, e = tagEIndex)
         } else tagBody
 
         return rawTagName.trim().lowercase()
@@ -236,7 +268,7 @@ internal object Parser {
 
             if (char == '<') {
                 val startingTagEndIndex = content.iOf(char = '>', startIndex = index)
-                val rawTag = content.sub(startIndex = index + 1, endIndex = startingTagEndIndex)
+                val rawTag = content.sub(s = index + 1, e = startingTagEndIndex)
                 var tag = rawTag
 
                 if (tag.contains(' ')) {

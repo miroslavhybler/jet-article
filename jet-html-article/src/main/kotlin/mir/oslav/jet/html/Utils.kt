@@ -33,7 +33,7 @@ fun String.toHtml(): Spanned {
  * @author Miroslav Hýbler <br>
  * created on 26.08.2023
  */
-fun String.normalizedUrl(): String = this
+fun String.normalizedLink(): String = this
     .removePrefix(prefix = "\"")
     .removePrefix(prefix = " ")
     .removeSuffix(suffix = "/")
@@ -47,13 +47,10 @@ fun String.normalizedAttributeValue(): String = this
     .removeSuffix(suffix = " ")
 
 
-fun String.sub(startIndex: Int, endIndex: Int): String = try {
-    this.substring(startIndex = startIndex, endIndex = endIndex)
+fun String.sub(s: Int, e: Int): String = try {
+    this.substring(startIndex = s, endIndex = e)
 } catch (exception: StringIndexOutOfBoundsException) {
-    Log.e(
-        "mirek",
-        "failed to get substring f: $startIndex e: $endIndex from $this"
-    )
+    exception.printStackTrace()
     throw exception
 }
 
@@ -63,7 +60,7 @@ fun String.iOf(char: Char, startIndex: Int): Int {
             .takeIf { index -> index != -1 }
             ?: throw StringIndexOutOfBoundsException()
     } catch (exception: StringIndexOutOfBoundsException) {
-        val clipped = this.sub(startIndex = startIndex, endIndex = this.length)
+        val clipped = this.sub(s = startIndex, e = this.length)
         Log.e(
             "mirek",
             "Failed to get index of char $char " +
@@ -82,7 +79,7 @@ fun String.iOf(string: String, startIndex: Int): Int {
             .takeIf { index -> index != -1 }
             ?: throw StringIndexOutOfBoundsException()
     } catch (exception: StringIndexOutOfBoundsException) {
-        val clipped = this.sub(startIndex = startIndex, endIndex = this.length)
+        val clipped = this.sub(s = startIndex, e = this.length)
         Log.e(
             "mirek",
             "Failed to get index of char $string " +

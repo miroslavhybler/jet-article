@@ -1,6 +1,12 @@
+import org.jetbrains.dokka.DokkaConfiguration.Visibility
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.dokka")
+    id("maven-publish")
 }
 
 android {
@@ -47,24 +53,23 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.5"
+        kotlinCompilerExtensionVersion = "1.5.7"
     }
 }
 
 dependencies {
 
-    implementation("mir.oslav.jet:annotations:1.0.0")
-    implementation("mir.oslav.jet:utils:1.0.2")
+    api("com.github.miroslavhybler:jet-lint:1.0.2")
+    implementation("com.github.miroslavhybler:jet-utils:1.0.4")
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.activity:activity-compose:1.8.1")
 
     /** Compose */
     val composeVersion = "1.5.4"
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
-    implementation("androidx.activity:activity-compose:1.8.1")
+    implementation("androidx.activity:activity-compose:1.8.2")
     implementation("androidx.compose.material3:material3:1.1.2")
     implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
     implementation("androidx.compose.animation:animation-graphics:1.5.4")
@@ -75,7 +80,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.28.0")
 
     implementation("io.coil-kt:coil-compose:2.4.0")
-    implementation("com.google.android.material:material:1.10.0")
+    implementation("com.google.android.material:material:1.11.0")
     implementation("net.danlew:android.joda:2.12.5")
 
 
@@ -86,4 +91,21 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("release") {
+                from (components.getByName("release"))
+                groupId = "mir.oslav.jet"
+                artifactId = "html-article"
+                version = "1.0.0"
+            }
+
+        }
+        repositories {
+            mavenLocal()
+        }
+    }
 }
