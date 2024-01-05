@@ -2,6 +2,7 @@ package jet.html.article.example
 
 import android.content.Context
 import android.content.res.AssetManager
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -9,9 +10,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import mir.oslav.jet.html.data.HtmlData
-import mir.oslav.jet.html.data.IgnoreOptions
-import mir.oslav.jet.html.parse.JetHtmlArticleParser
+import mir.oslav.jet.html.article.data.HtmlData
+import mir.oslav.jet.html.article.parse.JetHtmlArticleParser
 import javax.inject.Inject
 
 
@@ -21,7 +21,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ArticleViewModel @Inject constructor(
-   @ApplicationContext context: Context
+    @ApplicationContext context: Context
 ) : ViewModel() {
 
     private val assets: AssetManager = context.assets
@@ -29,14 +29,20 @@ class ArticleViewModel @Inject constructor(
     private val mArticleData: MutableStateFlow<HtmlData> = MutableStateFlow(value = HtmlData.empty)
     val articleData: StateFlow<HtmlData> get() = mArticleData
 
-    fun parse( ignoreOptions: IgnoreOptions, article: String) {
+    fun parse(article: String) {
         viewModelScope.launch {
+            val start = System.currentTimeMillis()
+            Log.d("mirek", "start: $start")
             JetHtmlArticleParser.parse(
                 content = getArticle(fileName = article),
-                ignoreOptions = ignoreOptions,
-                isDoingMetering = true
             ).collect { newData ->
                 mArticleData.value = newData
+
+                if (newData.isFullyLoaded) {
+                    val end = System.currentTimeMillis()
+                    Log.d("mirek", "end: $end")
+                    Log.d("mirek", "duration: ${end - start}")
+                }
             }
         }
     }

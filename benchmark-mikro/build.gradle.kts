@@ -46,7 +46,7 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.benchmark:benchmark-junit4:1.2.2")
-    androidTestImplementation(project(":jet-html-article"))
+    androidTestImplementation(project(":jet-html-article-old"))
     // Add your dependencies here. Note that you cannot benchmark code
     // in an app module this way - you will need to move any code you
     // want to benchmark to a library module:

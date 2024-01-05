@@ -37,9 +37,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import jet.html.article.example.ui.theme.JetHtmlArticleExampleTheme
-import mir.oslav.jet.html.ui.JetHtmlArticle
-import mir.oslav.jet.html.data.HtmlData
-import mir.oslav.jet.html.data.IgnoreOptions
+import mir.oslav.jet.html.article.ui.JetHtmlArticle
+import mir.oslav.jet.html.article.data.HtmlData
 
 /**
  *
@@ -153,7 +152,6 @@ private fun HomePage(navHostController: NavHostController) {
 @Composable
 private fun ArticleScreen(
     article: String,
-    ignoreOptions: IgnoreOptions = IgnoreOptions(),
     viewModel: ArticleViewModel = hiltViewModel()
 ) {
 
@@ -162,7 +160,6 @@ private fun ArticleScreen(
     LaunchedEffect(key1 = Unit, block = {
        if (data.isEmpty) {
             viewModel.parse(
-                ignoreOptions = ignoreOptions,
                 article = article
             )
         }

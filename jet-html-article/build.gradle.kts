@@ -1,16 +1,12 @@
-import org.jetbrains.dokka.DokkaConfiguration.Visibility
-import java.io.FileInputStream
-import java.util.Properties
+@file:Suppress("UnstableApiUsage")
 
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.dokka")
-    id("maven-publish")
 }
 
 android {
-    namespace = "mir.oslav.jet.html"
+    namespace = "mir.oslav.jet.html.article"
     compileSdk = 34
 
     defaultConfig {
@@ -18,6 +14,11 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+        externalNativeBuild {
+            cmake {
+                cppFlags("")
+            }
+        }
     }
 
     buildTypes {
@@ -29,25 +30,18 @@ android {
             )
         }
     }
+    externalNativeBuild {
+        cmake {
+            path("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
+    }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = "11"
-        freeCompilerArgs += listOf(
-            "-Xcontext-receivers",
-            "-Xopt-in=androidx.compose.material.ExperimentalMaterialApi",
-            "-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi",
-            "-Xopt-in=androidx.compose.ui.ExperimentalComposeUiApi",
-            "-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi",
-            "-Xopt-in=androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi",
-            "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi",
-            "-Xopt-in=com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi"
-        )
-    }
-    kotlin {
-        jvmToolchain(jdkVersion = 11)
+        jvmTarget = "1.8"
     }
     buildFeatures {
         compose = true
@@ -83,29 +77,7 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("net.danlew:android.joda:2.12.5")
 
-
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
-}
-
-afterEvaluate {
-    publishing {
-        publications {
-            create<MavenPublication>("release") {
-                from (components.getByName("release"))
-                groupId = "mir.oslav.jet"
-                artifactId = "html-article"
-                version = "1.0.0"
-            }
-
-        }
-        repositories {
-            mavenLocal()
-        }
-    }
 }

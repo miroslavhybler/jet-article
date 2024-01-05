@@ -94,6 +94,7 @@ android {
 
 dependencies {
 
+    implementation(project(":jet-html-article-old"))
     implementation(project(":jet-html-article"))
 
     implementation("androidx.core:core-ktx:1.12.0")

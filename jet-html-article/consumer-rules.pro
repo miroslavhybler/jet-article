@@ -1,1 +1,0 @@
--keep class mir.oslav.jet.html.data.**

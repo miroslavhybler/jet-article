@@ -5,6 +5,9 @@ import java.io.FileInputStream
 import kotlin.collections.mutableListOf
 import java.util.Properties
 
+include(":jet-html-article")
+
+
 include(":benchmark-mikro")
 
 
@@ -27,6 +30,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Jet Html Article"
-include(":jet-html-article")
+include(":jet-html-article-old")
 include(":example-app")
 include(":benchmark")
