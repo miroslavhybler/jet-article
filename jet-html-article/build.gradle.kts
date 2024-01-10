@@ -58,6 +58,7 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    implementation("androidx.startup:startup-runtime:1.1.1")
 
     /** Compose */
     val composeVersion = "1.5.4"

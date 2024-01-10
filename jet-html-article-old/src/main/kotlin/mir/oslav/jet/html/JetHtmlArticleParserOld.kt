@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import mir.oslav.jet.html.article.data.HtmlData
 import mir.oslav.jet.html.article.data.HtmlHeadData
-import mir.oslav.jet.html.article.data.HtmlParseMetering
 import mir.oslav.jet.html.article.iOf
 import mir.oslav.jet.html.Parser.indexOfSub
 import mir.oslav.jet.html.listeners.LinearListenerOld
@@ -139,12 +138,12 @@ public object JetHtmlArticleParserOld {
             //Actual char is start of tag '<'
             //Start tag end index
             val stei = content.iOf(char = '>', startIndex = index)
-            //Tag body within <...>
+            //TagType body within <...>
             val tagBody = content.sub(s = index + 1, e = stei)
-            //Tag name lowercase
+            //TagType name lowercase
             when (Parser.extractTagName(tagBody = tagBody)) {
                 "head" -> {
-                    //Tag content with starting and closing tag <>...</>
+                    //TagType content with starting and closing tag <>...</>
                     val ceIndex = content.indexOfSub(substring = "</head>", startIndex = index)
                     //Plus one because startIndex is inclusive and would include '<' char
                     val tagContent = content.sub(s = stei + 1, e = ceIndex)
@@ -152,7 +151,6 @@ public object JetHtmlArticleParserOld {
 
                     emit(
                         value = listener.onDataRequested(
-                            metering = null,
                             headData = headData,
                             loadingStates = HtmlData.LoadingStates(
                                 isLoading = true,
@@ -167,7 +165,7 @@ public object JetHtmlArticleParserOld {
                 }
 
                 "body" -> {
-                    //Tag content with starting and closing tag <>...</>
+                    //TagType content with starting and closing tag <>...</>
                     val ceIndex =
                         content.indexOfSub(substring = "</body>", startIndex = index)
                     //Plus one because startIndex is inclusive and would include '<' char
@@ -181,19 +179,8 @@ public object JetHtmlArticleParserOld {
                         headData = headData
                     )
 
-
-                    val metering = if (isDoingMetering && startTime != null) {
-                        HtmlParseMetering(
-                            startTime = startTime,
-                            endTime = System.currentTimeMillis(),
-                            tagsCount = totalBodyTagsCount,
-                            tags = tagsCounts
-                        )
-                    } else null
-
                     emit(
                         value = listener.onDataRequested(
-                            metering = metering,
                             headData = headData,
                             HtmlData.LoadingStates(
                                 isLoading = false,
@@ -252,7 +239,7 @@ public object JetHtmlArticleParserOld {
                 }
             }
 
-            //Tag body within <...>
+            //TagType body within <...>
             val tagBody = try {
                 content.sub(s = index + 1, e = steIndex)
             } catch (ignored: Exception) {
@@ -549,7 +536,6 @@ public object JetHtmlArticleParserOld {
         if (canEmitNewTag) {
             upperFlow.emit(
                 value = listener.onDataRequested(
-                    metering = null,
                     headData = null,
                     HtmlData.LoadingStates(
                         isLoading = true,
@@ -589,7 +575,7 @@ public object JetHtmlArticleParserOld {
             //Char is starting tag '<'
             //Actual char is start of tag '<'
             val seIndex = content.iOf(char = '>', startIndex = index)
-            //Tag body within <...>
+            //TagType body within <...>
             if (index + 3 < content.length) {
                 val substring = content.sub(s = index, e = index + 4)
                 if (substring == "<!--") {

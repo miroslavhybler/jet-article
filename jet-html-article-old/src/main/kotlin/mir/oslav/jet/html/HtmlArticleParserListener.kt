@@ -2,7 +2,6 @@ package mir.oslav.jet.html
 
 import mir.oslav.jet.html.article.data.HtmlData
 import mir.oslav.jet.html.article.data.HtmlHeadData
-import mir.oslav.jet.html.article.data.HtmlParseMetering
 
 
 /**
@@ -73,7 +72,6 @@ abstract class HtmlArticleParserListener constructor() {
      * @since 1.0.0
      */
     abstract fun onDataRequested(
-        metering: HtmlParseMetering?,
         headData: HtmlHeadData?,
         loadingStates: HtmlData.LoadingStates,
         isFullyLoaded:Boolean

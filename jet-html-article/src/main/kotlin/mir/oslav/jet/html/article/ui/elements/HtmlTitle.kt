@@ -52,7 +52,7 @@ fun HtmlTitle(
             "h5" -> typography.headlineMedium
             "h6" -> typography.headlineSmall
             "h7" -> typography.titleLarge
-            else -> throw IllegalStateException("Tag ${title.titleTag} is not supported!")
+            else -> throw IllegalStateException("TagType ${title.titleTag} is not supported!")
         }
     }
 

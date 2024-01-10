@@ -5,8 +5,9 @@ project("article")
 add_library(
         ${CMAKE_PROJECT_NAME} SHARED
         ContentParser.h ContentParser.cpp
+        BodyProcessor.h BodyProcessor.cpp
 
-        ParserJNI.cpp
+        LibraryJNI.cpp
 )
 
 add_subdirectory(

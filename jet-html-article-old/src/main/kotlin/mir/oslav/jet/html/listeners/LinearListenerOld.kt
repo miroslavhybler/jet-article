@@ -3,7 +3,6 @@ package mir.oslav.jet.html.listeners
 import mir.oslav.jet.html.article.data.HtmlData
 import mir.oslav.jet.html.HtmlElementOld
 import mir.oslav.jet.html.article.data.HtmlHeadData
-import mir.oslav.jet.html.article.data.HtmlParseMetering
 import mir.oslav.jet.html.HtmlArticleParserListener
 
 
@@ -59,15 +58,12 @@ open class LinearListenerOld constructor() : HtmlArticleParserListener() {
 
 
     override fun onDataRequested(
-        metering: HtmlParseMetering?,
         headData: HtmlHeadData?,
         loadingStates: HtmlData.LoadingStates,
         isFullyLoaded: Boolean
     ): HtmlData {
-        //TODO loading states
         return HtmlData(
             elements = throw IllegalStateException(),
-            metering = metering,
             headData = headData,
             error = null,
             loadingStates =loadingStates,

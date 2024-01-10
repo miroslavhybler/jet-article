@@ -19,7 +19,6 @@ class IndexWrapper {
 
 private:
     int index = 0;
-    int length = 0;
     int tempIndex = 0;
 
 public:
@@ -34,16 +33,7 @@ public:
      * @param i New index value
      * @since 1.0.0
      */
-    void setIndex(int i);
-
-
-    /**
-     * Sets new input length value for simplifiing checks of index validity.
-     * @param l New length value.
-     * @since 1.0.0
-     */
-    void setLength(int l);
-
+    void moveIndex(int i);
 
     /**
      * Sets new tempIndex value.
@@ -78,11 +68,18 @@ public:
 
 
     /**
-     *
-     * @return Length
      * @since 1.0.0
      */
-    int getLength();
+    void reset();
+
+
+    /**
+     *
+     * @return
+     * @since 1.0.0
+     */
+    std::string toString();
+
 };
 
 

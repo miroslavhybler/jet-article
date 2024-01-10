@@ -17,36 +17,16 @@ IndexWrapper::~IndexWrapper() {
 
 }
 
-void IndexWrapper::setIndex(int i) {
-    if (i < this->index || i > this->length) {
-        std::string msg =
-                "i: " + std::to_string(i) + " index: " + std::to_string(index) + " length: " +
-                std::to_string(length);
-        utils::log("mirek", msg);
-        throw "New index is lower or bigger than length";
-    }
-
+void IndexWrapper::moveIndex(int i) {
     this->index = i;
-    if (this->tempIndex < this->index) {
+    if (this->tempIndex < i) {
         //tempIndex should always be same or bigger
         tempIndex = i;
     }
 }
 
-
-void IndexWrapper::setLength(int l) {
-    this->length = l;
-    this->index = 0;
-    this->tempIndex = 0;
-}
-
 void IndexWrapper::setTempIndex(int i) {
-    if (i > length) {
-        std::string cause = "New tempIndex is bigger than length"
-                            + std::to_string(i) + " > " + std::to_string(length);
-        throw;
-    }
-    this->tempIndex = index;
+    this->tempIndex = i;
 }
 
 bool IndexWrapper::moveToTempIndex() {
@@ -63,10 +43,18 @@ int IndexWrapper::getIndex() {
     return index;
 }
 
-int IndexWrapper::getLength() {
-    return length;
-}
 
 int IndexWrapper::getTempIndex() {
     return tempIndex;
+}
+
+
+void IndexWrapper::reset() {
+    index = 0;
+    tempIndex = 0;
+}
+
+
+std::string IndexWrapper::toString() {
+    return "index: " + std::to_string(index) + " tempIndex: " + std::to_string(tempIndex);
 }

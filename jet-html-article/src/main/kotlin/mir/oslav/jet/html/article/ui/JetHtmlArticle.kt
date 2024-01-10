@@ -36,7 +36,6 @@ import mir.oslav.jet.html.article.ui.elements.HtmlAddress
 import mir.oslav.jet.html.article.ui.elements.HtmlCode
 import mir.oslav.jet.html.article.ui.elements.HtmlImage
 import mir.oslav.jet.html.article.ui.elements.HtmlInvalid
-import mir.oslav.jet.html.article.ui.elements.HtmlMetrics
 import mir.oslav.jet.html.article.ui.elements.HtmlQuoete
 import mir.oslav.jet.html.article.ui.elements.HtmlTable
 import mir.oslav.jet.html.article.ui.elements.HtmlTextBlock
@@ -128,13 +127,6 @@ fun JetHtmlArticleContent(
         verticalArrangement = verticalArrangement,
         content = {
             item(content = header)
-
-            item {
-                HtmlMetrics(
-                    metering = data.metering,
-                    modifier = Modifier.statusBarsPadding()
-                )
-            }
 
             itemsIndexed(
                 items = data.elements,

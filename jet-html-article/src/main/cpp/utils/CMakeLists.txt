@@ -5,7 +5,9 @@ add_library(
         UTILS STATIC
         Utils.h Utils.cpp
         IndexWrapper.h IndexWrapper.cpp
-        StringRef.h StringRef.cpp
+#        StringRef.h StringRef.cpp,
+        Rule.h Rule.cpp
+        Constants.h
 )
 
 target_include_directories(UTILS INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})

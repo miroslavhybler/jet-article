@@ -11,7 +11,6 @@ data class HtmlData constructor(
     val elements: List<HtmlElement>,
     val headData: HtmlHeadData?,
     val error: HtmlDataError? = null,
-    val metering: HtmlParseMetering? = null,
     val isFullyLoaded: Boolean
 ) {
 
@@ -40,10 +39,18 @@ data class HtmlData constructor(
         val isLoading: Boolean,
         val isAppending: Boolean,
         val message: String?,
-    )
+    ) {
+       companion object {
+            val appending: LoadingStates = LoadingStates(
+                isLoading = true,
+                isAppending = true,
+                message = null
+            )
+        }
+    }
 
     data class HtmlDataError constructor(
         val message: String,
-        val cause: Throwable
+        val cause: Throwable?
     )
 }

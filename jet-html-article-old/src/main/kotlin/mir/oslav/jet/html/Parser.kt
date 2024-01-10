@@ -192,13 +192,6 @@ internal object Parser {
             }
 
             val seIndex = content.iOf(char = '>', startIndex = index)
-            if (seIndex == -1) {
-                Log.e(
-                    "mirek",
-                    "failed to create tagBody using f: ${index + 1} e: $seIndex from $content"
-                )
-                return -1
-            }
             val tagBody = content.sub(s = index + 1, e = seIndex)
             val localTag = extractTagName(tagBody = tagBody)
             val isClosing = localTag.startsWith(char = '/')
@@ -219,7 +212,7 @@ internal object Parser {
 //                    Log.d(
 //                        "mirek",
 //                        "end found, checking content:${
-//                            content.indexOf(
+//                            content.indexOfOrThrow(
 //                                startIndex = startIndex,
 //                                endIndex = finalIndex
 //                            )
@@ -284,7 +277,7 @@ internal object Parser {
                         substring = "</$tag>",
                         startIndex = index
                     )
-                    outList.add(content.sub(startingTagEndIndex + 1, closingTagStart))
+                     outList.add(content.sub(startingTagEndIndex + 1, closingTagStart))
                     index = closingTagStart + 1
 
                 } else index += 1

@@ -5,6 +5,9 @@
 #ifndef JET_HTML_ARTICLE_UTILS_H
 #define JET_HTML_ARTICLE_UTILS_H
 
+
+#include "IndexWrapper.h"
+
 /**
  * @since 1.0.0
  */
@@ -19,25 +22,48 @@ namespace utils {
      * @return index of first found substring, -1 if not found
      * @since 1.0.0
      */
-    int indexOf(const std::string &input, const std::string &sub, int i);
+    int indexOf(const std::string &input, const std::string &sub, const int i);
+
+
+    /**
+     * Tries to find index of substring within input
+     * @param input Input for searching substring
+     * @param sub Substring you want to search
+     * @param i Start index
+     * @throws Exception when TODO
+     * @return index of first found substring
+     * @since 1.0.0
+     */
+    int indexOfOrThrow(const std::string &input, const std::string &sub, const int i);
 
 
     /**
      * Extracts tag name out of the tag body and makes it lowercase.
-     * @param tagBody Tag body within <> e.g. <a href="">
+     * @param tagBody TagType body within <> e.g. <a href="">
      * @return Lowercase tag name parsed out of tagBody
      * @since 1.0.0
      */
-    std::string getTagName(std::string tagBody);
+    std::string getTagName(const std::string tagBody);
 
 
     /**
      * Logs message in logcat
-     * @param tag Tag of the message
+     * @param tag TagType of the message
      * @param message Message body
      * @since 1.0.0
      */
     void log(const char *tag, const std::string message);
+
+
+    /**
+     * Fastly compares given strings. Checks first chars at fist because at 90% of scenarios first
+     * characters will be different. When first chars are same, results is from strcmp() function.
+     * @param s1 Input string 1
+     * @param s2 Input string 2
+     * @return True when s1 and s2 are equeal strings, false otherwise.
+     * @since 1.0.0
+     */
+    bool fastCompare(const std::string s1, const std::string s2);
 
 
     /**
@@ -49,12 +75,16 @@ namespace utils {
      * Note: There is no check whatever is tag valid, the sequence after '<' is considered being
      * able to parse.
      * @param input Input
+     * @param l Length of input
      * @param index IndexWrapper that will be used.
      * @return True if next string to process is valid tag syntax
      * @since 1.0.0
      */
-    bool canProcessIncomingTag(std::string input, IndexWrapper index);
-
+    bool canProcessIncomingTag(
+            const std::string input,
+            const int l,
+            IndexWrapper index
+    );
 
 
     /**
@@ -78,7 +108,28 @@ namespace utils {
      * @return Index if start of the closing tag, index of '<' char
      * @since 1.0.0
      */
-    int findClosingTag(std::string input, std::string tag, IndexWrapper index, int e = 0);
+    int findClosingTag(
+            const std::string input,
+            const std::string tag,
+            IndexWrapper index,
+            const int e = 0
+    );
+
+
+    /**
+     *
+     * @param input
+     * @param tag
+     * @param s
+     * @param e
+     * @since 1.0.0
+     */
+    void groupPairTagContents(
+            const std::string input,
+            const std::string tag,
+            const int s = 0,
+            const int e = 0
+    );
 }
 
 #endif //JET_HTML_ARTICLE_UTILS_H
