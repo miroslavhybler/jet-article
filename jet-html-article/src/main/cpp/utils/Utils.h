@@ -130,6 +130,27 @@ namespace utils {
             const int s = 0,
             const int e = 0
     );
+
+
+    /**
+     *
+     * @param s
+     */
+    inline void ltrim(std::string &s);
+
+
+    /**
+     *
+     * @param s
+     */
+    inline void rtrim(std::string &s);
+
+
+    /**
+     *
+     * @param s
+     */
+    inline void trim(std::string &s);
 }
 
 #endif //JET_HTML_ARTICLE_UTILS_H

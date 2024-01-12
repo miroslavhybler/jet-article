@@ -13,6 +13,7 @@ bool BodyProcessor::isTagValidForNextProcessing(
         const std::string tag,
         const std::string tagBody
 ) {
+
     if (rules.empty()) {
         return true;
     }

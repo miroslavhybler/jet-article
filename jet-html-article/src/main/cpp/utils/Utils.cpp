@@ -27,6 +27,25 @@ namespace utils {
     }
 
 
+    inline void ltrim(std::string &s) {
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+            return !std::isspace(ch);
+        }));
+    }
+
+    inline void rtrim(std::string &s) {
+        s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+            return !std::isspace(ch);
+        }).base(), s.end());
+    }
+
+
+    inline void trim(std::string &s) {
+        ltrim(s);
+        rtrim(s);
+    }
+
+
     bool fastCompare(const std::string s1, const std::string s2) {
         char ch1 = s1[0];
         char ch2 = s2[0];
@@ -76,6 +95,7 @@ namespace utils {
                 name = tagBody.substr(0, ei);
             }
         }
+        trim(name);
 
         //TODO maybe remove tolower
         //for (int x = 0; x < name.length(); x++) {
@@ -87,14 +107,25 @@ namespace utils {
 
 
     bool canProcessIncomingTag(std::string input, int l, IndexWrapper index) {
+        //TODO chyba je tady, je něco špatně s indexem
+        if (input[index.getTempIndex()] != '<') {
+            std::string error = "Char at "
+                                + std::to_string(index.getTempIndex())
+                                + " != '<'   ::    char: '"
+                                + std::string(1, input[index.getTempIndex()])
+                                + "'";
+            utils::log("UTILS", error);
+            throw error;
+        }
+
+
         int i = index.getTempIndex();
         if ((i + 3) < l) {
             int il = i + 3;
             std::string sub = input.substr(i + 1, 3);
-            //TODO exclude < from sub to make if faster
             if (utils::fastCompare(sub, "!--")) {
                 int ei = utils::indexOfOrThrow(input, "-->", il);
-                index.setTempIndex(ei);
+                index.moveTempIndex(ei);
                 return false;
             }
         }
@@ -103,7 +134,7 @@ namespace utils {
             int il = i + 15;
             std::string sub = input.substr(i + 1, 14);
             if (utils::fastCompare(sub, "!doctype html>")) {
-                index.setTempIndex(il);
+                index.moveTempIndex(il);
                 return false;
             }
         }
@@ -112,7 +143,7 @@ namespace utils {
             int il = i + 12;
             std::string sub = input.substr(i + 1, 12);
             if (utils::fastCompare(sub, "/![cdata[//>")) {
-                index.setTempIndex(il);
+                index.moveTempIndex(il);
                 return false;
             }
         }
@@ -127,6 +158,13 @@ namespace utils {
             IndexWrapper index,
             const int e
     ) {
+
+        if (utils::fastCompare(searchedTag, "img") || searchedTag == "img") {
+            std::string  error = "IMAGE";
+            utils::log("mirek", error);
+            throw error;
+        }
+
         int i = index.getTempIndex();
         //Clearing tempStack before another use
         while (!tempStack.empty()) {
@@ -140,8 +178,10 @@ namespace utils {
                 continue;
             }
 
+            //TODO toto odhalí další chyby
+            index.moveTempIndex(i);
             //char is '<'
-            if (!canProcessIncomingTag(input, input.length(), index)) {
+            if (!utils::canProcessIncomingTag(input, input.length(), index)) {
                 //Unable to process
                 i = index.getTempIndex();
                 continue;
@@ -177,9 +217,8 @@ namespace utils {
         }
 
         std::string error = "Unable to find closing for: " + searchedTag
-                            + " at: " + std::to_string(index.getIndex())
-                            + " in:\n" + input.substr(index.getIndex(), end);
-        log("CLOSING", error);
+                            + " at: " + index.toString();
+        utils::log("CLOSING", error);
         throw error;
     }
 

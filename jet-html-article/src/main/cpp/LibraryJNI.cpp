@@ -54,7 +54,6 @@ Java_mir_oslav_jet_html_article_ContentParserNative_doNextStep(
         JNIEnv *environment, jobject caller
 ) {
     jni::contentParser->doNextStep();
-
     if (jni::contentParser->hasParsedContentToBeProcessed()) {
         jni::isContentForVisualAvailable = jni::processor->isTagValidForNextProcessing(
                 jni::contentParser->actualTag,
@@ -73,6 +72,7 @@ extern "C" JNIEXPORT jstring JNICALL
 Java_mir_oslav_jet_html_article_ContentParserNative_getContent(
         JNIEnv *environment, jobject caller
 ) {
+    //TODO musí být jinak, protože takto když se zavolá getContent před getType tak se přemaže contentType
     jni::contentParser->hasParsedContentToBeProcessed(false);
     jni::isContentForVisualAvailable = false;
     return environment->NewStringUTF(jni::contentParser->getTempContent().c_str());

@@ -142,7 +142,7 @@ private:
     /**
      * @since 1.0.0
      */
-    void parseTagsWithinBodyContext(std::string tag);
+    void parseNextTagWithinBodyContext(std::string tag);
 
 };
 

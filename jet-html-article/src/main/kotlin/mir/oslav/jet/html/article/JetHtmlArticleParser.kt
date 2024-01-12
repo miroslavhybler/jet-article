@@ -47,8 +47,14 @@ object JetHtmlArticleParser {
             ContentParserNative.doNextStep()
 
             if (ContentParserNative.hasContent()) {
+                val type = ContentParserNative.getContentType()
                 val c = ContentParserNative.getContent()
-                when (ContentParserNative.getContentType()) {
+
+                if (type == HtmlContentType.NO_CONTENT) {
+                    continue
+                }
+                Log.d("mirek", "Type: $type")
+                when (type) {
                     HtmlContentType.PARAGRAPH -> {
                         elements.add(element = HtmlElement.TextBlock(text = c))
                     }

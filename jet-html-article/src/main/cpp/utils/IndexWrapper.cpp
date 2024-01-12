@@ -19,13 +19,11 @@ IndexWrapper::~IndexWrapper() {
 
 void IndexWrapper::moveIndex(int i) {
     this->index = i;
-    if (this->tempIndex < i) {
-        //tempIndex should always be same or bigger
-        tempIndex = i;
-    }
+    this->tempIndex = i;
+
 }
 
-void IndexWrapper::setTempIndex(int i) {
+void IndexWrapper::moveTempIndex(int i) {
     this->tempIndex = i;
 }
 

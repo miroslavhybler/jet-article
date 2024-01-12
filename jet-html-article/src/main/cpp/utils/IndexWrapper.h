@@ -2,10 +2,6 @@
 /// Created by Miroslav Hýbler  on 03.01.2024
 ///
 
-//
-// Created by Miroslav Hýbler on 03.01.2024.
-//
-
 #ifndef JET_HTML_ARTICLE_INDEXWRAPPER_H
 #define JET_HTML_ARTICLE_INDEXWRAPPER_H
 
@@ -40,7 +36,7 @@ public:
      * @param i New tempIndex value.
      * @since 1.0.0
      */
-    void setTempIndex(int i);
+    void moveTempIndex(int i);
 
 
     /**
