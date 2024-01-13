@@ -4,7 +4,6 @@ package mir.oslav.jet.html.article.ui
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,8 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -42,6 +39,7 @@ import mir.oslav.jet.html.article.ui.elements.HtmlTextBlock
 import mir.oslav.jet.html.article.ui.elements.HtmlTitle
 import mir.oslav.jet.html.article.data.HtmlData
 import mir.oslav.jet.html.article.data.HtmlElement
+import mir.oslav.jet.html.article.ui.elements.HtmlBasicList
 
 
 /**
@@ -93,7 +91,6 @@ fun JetHtmlArticleContent(
     modifier: Modifier = Modifier,
     data: HtmlData,
     listState: LazyListState = rememberLazyListState(),
-    loading: @Composable () -> Unit = remember { { JetHtmlArticleDefaults.DefaultLoading() } },
     image: @Composable (HtmlElement.Image) -> Unit = remember { { HtmlImage(data = it) } },
     quote: @Composable (HtmlElement.Quote) -> Unit = remember { { HtmlQuoete(data = it) } },
     table: @Composable (HtmlElement.Table) -> Unit = remember { { HtmlTable(data = it) } },
@@ -101,6 +98,7 @@ fun JetHtmlArticleContent(
     text: @Composable (HtmlElement.TextBlock) -> Unit = remember { { HtmlTextBlock(text = it) } },
     title: @Composable (HtmlElement.Title) -> Unit = remember { { HtmlTitle(title = it) } },
     code: @Composable (HtmlElement.Code) -> Unit = remember { { HtmlCode(code = it) } },
+    basicList: @Composable (HtmlElement.BasicList) -> Unit = remember { { HtmlBasicList(list = it) } },
     header: @Composable LazyItemScope. () -> Unit = {},
     footer: @Composable LazyItemScope.() -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(all = 0.dp),
@@ -110,13 +108,8 @@ fun JetHtmlArticleContent(
     val dimensions = LocalHtmlDimensions.current
 
 
-    if (data.loadingStates.isLoading && !data.loadingStates.isAppending) {
-        loading()
-        return
-    }
-
     if (data.error != null) {
-        HtmlInvalid(error = data.error!!)
+        HtmlInvalid(error = data.error)
         return
     }
 
@@ -140,25 +133,10 @@ fun JetHtmlArticleContent(
                     is HtmlElement.TextBlock -> text(element)
                     is HtmlElement.Title -> title(element)
                     is HtmlElement.Code -> code(element)
+                    is HtmlElement.BasicList -> basicList(element)
                     else -> throw IllegalStateException(
                         "Element ${element.javaClass.simpleName} not supported yet!"
                     )
-                }
-            }
-
-            if (data.loadingStates.isAppending) {
-                item() {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = dimensions.sidePadding, vertical = 4.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .size(size = 24.dp)
-                                .align(alignment = Alignment.Center)
-                        )
-                    }
                 }
             }
 

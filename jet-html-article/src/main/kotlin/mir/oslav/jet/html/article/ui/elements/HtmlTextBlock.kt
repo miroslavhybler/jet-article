@@ -38,7 +38,7 @@ fun HtmlTextBlock(
 
     Text(
         text = remember(key1 = text) {
-            text.text.toHtml()
+            text.styledText.toHtml()
                 .toSpannable()
                 .toAnnotatedString(primaryColor = colorScheme.primary)
         },

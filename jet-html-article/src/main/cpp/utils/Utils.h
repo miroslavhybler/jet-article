@@ -5,10 +5,12 @@
 #ifndef JET_HTML_ARTICLE_UTILS_H
 #define JET_HTML_ARTICLE_UTILS_H
 
-
+#include <list>
 #include "IndexWrapper.h"
 
+
 /**
+ * Defines the utils namespace.
  * @since 1.0.0
  */
 namespace utils {
@@ -127,14 +129,16 @@ namespace utils {
     void groupPairTagContents(
             const std::string input,
             const std::string tag,
-            const int s = 0,
-            const int e = 0
+            const int s,
+            const int e,
+            std::list<std::string> outputList
     );
 
 
     /**
      *
      * @param s
+     * @since 1.0.0
      */
     inline void ltrim(std::string &s);
 
@@ -142,6 +146,7 @@ namespace utils {
     /**
      *
      * @param s
+     * @since 1.0.0
      */
     inline void rtrim(std::string &s);
 
@@ -149,6 +154,7 @@ namespace utils {
     /**
      *
      * @param s
+     * @since 1.0.0
      */
     inline void trim(std::string &s);
 }

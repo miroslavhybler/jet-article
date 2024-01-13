@@ -6,6 +6,7 @@
 
 #include <jni.h>
 #include <string>
+#include <map>
 #include "ContentParser.h"
 #include "BodyProcessor.h"
 #include "utils/Utils.h"
@@ -24,7 +25,7 @@ namespace jni {
 
 
 extern "C" JNIEXPORT void JNICALL
-Java_mir_oslav_jet_html_article_ContentParserNative_setContent(
+Java_mir_oslav_jet_html_article_ParserNative_setInput(
         JNIEnv *environment,
         jobject caller,
         jstring content
@@ -33,8 +34,9 @@ Java_mir_oslav_jet_html_article_ContentParserNative_setContent(
     jni::contentParser->setInput(environment->GetStringUTFChars(content, &isCopy));
 }
 
+
 extern "C" JNIEXPORT jboolean JNICALL
-Java_mir_oslav_jet_html_article_ContentParserNative_hasNextStep(
+Java_mir_oslav_jet_html_article_ParserNative_hasNextStep(
         JNIEnv *environment, jobject caller
 ) {
     return jni::contentParser->hasNextStep();
@@ -42,7 +44,7 @@ Java_mir_oslav_jet_html_article_ContentParserNative_hasNextStep(
 
 
 extern "C" JNIEXPORT jboolean JNICALL
-Java_mir_oslav_jet_html_article_ContentParserNative_hasContent(
+Java_mir_oslav_jet_html_article_ParserNative_hasContent(
         JNIEnv *environment, jobject caller
 ) {
     return jni::isContentForVisualAvailable;
@@ -50,7 +52,7 @@ Java_mir_oslav_jet_html_article_ContentParserNative_hasContent(
 
 
 extern "C" JNIEXPORT void JNICALL
-Java_mir_oslav_jet_html_article_ContentParserNative_doNextStep(
+Java_mir_oslav_jet_html_article_ParserNative_doNextStep(
         JNIEnv *environment, jobject caller
 ) {
     jni::contentParser->doNextStep();
@@ -61,26 +63,49 @@ Java_mir_oslav_jet_html_article_ContentParserNative_doNextStep(
         );
     }
 }
+
+
 extern "C" JNIEXPORT jint JNICALL
-Java_mir_oslav_jet_html_article_ContentParserNative_getContentType(
+Java_mir_oslav_jet_html_article_ParserNative_getContentType(
         JNIEnv *environment, jobject caller
 ) {
     return jni::contentParser->contentType;
 }
 
+
 extern "C" JNIEXPORT jstring JNICALL
-Java_mir_oslav_jet_html_article_ContentParserNative_getContent(
+Java_mir_oslav_jet_html_article_ParserNative_getContent(
         JNIEnv *environment, jobject caller
 ) {
-    //TODO musí být jinak, protože takto když se zavolá getContent před getType tak se přemaže contentType
-    jni::contentParser->hasParsedContentToBeProcessed(false);
-    jni::isContentForVisualAvailable = false;
     return environment->NewStringUTF(jni::contentParser->getTempContent().c_str());
+}
+
+extern "C" JNIEXPORT jint JNICALL
+Java_mir_oslav_jet_html_article_ParserNative_getContentListSize(
+        JNIEnv *environment, jobject caller, jint index
+) {
+    return jni::contentParser->getTempListSize();
+}
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_mir_oslav_jet_html_article_ParserNative_getContentListItem(
+        JNIEnv *environment, jobject caller, jint index
+) {
+    return environment->NewStringUTF(jni::contentParser->getTempListItem(index).c_str());
 }
 
 
 extern "C" JNIEXPORT void JNICALL
-Java_mir_oslav_jet_html_article_ContentParserNative_clearAllResources(
+Java_mir_oslav_jet_html_article_ParserNative_resetCurrentContent(
+        JNIEnv *environment, jobject caller
+) {
+    jni::contentParser->hasParsedContentToBeProcessed(false);
+    jni::isContentForVisualAvailable = false;
+}
+
+
+extern "C" JNIEXPORT void JNICALL
+Java_mir_oslav_jet_html_article_ParserNative_clearAllResources(
         JNIEnv *environment, jobject caller
 ) {
     jni::contentParser->clearAllResources();

@@ -6,6 +6,7 @@
 // Created by Miroslav Hýbler on 03.01.2024.
 //
 #include <string>
+#include <list>
 #include "utils/IndexWrapper.h"
 #include "utils/Constants.h"
 
@@ -41,6 +42,7 @@ private:
     IndexWrapper index;
     int tempContentIndexStart = -1;
     int tempContentIndexEnd = -1;
+    std::list<std::string> tempOutputList;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     /////
@@ -105,6 +107,11 @@ public:
     bool moveIndexToNextTag();
 
 
+    /**
+     *
+     * @return
+     * @since 1.0.0
+     */
     std::string getTempContent();
 
 
@@ -112,6 +119,23 @@ public:
      * @since 1.0.0
      */
     void clearAllResources();
+
+
+    /**
+     *
+     * @return
+     * @since 1.0.0
+     */
+    int getTempListSize();
+
+
+    /**
+     *
+     * @param i
+     * @return
+     * @since 1.0.0
+     */
+    std::string getTempListItem(int i);
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,7 +167,6 @@ private:
      * @since 1.0.0
      */
     void parseNextTagWithinBodyContext(std::string tag);
-
 };
 
 

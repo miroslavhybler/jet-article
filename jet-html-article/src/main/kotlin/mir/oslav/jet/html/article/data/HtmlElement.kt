@@ -19,11 +19,14 @@ sealed class HtmlElement private constructor() {
 
 
     /**
+     * @param styledText Styled text containing simple html formatting tags like b, i, u,...
+     * @param cleanText Text from styled text without any formatting. This is set for additional need.
      * @since 1.0.0
      */
     //TODO html text a raw text pro talkback
     data class TextBlock constructor(
-        val text: String,
+        val styledText: String,
+        val cleanText: String,
         ) : HtmlElement()
 
 
@@ -57,7 +60,7 @@ sealed class HtmlElement private constructor() {
     /**
      * @since 1.0.0
      */
-    data class BasicList(
+    data class BasicList constructor(
         val items: List<String>,
         val isOrdered: Boolean,
     ) : HtmlElement()
@@ -69,7 +72,6 @@ sealed class HtmlElement private constructor() {
     data class DescriptionList(
         val items: List<String>,
         val isOrdered: Boolean,
-        val span: Int
     ) : HtmlElement()
 
     /**
@@ -79,6 +81,10 @@ sealed class HtmlElement private constructor() {
         val content: String,
     ) : HtmlElement()
 
+
+    /**
+     * @since 1.0.0
+     */
     data class Code constructor(
         val content: String,
         ) : HtmlElement()

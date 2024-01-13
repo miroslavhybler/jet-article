@@ -5,19 +5,24 @@
 #include <string>
 #include <stack>
 #include <jni.h>
+#include <list>
 #include <android/log.h>
 #include "IndexWrapper.h"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
-namespace utils {
 
+namespace utils {
 
     std::stack<int> tempStack;
 
 
+    std::function<bool(unsigned char)> trimPred = [](unsigned char ch) {
+        return !std::isspace(ch);
+    };
+
+
     void log(const char *tag, const std::string message) {
-        /** True will enable in android logcat */
         __android_log_print(
                 ANDROID_LOG_DEBUG,
                 tag,
@@ -28,15 +33,11 @@ namespace utils {
 
 
     inline void ltrim(std::string &s) {
-        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
-            return !std::isspace(ch);
-        }));
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), trimPred));
     }
 
     inline void rtrim(std::string &s) {
-        s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
-            return !std::isspace(ch);
-        }).base(), s.end());
+        s.erase(std::find_if(s.rbegin(), s.rend(), trimPred).base(), s.end());
     }
 
 
@@ -55,6 +56,7 @@ namespace utils {
         }
         return false;
     }
+
 
     int indexOf(const std::string &input, const std::string &sub, const int i) {
         typename std::string::const_iterator sit = input.begin();
@@ -77,8 +79,10 @@ namespace utils {
         int index = indexOf(input, sub, i);
 
         if (index == -1) {
-            std::string error = "Unable to find index of " + sub + " from: " + std::to_string(i);
-            utils::log("INDEX_OF", error);
+            std::string error = "Unable to find index of " + sub
+                    + " from: " + std::to_string(i)
+                    + " until: " + std::to_string(input.length());
+            utils::log("UTILS", error);
             throw error;
         }
 
@@ -108,6 +112,8 @@ namespace utils {
 
     bool canProcessIncomingTag(std::string input, int l, IndexWrapper index) {
         //TODO chyba je tady, je něco špatně s indexem
+
+        /*
         if (input[index.getTempIndex()] != '<') {
             std::string error = "Char at "
                                 + std::to_string(index.getTempIndex())
@@ -118,6 +124,7 @@ namespace utils {
             throw error;
         }
 
+        */
 
         int i = index.getTempIndex();
         if ((i + 3) < l) {
@@ -158,13 +165,6 @@ namespace utils {
             IndexWrapper index,
             const int e
     ) {
-
-        if (utils::fastCompare(searchedTag, "img") || searchedTag == "img") {
-            std::string  error = "IMAGE";
-            utils::log("mirek", error);
-            throw error;
-        }
-
         int i = index.getTempIndex();
         //Clearing tempStack before another use
         while (!tempStack.empty()) {
@@ -178,7 +178,6 @@ namespace utils {
                 continue;
             }
 
-            //TODO toto odhalí další chyby
             index.moveTempIndex(i);
             //char is '<'
             if (!utils::canProcessIncomingTag(input, input.length(), index)) {
@@ -223,13 +222,18 @@ namespace utils {
     }
 
 
-    //TODO out list
+    //TODO fix
     void groupPairTagContents(
             const std::string input,
             const std::string tag,
-            const int s = 0,
-            const int e = 0
+            const int s,
+            const int e,
+            std::list<std::string> outputList
     ) {
+        if (!outputList.empty()) {
+            outputList.clear();
+        }
+
         int end = e != 0 ? e : input.length();
         int i = s;
         while (i < end) {
@@ -246,7 +250,7 @@ namespace utils {
 
             if (utils::fastCompare(tag, rawTagName)) {
                 int ctsi = utils::indexOfOrThrow(input, "</" + tag + ">", i);
-                //TODO add to out list
+                outputList.push_back(input.substr(i, ctsi));
             }
             i += tagBodyLength;
         }
