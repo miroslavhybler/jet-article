@@ -26,6 +26,7 @@ enum TagType {
     // TODO container
 };
 
+
 #endif //JET_HTML_ARTICLE_CONSTANTS_H
 
 #pragma clang diagnostic pop

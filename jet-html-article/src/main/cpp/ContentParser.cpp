@@ -124,14 +124,15 @@ void ContentParser::doNextStep() {
     std::string tag = utils::getTagName(tagBody);
 
     //Move index to the next char after tag
-    index.moveIndex(tei + 1);
+    //TODO unable to proccess image because index is moved at the end of img tag before
+    //  index.moveIndex(tei + 1);
 
     if (mHasBodyContext) {
-        parseNextTagWithinBodyContext(tag);
+        parseNextTagWithinBodyContext(tag, tei);
         invalidateHasNextStep();
         return;
     }
-
+    index.moveIndex(tei + 1);
 
     if (!wasHeadParsed && utils::fastCompare(tag, "head")) {
         //Closing tag start index
@@ -186,20 +187,20 @@ void ContentParser::parseHeadData(int e) {
 }
 
 
-void ContentParser::parseNextTagWithinBodyContext(std::string tag) {
+void ContentParser::parseNextTagWithinBodyContext(std::string tag, int tei) {
     //TODO final version should not need this
     if (tag.find('/', 0) == 0) {
+        index.moveIndex(tei + 1);
         index.moveIndex(index.getIndex() + tag.length());
         invalidateHasNextStep();
         return;
     }
 
-    int stei = utils::indexOfOrThrow(input, ">", index.getIndex());
     if (utils::fastCompare(tag, "br/")
         || utils::fastCompare(tag, "input")
         || utils::fastCompare(tag, "source")
             ) {
-        index.moveIndex(stei);
+        index.moveIndex(tei + 1);
         return;
     }
 
@@ -207,10 +208,10 @@ void ContentParser::parseNextTagWithinBodyContext(std::string tag) {
         || utils::fastCompare(tag, "script")
         || utils::fastCompare(tag, "svg")
             ) {
+        index.moveIndex(tei + 1);
         //Skipping tags that can't be processed by library
-
         //Can't use findColsingTag because script can contain '<' inside of it and that breaks
-        //searching for losing tag
+        //searching for closing tag
         int ctsi = utils::findClosingTag(input, tag, index);
         index.moveIndex(ctsi + tag.length() + 3);
         return;
@@ -219,14 +220,12 @@ void ContentParser::parseNextTagWithinBodyContext(std::string tag) {
     //At this point index is pointing at the sequence starting with '<' which is ready to be
     //processed as tag
     if (utils::fastCompare(tag, "img")) {
-        contentType = IMAGE;
-        hasContentToProcess = true;
-        tempContentIndexStart = index.getIndex();
-        tempContentIndexEnd = stei;
-        index.moveIndex(stei + 1);
+        parseImageTag(tei + 1);
         return;
     }
 
+    index.moveIndex(tei + 1);
+    //closing tag start index
     int ctsi = utils::findClosingTag(input, tag, index);
     tempContentIndexStart = index.getIndex();
     tempContentIndexEnd = ctsi;
@@ -276,8 +275,25 @@ void ContentParser::parseNextTagWithinBodyContext(std::string tag) {
     if (hasContentToProcess) {
         index.moveIndex(ctsi + tag.length() + 1);
     } else {
-        index.moveIndex(stei + 1);
+        index.moveIndex(tei + 1);
     }
+}
+
+
+void ContentParser::parseImageTag(int tei) {
+    contentType = IMAGE;
+    hasContentToProcess = true;
+    tempContentIndexStart = index.getIndex();
+    tempContentIndexEnd = tei;
+
+    if (!tempOutputMap.empty()) {
+        tempOutputMap.clear();
+    }
+    int n = tempContentIndexEnd - tempContentIndexStart;
+    std::string tagBody = input.substr(tempContentIndexStart, n);
+    utils::getTagAttributes(tagBody, tempOutputMap);
+    index.moveIndex(tei + 1);
+    invalidateHasNextStep();
 }
 
 
@@ -285,14 +301,21 @@ void ContentParser::invalidateHasNextStep() {
     mHasNextStep = index.getIndex() < length;
 }
 
+
 int ContentParser::getTempListSize() {
     return tempOutputList.size();
 }
+
 
 std::string ContentParser::getTempListItem(int i) {
     auto iterator = tempOutputList.begin();
     std::advance(iterator, i);
     return *iterator;
+}
+
+
+std::string ContentParser::getTempMapItem(std::string attributeName) {
+    return tempOutputMap[attributeName];
 }
 
 

@@ -6,6 +6,7 @@
 #define JET_HTML_ARTICLE_UTILS_H
 
 #include <list>
+#include <map>
 #include "IndexWrapper.h"
 
 
@@ -157,6 +158,15 @@ namespace utils {
      * @since 1.0.0
      */
     inline void trim(std::string &s);
+
+
+    /**
+     *
+     * @param tagBody
+     * @param outMap
+     * @since 1.0.0
+     */
+    void getTagAttributes(std::string tagBody, std::map<std::string, std::string> &outMap);
 }
 
 #endif //JET_HTML_ARTICLE_UTILS_H

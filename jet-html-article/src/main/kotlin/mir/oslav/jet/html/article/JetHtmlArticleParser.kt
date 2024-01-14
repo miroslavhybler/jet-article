@@ -1,6 +1,5 @@
 package mir.oslav.jet.html.article
 
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -65,7 +64,9 @@ object JetHtmlArticleParser {
         val c = ParserNative.getContent()
         when (type) {
             HtmlContentType.IMAGE -> {
-                //TODO
+                val url: String = ParserNative.getContentMapItem(attributeName = "src")
+                val alt: String = ParserNative.getContentMapItem(attributeName = "alt")
+                elements.add(element = HtmlElement.Image(url = url, description = alt))
             }
 
             HtmlContentType.PARAGRAPH -> {

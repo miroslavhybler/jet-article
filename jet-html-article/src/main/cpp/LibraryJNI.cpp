@@ -82,7 +82,7 @@ Java_mir_oslav_jet_html_article_ParserNative_getContent(
 
 extern "C" JNIEXPORT jint JNICALL
 Java_mir_oslav_jet_html_article_ParserNative_getContentListSize(
-        JNIEnv *environment, jobject caller, jint index
+        JNIEnv *environment, jobject caller
 ) {
     return jni::contentParser->getTempListSize();
 }
@@ -92,6 +92,17 @@ Java_mir_oslav_jet_html_article_ParserNative_getContentListItem(
         JNIEnv *environment, jobject caller, jint index
 ) {
     return environment->NewStringUTF(jni::contentParser->getTempListItem(index).c_str());
+}
+
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_mir_oslav_jet_html_article_ParserNative_getContentMapItem(
+        JNIEnv *environment, jobject caller, jstring attributeName
+) {
+    jboolean isCopy;
+    std::string nameNative = environment->GetStringUTFChars(attributeName, &isCopy);
+    std::string value = jni::contentParser->getTempMapItem(nameNative);
+    return environment->NewStringUTF(value.c_str());
 }
 
 

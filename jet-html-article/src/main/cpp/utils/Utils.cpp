@@ -6,6 +6,7 @@
 #include <stack>
 #include <jni.h>
 #include <list>
+#include <map>
 #include <android/log.h>
 #include "IndexWrapper.h"
 
@@ -80,8 +81,8 @@ namespace utils {
 
         if (index == -1) {
             std::string error = "Unable to find index of " + sub
-                    + " from: " + std::to_string(i)
-                    + " until: " + std::to_string(input.length());
+                                + " from: " + std::to_string(i)
+                                + " until: " + std::to_string(input.length());
             utils::log("UTILS", error);
             throw error;
         }
@@ -101,7 +102,6 @@ namespace utils {
         }
         trim(name);
 
-        //TODO maybe remove tolower
         //for (int x = 0; x < name.length(); x++) {
         //    putchar(tolower(name[x]));
         // }
@@ -219,6 +219,39 @@ namespace utils {
                             + " at: " + index.toString();
         utils::log("CLOSING", error);
         throw error;
+    }
+
+
+    void getTagAttributes(std::string tagBody, std::map<std::string, std::string> &outMap) {
+        int i = 0;
+        while (i < tagBody.length()) {
+            int ni = indexOf(tagBody, " ", i);
+            if (ni == -1) {
+                //Tag has no attributes defined within it's body or we read all attributes already
+                return;
+            }
+
+            //atrribute name start index
+            int asi = ni + 1;
+            //attribute name end
+            int aei = indexOf(tagBody, "\"", asi);
+            //atribute value end
+            int avi = indexOf(tagBody, "\"", aei + 1);
+
+            if (aei == -1) {
+                //attribute not found,
+                return;
+            }
+            //Minus 1 to remove '=' from attribute name e.g. class="hello"
+            std::string attributeName = tagBody.substr(asi, aei - asi - 1);
+            //Plus 1 to remove '=' from attribute value
+            //Minus 1 to remove '"' from attribute value
+            std::string attributeValue = tagBody.substr(aei + 1, avi - aei - 1);
+            utils::trim(attributeName);
+            utils::trim(attributeValue);
+            outMap[attributeName] = attributeValue;
+            i = aei;
+        }
     }
 
 

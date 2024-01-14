@@ -7,6 +7,7 @@
 //
 #include <string>
 #include <list>
+#include <map>
 #include "utils/IndexWrapper.h"
 #include "utils/Constants.h"
 
@@ -43,6 +44,7 @@ private:
     int tempContentIndexStart = -1;
     int tempContentIndexEnd = -1;
     std::list<std::string> tempOutputList;
+    std::map<std::string , std::string> tempOutputMap;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     /////
@@ -94,7 +96,7 @@ public:
      * @param hasContent
      * @since 1.0.0
      */
-    void hasParsedContentToBeProcessed( bool hasContent);
+    void hasParsedContentToBeProcessed(bool hasContent);
 
 
     /**
@@ -138,6 +140,15 @@ public:
     std::string getTempListItem(int i);
 
 
+    /**
+     *
+     * @param entry
+     * @return
+     * @since 1.0.0
+     */
+    std::string getTempMapItem(std::string attributeName);
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     /////
     /////   Private Functions
@@ -166,7 +177,10 @@ private:
     /**
      * @since 1.0.0
      */
-    void parseNextTagWithinBodyContext(std::string tag);
+    void parseNextTagWithinBodyContext(std::string tag, int tei);
+
+
+    void parseImageTag(int tei);
 };
 
 

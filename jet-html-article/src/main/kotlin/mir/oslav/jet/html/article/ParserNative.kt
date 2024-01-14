@@ -68,6 +68,11 @@ internal object ParserNative {
     external fun getContentListItem(index: Int): String
 
 
+    /**
+     * @since 1.0.0
+     */
+    external fun getContentMapItem(attributeName: String): String
+
 
     /**
      * @since 1.0.0
