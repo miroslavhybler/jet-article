@@ -7,11 +7,12 @@
 
 #include <list>
 #include <map>
+#include <android/log.h>
 #include "IndexWrapper.h"
 
 
 /**
- * Defines the utils namespace.
+ * Defines the utils namespace. Containing usefull util functions for working with tags.
  * @since 1.0.0
  */
 namespace utils {
@@ -55,7 +56,11 @@ namespace utils {
      * @param message Message body
      * @since 1.0.0
      */
-    void log(const char *tag, const std::string message);
+    void log(
+            const char *tag,
+            const std::string message,
+            android_LogPriority prio = ANDROID_LOG_DEBUG
+    );
 
 
     /**
@@ -120,11 +125,13 @@ namespace utils {
 
 
     /**
-     *
-     * @param input
-     * @param tag
-     * @param s
-     * @param e
+     * Goes through input from s to e and parses out all tags same as tag and puts it into output list.
+     * @param input Input within you want to search for tag. Must be full content input, start and end
+     * are defined by s and e.
+     * @param tag Pair tag you want to group.
+     * @param s Start index of range where to search for tags.
+     * @param e End index of range where to search for tags.
+     * @param outputList List where result will be stored.
      * @since 1.0.0
      */
     void groupPairTagContents(
@@ -132,38 +139,40 @@ namespace utils {
             const std::string tag,
             const int s,
             const int e,
-            std::list<std::string> outputList
+            std::list<std::string> &outputList
     );
 
 
     /**
-     *
-     * @param s
+     * Trims s from the left side, removing white chars from the text.
+     * @param s String you want to trim. Will be modified.
      * @since 1.0.0
      */
     inline void ltrim(std::string &s);
 
 
     /**
-     *
-     * @param s
+     * Trims s from the right side, removing white chars from the text.
+     * @param s String you want to trim. Will be modified.
      * @since 1.0.0
      */
     inline void rtrim(std::string &s);
 
 
     /**
-     *
-     * @param s
+     * Trims s from both side, removing white chars from the text.
+     * @param s String you want to trim. Will be modified.
      * @since 1.0.0
      */
     inline void trim(std::string &s);
 
 
     /**
-     *
-     * @param tagBody
-     * @param outMap
+     * Process tagBody and parses out all attributes and it's values and stores it into outMap.
+     * OutMap is cleared at the begging. OutMap can be empty when there are no attributes inside tagBody.
+     * @param tagBody Tag body with <> with brackets removed, e.g. 'img src="url"'
+     * @param outMap Output map where result will be stored. Attrubute is key and attribute value
+     * is value.
      * @since 1.0.0
      */
     void getTagAttributes(std::string tagBody, std::map<std::string, std::string> &outMap);

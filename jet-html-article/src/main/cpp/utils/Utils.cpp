@@ -23,9 +23,13 @@ namespace utils {
     };
 
 
-    void log(const char *tag, const std::string message) {
+    void log(
+            const char *tag,
+            const std::string message,
+            android_LogPriority prio = ANDROID_LOG_DEBUG
+    ) {
         __android_log_print(
-                ANDROID_LOG_DEBUG,
+                prio,
                 tag,
                 "%s",
                 message.c_str()
@@ -48,12 +52,14 @@ namespace utils {
     }
 
 
+    //TODO measure and maybe remove,slower than ==
     bool fastCompare(const std::string s1, const std::string s2) {
+        //  return s1 == s2;
+
         char ch1 = s1[0];
         char ch2 = s2[0];
-
         if (ch1 == ch2) {
-            return strcmp(s1.c_str(), s2.c_str()) == 0;
+            return s1 == s2;
         }
         return false;
     }
@@ -111,20 +117,17 @@ namespace utils {
 
 
     bool canProcessIncomingTag(std::string input, int l, IndexWrapper index) {
-        //TODO chyba je tady, je něco špatně s indexem
-
-        /*
+        //TODO bug
         if (input[index.getTempIndex()] != '<') {
             std::string error = "Char at "
                                 + std::to_string(index.getTempIndex())
                                 + " != '<'   ::    char: '"
                                 + std::string(1, input[index.getTempIndex()])
                                 + "'";
-            utils::log("UTILS", error);
+            utils::log("mirek", error);
             throw error;
         }
 
-        */
 
         int i = index.getTempIndex();
         if ((i + 3) < l) {
@@ -132,7 +135,7 @@ namespace utils {
             std::string sub = input.substr(i + 1, 3);
             if (utils::fastCompare(sub, "!--")) {
                 int ei = utils::indexOfOrThrow(input, "-->", il);
-                index.moveTempIndex(ei);
+                index.moveTempIndex(ei + 4);
                 return false;
             }
         }
@@ -158,7 +161,6 @@ namespace utils {
     }
 
 
-    //TODO what if there is '<' char in the content
     int findClosingTag(
             const std::string input,
             const std::string searchedTag,
@@ -182,10 +184,14 @@ namespace utils {
             //char is '<'
             if (!utils::canProcessIncomingTag(input, input.length(), index)) {
                 //Unable to process
-                i = index.getTempIndex();
+                int temp = index.getTempIndex();
+                if (i == temp) {
+                    i += 1;
+                } else {
+                    i = temp;
+                }
                 continue;
             }
-
             //TagType closing index, index of next '>'
             int tei = utils::indexOfOrThrow(input, ">", i);
             // -1 to remove '<' at the end
@@ -217,7 +223,7 @@ namespace utils {
 
         std::string error = "Unable to find closing for: " + searchedTag
                             + " at: " + index.toString();
-        utils::log("CLOSING", error);
+        utils::log("UTILS", error);
         throw error;
     }
 
@@ -261,7 +267,7 @@ namespace utils {
             const std::string tag,
             const int s,
             const int e,
-            std::list<std::string> outputList
+            std::list<std::string> &outputList
     ) {
         if (!outputList.empty()) {
             outputList.clear();
@@ -282,10 +288,15 @@ namespace utils {
             std::string rawTagName = utils::getTagName(tagBody);
 
             if (utils::fastCompare(tag, rawTagName)) {
-                int ctsi = utils::indexOfOrThrow(input, "</" + tag + ">", i);
-                outputList.push_back(input.substr(i, ctsi));
+                std::string closingTag = "</" + tag + ">";
+                //TODO find closing needs index
+                int ctsi = utils::indexOfOrThrow(input, closingTag, tei);
+                std::string foundTag = input.substr(tei + 1, ctsi - tei - 1);
+                outputList.push_back(foundTag);
+                i = ctsi + 1;
+            } else {
+                i += tagBodyLength;
             }
-            i += tagBodyLength;
         }
     }
 }

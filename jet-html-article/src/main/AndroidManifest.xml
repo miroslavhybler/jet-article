@@ -5,7 +5,7 @@
     <application>
         <provider
             android:name="androidx.startup.InitializationProvider"
-            android:authorities="mir.oslav.jet.html.article.androidx-startup"
+            android:authorities="${applicationId}.androidx-startup"
             android:exported="false"
             tools:node="merge"
             tools:replace="android:authorities">

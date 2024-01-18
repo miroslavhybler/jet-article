@@ -1,3 +1,5 @@
+@file:Suppress("RedundantVisibilityModifier")
+
 package mir.oslav.jet.html.article.data
 
 
@@ -6,28 +8,18 @@ package mir.oslav.jet.html.article.data
  * @author Miroslav Hýbler <br>
  * created on 15.07.2023
  */
-data class HtmlData constructor(
-    val elements: List<HtmlElement>,
-    val headData: HtmlHeadData?,
-    val error: HtmlDataError? = null,
-) {
+public sealed class HtmlData private constructor() {
 
-    companion object {
-        val empty: HtmlData = HtmlData(
-            elements = emptyList(),
-            error = null,
-            headData = null,
-        )
-    }
+    public data object Empty : HtmlData()
+
+    public data class Success internal constructor(
+        val elements: List<HtmlElement>,
+        val headData: HtmlHeadData,
+    ) : HtmlData()
 
 
-    val isEmpty: Boolean
-        get() = elements.isEmpty()
-                && error == null
-
-
-    data class HtmlDataError constructor(
+    public data class Failure internal constructor(
         val message: String,
         val cause: Throwable?
-    )
+    ) : HtmlData()
 }

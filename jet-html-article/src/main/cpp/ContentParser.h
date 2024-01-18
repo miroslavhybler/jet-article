@@ -26,10 +26,11 @@ class ContentParser {
 public:
     std::string title;
     std::string base;
+    std::string  lang;
 
-    std::string actualTag = "";
-    std::string actualTagBody = "";
-    std::string actualTagContent = "";
+    std::string currentTag = "";
+    std::string currentTagBody = "";
+    std::string currentTagContent = "";
     TagType contentType = NO_CONTENT;
 
 private:
@@ -46,11 +47,13 @@ private:
     std::list<std::string> tempOutputList;
     std::map<std::string , std::string> tempOutputMap;
 
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     /////
     /////   Public Functions
     /////
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
 public:
 
     ContentParser();
@@ -147,6 +150,22 @@ public:
      * @since 1.0.0
      */
     std::string getTempMapItem(std::string attributeName);
+
+
+    /**
+     *
+     * @return
+     * @since 1.0.0
+     */
+    std::string getTitle();
+
+
+    /**
+     *
+     * @return
+     * @since 1.0.0
+     */
+    std::string getBase();
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

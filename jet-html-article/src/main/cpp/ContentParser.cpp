@@ -13,11 +13,12 @@ ContentParser::ContentParser() {
     mHasBodyContext = false;
     hasContentToProcess = false;
     wasHeadParsed = false;
+    index = IndexWrapper();
     length = 0;
     input = "";
-    index = IndexWrapper();
     title = "";
     base = "";
+    lang = "";
 }
 
 
@@ -25,11 +26,7 @@ ContentParser::~ContentParser() {
     mHasNextStep = false;
     mHasBodyContext = false;
     hasContentToProcess = false;
-    tempOutputList.clear();
-    length = 0;
-    input = "";
-    title = "";
-    base = "";
+    clearAllResources();
 }
 
 
@@ -108,12 +105,13 @@ bool ContentParser::moveIndexToNextTag() {
 }
 
 
+//TODO parse out lang attribute from <html> tag
 void ContentParser::doNextStep() {
     if (!moveIndexToNextTag()) {
         //No tag to process
+        invalidateHasNextStep();
         return;
     }
-
     //char is < and its probably start of valid tag
     //TagType end index, index of next '>'
     int tei = utils::indexOfOrThrow(input, ">", index.getIndex());
@@ -124,17 +122,19 @@ void ContentParser::doNextStep() {
     std::string tag = utils::getTagName(tagBody);
 
     //Move index to the next char after tag
-    //TODO unable to proccess image because index is moved at the end of img tag before
-    //  index.moveIndex(tei + 1);
-
     if (mHasBodyContext) {
         parseNextTagWithinBodyContext(tag, tei);
         invalidateHasNextStep();
         return;
     }
+
     index.moveIndex(tei + 1);
 
-    if (!wasHeadParsed && utils::fastCompare(tag, "head")) {
+    if (utils::fastCompare(tag, "html")) {
+        //TODO add util function for single attribute
+        utils::getTagAttributes(tagBody, tempOutputMap);
+        lang = tempOutputMap["lang"];
+    } else if (!wasHeadParsed && utils::fastCompare(tag, "head")) {
         //Closing tag start index
         int ctsi = utils::findClosingTag(input, tag, index);
         std::string tagContent = input.substr(tei, ctsi - 1);
@@ -166,7 +166,7 @@ void ContentParser::parseHeadData(int e) {
 
         if (utils::fastCompare(tag, "title")) {
             int ctsi = utils::findClosingTag(input, tag, index, e);
-            std::string tagContent = input.substr(tei, ctsi - 1);
+            std::string tagContent = input.substr(tei + 1, ctsi - tei - 1);
             title = tagContent;
             int i = index.getIndex() + ctsi + 7;
             index.moveIndex(i);
@@ -188,10 +188,11 @@ void ContentParser::parseHeadData(int e) {
 
 
 void ContentParser::parseNextTagWithinBodyContext(std::string tag, int tei) {
-    //TODO final version should not need this
+    //TODO its because after we parse out contet out, we can't move immediatelly
+    //TODO example <div><p>...</p></div> after parsing <p> we move behind </p>
     if (tag.find('/', 0) == 0) {
+        //Skipping closing tag
         index.moveIndex(tei + 1);
-        index.moveIndex(index.getIndex() + tag.length());
         invalidateHasNextStep();
         return;
     }
@@ -212,7 +213,8 @@ void ContentParser::parseNextTagWithinBodyContext(std::string tag, int tei) {
         //Skipping tags that can't be processed by library
         //Can't use findColsingTag because script can contain '<' inside of it and that breaks
         //searching for closing tag
-        int ctsi = utils::findClosingTag(input, tag, index);
+        std::string closingTag = "</" + tag + ">";
+        int ctsi = utils::indexOfOrThrow(input, closingTag, index.getIndex());
         index.moveIndex(ctsi + tag.length() + 3);
         return;
     }
@@ -232,8 +234,10 @@ void ContentParser::parseNextTagWithinBodyContext(std::string tag, int tei) {
 
     //TODO more content types
 
-    if (utils::fastCompare(tag, "p")) {
-        contentType = PARAGRAPH;
+    if (utils::fastCompare(tag, "p")
+        || utils::fastCompare(tag, "span")
+            ) {
+        contentType = TEXT;
         hasContentToProcess = true;
     } else if (utils::fastCompare(tag, "h1")
                || utils::fastCompare(tag, "h2")
@@ -246,13 +250,19 @@ void ContentParser::parseNextTagWithinBodyContext(std::string tag, int tei) {
     } else if (utils::fastCompare(tag, "table")) {
         contentType = TABLE;
         hasContentToProcess = true;
+        utils::groupPairTagContents(
+                input, "tr", index.getIndex(), ctsi, tempOutputList
+        );
+        //TODO how to send table to native (if even so)
     } else if (utils::fastCompare(tag, "blockquote")) {
         contentType = QUOTE;
         hasContentToProcess = true;
     } else if (utils::fastCompare(tag, "address")) {
         contentType = ADDRESS;
         hasContentToProcess = true;
-    } else if (
+    }
+    /*
+    else if (
             utils::fastCompare(tag, "ul")
             || utils::fastCompare(tag, "ol")
             ) {
@@ -261,20 +271,27 @@ void ContentParser::parseNextTagWithinBodyContext(std::string tag, int tei) {
         utils::groupPairTagContents(
                 input, "li", index.getIndex(), ctsi, tempOutputList
         );
-    } else if (utils::fastCompare(tag, "code")) {
+    }
+     */
+    else if (utils::fastCompare(tag, "code")) {
         contentType = CODE;
         hasContentToProcess = true;
     } else {
+        //TODO maybe call recursively do step until have content?
         contentType = NO_CONTENT;
         hasContentToProcess = false;
         tempContentIndexStart = -1;
         tempContentIndexEnd = -1;
     }
 
-    actualTag = tag;
+    currentTag = tag;
     if (hasContentToProcess) {
-        index.moveIndex(ctsi + tag.length() + 1);
+        //Moves  at next char after closing of pair tag
+        int next = utils::indexOfOrThrow(input, ">", ctsi);
+        index.moveIndex(next + 1);
     } else {
+        //Moves at next char after open tag
+        //This ussualy means that we are inside container like "div" and need to go deeper for the content
         index.moveIndex(tei + 1);
     }
 }
@@ -319,6 +336,23 @@ std::string ContentParser::getTempMapItem(std::string attributeName) {
 }
 
 
+std::string ContentParser::getTitle() {
+    return title;
+}
+
+
+std::string ContentParser::getBase() {
+    return base;
+}
+
+
 void ContentParser::clearAllResources() {
+    length = 0;
     input = "";
+    title = "";
+    base = "";
+    lang = "";
+
+    tempOutputList.clear();
+    tempOutputMap.clear();
 }

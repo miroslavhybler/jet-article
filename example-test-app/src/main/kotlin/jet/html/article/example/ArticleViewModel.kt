@@ -26,7 +26,7 @@ class ArticleViewModel @Inject constructor(
 
     private val assets: AssetManager = context.assets
 
-    private val mArticleData: MutableStateFlow<HtmlData> = MutableStateFlow(value = HtmlData.empty)
+    private val mArticleData: MutableStateFlow<HtmlData> = MutableStateFlow(value = HtmlData.Empty)
     val articleData: StateFlow<HtmlData> get() = mArticleData
 
     fun parse(article: String) {

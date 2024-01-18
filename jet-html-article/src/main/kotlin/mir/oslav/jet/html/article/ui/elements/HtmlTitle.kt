@@ -10,9 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.text.toSpannable
-import mir.oslav.jet.html.article.LocalHtmlDimensions
 import mir.oslav.jet.html.article.data.HtmlElement
 import mir.oslav.jet.html.article.toAnnotatedString
 import mir.oslav.jet.html.article.toHtml
@@ -28,7 +26,6 @@ fun HtmlTitle(
     title: HtmlElement.Title
 ) {
 
-    val dimensions = LocalHtmlDimensions.current
     val colorScheme = MaterialTheme.colorScheme
     val typography = MaterialTheme.typography
 
@@ -65,7 +62,6 @@ fun HtmlTitle(
             },
             modifier = modifier
                 .fillMaxWidth()
-                .padding(start = dimensions.sidePadding, end = dimensions.sidePadding, top = 12.dp)
             , //   .alpha(alpha = alpha.value),
             style = textStyle
         )

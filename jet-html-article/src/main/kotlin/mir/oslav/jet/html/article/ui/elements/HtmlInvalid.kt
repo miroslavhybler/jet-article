@@ -19,7 +19,7 @@ import mir.oslav.jet.html.article.data.HtmlData
 @Composable
 fun HtmlInvalid(
     modifier: Modifier = Modifier,
-    error: HtmlData.HtmlDataError
+    error: HtmlData.Failure
 ) {
 
     Box(modifier = modifier.fillMaxSize()) {

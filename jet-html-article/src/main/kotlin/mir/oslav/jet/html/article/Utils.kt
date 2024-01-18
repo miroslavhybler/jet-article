@@ -33,66 +33,7 @@ fun String.toHtml(): Spanned {
  * @author Miroslav Hýbler <br>
  * created on 26.08.2023
  */
-fun String.normalizedLink(): String = this
-    .removePrefix(prefix = "\"")
-    .removePrefix(prefix = " ")
-    .removeSuffix(suffix = "/")
-    .removeSuffix(suffix = "\"")
-    .removeSuffix(suffix = " ")
-
-
-fun String.normalizedAttributeValue(): String = this
-    .removePrefix(prefix = " ")
-    .removeSuffix(suffix = "/")
-    .removeSuffix(suffix = " ")
-
-
-fun String.sub(s: Int, e: Int): String = try {
-    this.substring(startIndex = s, endIndex = e)
-} catch (exception: StringIndexOutOfBoundsException) {
-    exception.printStackTrace()
-    throw exception
-}
-
-fun String.iOf(char: Char, startIndex: Int): Int {
-    return try {
-        this.indexOf(char = char, startIndex = startIndex)
-            .takeIf { index -> index != -1 }
-            ?: throw StringIndexOutOfBoundsException()
-    } catch (exception: StringIndexOutOfBoundsException) {
-        val clipped = this.sub(s = startIndex, e = this.length)
-        Log.e(
-            "mirek",
-            "Failed to get index of char $char " +
-                    "because its not in content from start $startIndex!\n" +
-                    "Content:\n" +
-                    clipped
-        )
-        throw exception
-    }
-}
-
-
-fun String.iOf(string: String, startIndex: Int): Int {
-    return try {
-        this.indexOf(string = string, startIndex = startIndex)
-            .takeIf { index -> index != -1 }
-            ?: throw StringIndexOutOfBoundsException()
-    } catch (exception: StringIndexOutOfBoundsException) {
-        val clipped = this.sub(s = startIndex, e = this.length)
-        Log.e(
-            "mirek",
-            "Failed to get index of char $string " +
-                    "because its not in content from start $startIndex!\n" +
-                    "Content:\n" +
-                    clipped
-        )
-        throw exception
-    }
-}
-
-
-fun Spannable.toAnnotatedString(primaryColor: Color): AnnotatedString {
+internal fun Spannable.toAnnotatedString(primaryColor: Color): AnnotatedString {
     val builder = AnnotatedString.Builder(this.toString())
     val copierContext = CopierContext(primaryColor)
     SpanCopier.entries.forEach { copier ->

@@ -23,7 +23,7 @@ class Benchmarks constructor() {
     val benchmarkRule = MacrobenchmarkRule()
 
     @Test
-    fun startup() = benchmarkRule.measureRepeated(
+    fun startup(): Unit = benchmarkRule.measureRepeated(
         packageName = "jet.html.article.example",
         metrics = listOf(StartupTimingMetric()),
         iterations = 5,
@@ -31,6 +31,5 @@ class Benchmarks constructor() {
     ) {
         pressHome()
         startActivityAndWait()
-
     }
 }

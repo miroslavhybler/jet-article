@@ -1,5 +1,7 @@
 package mir.oslav.jet.html.article
 
+import android.content.Context
+import android.util.Log
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -25,6 +27,12 @@ object JetHtmlArticleParser {
         .plus(context = CoroutineName(name = "JetHtmlArticleParse"))
 
 
+    suspend fun warmup(context: Context) {
+        val file = context.resources.assets.open("warm-up.html")
+        ParserNative.warmup(content = String(file.readBytes()))
+    }
+
+
     /**
      * @since 1.0.0
      */
@@ -36,7 +44,7 @@ object JetHtmlArticleParser {
             ParserNative.setInput(content = content)
 
             if (!ParserNative.hasNextStep()) {
-                return@parser errorData(message = "Empty")
+                return@parser HtmlData.Failure(message = "Empty", cause = null)
             }
 
             while (ParserNative.hasNextStep()) {
@@ -46,9 +54,15 @@ object JetHtmlArticleParser {
                     ParserNative.resetCurrentContent()
                 }
             }
-
+            val data = HtmlData.Success(
+                elements = elements,
+                headData = HtmlHeadData(
+                    title = ParserNative.getTitle(),
+                    baseUrl = ParserNative.getBase()
+                )
+            )
             ParserNative.clearAllResources()
-            return@parser finalData(elements = elements)
+            return@parser data
         }
     }
 
@@ -61,7 +75,6 @@ object JetHtmlArticleParser {
         if (type == HtmlContentType.NO_CONTENT) {
             return
         }
-        val c = ParserNative.getContent()
         when (type) {
             HtmlContentType.IMAGE -> {
                 val url: String = ParserNative.getContentMapItem(attributeName = "src")
@@ -69,25 +82,31 @@ object JetHtmlArticleParser {
                 elements.add(element = HtmlElement.Image(url = url, description = alt))
             }
 
-            HtmlContentType.PARAGRAPH -> {
+            HtmlContentType.TEXT -> {
                 elements.add(
                     element = HtmlElement.TextBlock(
-                        styledText = c,
+                        styledText = ParserNative.getContent(),
                         cleanText = "TODO"
                     )
                 )
             }
 
             HtmlContentType.TITLE -> {
-                elements.add(element = HtmlElement.Title(text = c, titleTag = "h3"))
+                elements.add(
+                    element = HtmlElement.Title(
+                        text = ParserNative.getContent(),
+                        titleTag = "h3"
+                    )
+                )
             }
 
             HtmlContentType.LIST -> {
                 elements.add(
                     element = HtmlElement.BasicList(
-                        isOrdered = false,
+                        isOrdered = ParserNative.getCurrentTag() == "ol",
                         items = ArrayList<String>().apply {
-                            for (i in 0 until ParserNative.getContentListSize()) {
+                            val listSize = ParserNative.getContentListSize()
+                            for (i in 0 until listSize) {
                                 add(ParserNative.getContentListItem(index = i))
                             }
                         }
@@ -99,35 +118,20 @@ object JetHtmlArticleParser {
                 elements.add(element = HtmlElement.Quote(text = ParserNative.getContent()))
             }
 
+            HtmlContentType.CODE -> {
+                elements.add(element = HtmlElement.Code(content = ParserNative.getContent()))
+            }
+
+            HtmlContentType.TABLE -> {
+                elements.add(element = HtmlElement.Table(rows = ArrayList<String>().apply {
+                    val listSize = ParserNative.getContentListSize()
+                    for (i in 0 until listSize) {
+                        add(ParserNative.getContentListItem(index = i))
+                    }
+                }));
+            }
+
             else -> {}
         }
     }
-
-
-    private fun appendingData(
-        elements: List<HtmlElement>
-    ): HtmlData = HtmlData(
-        elements = elements,
-        error = null,
-        headData = HtmlHeadData(title = "Parsing", baseUrl = null)
-    )
-
-
-    private fun finalData(
-        elements: List<HtmlElement>,
-    ): HtmlData = HtmlData(
-        elements = elements,
-        error = null,
-        headData = HtmlHeadData(title = "Parsed successfully", baseUrl = null)
-    )
-
-
-    private fun errorData(
-        message: String = "Error",
-        cause: Throwable? = null
-    ): HtmlData = HtmlData(
-        elements = emptyList(),
-        error = HtmlData.HtmlDataError(message = message, cause = cause),
-        headData = null
-    )
 }

@@ -20,15 +20,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import mir.oslav.jet.annotations.JetExperimental
-import mir.oslav.jet.html.article.HtmlDimensions
-import mir.oslav.jet.html.article.LocalHtmlDimensions
 import mir.oslav.jet.html.article.ui.elements.HtmlAddress
 import mir.oslav.jet.html.article.ui.elements.HtmlCode
 import mir.oslav.jet.html.article.ui.elements.HtmlImage
@@ -59,30 +56,15 @@ fun JetHtmlArticle(
     header: @Composable LazyItemScope.() -> Unit = {},
     footer: @Composable LazyItemScope.() -> Unit = {}
 ) {
+    JetHtmlArticleContent(
+        modifier = modifier,
+        data = data,
+        listState = listState,
+        contentPadding = contentPadding,
+        header = header,
+        footer = footer
+    )
 
-    val configuration = LocalConfiguration.current
-
-    val dimensions = remember(key1 = configuration) {
-        HtmlDimensions().also { dimensions ->
-            dimensions.init(
-                configuration = configuration,
-                screenWidth = configuration.screenWidthDp.dp,
-                screenHeight = configuration.screenHeightDp.dp,
-            )
-        }
-    }
-
-
-    CompositionLocalProvider(LocalHtmlDimensions provides dimensions) {
-        JetHtmlArticleContent(
-            modifier = modifier,
-            data = data,
-            listState = listState,
-            contentPadding = contentPadding,
-            header = header,
-            footer = footer
-        )
-    }
 }
 
 
@@ -105,73 +87,42 @@ fun JetHtmlArticleContent(
     verticalArrangement: Arrangement.Vertical = Arrangement.Top
 ) {
 
-    val dimensions = LocalHtmlDimensions.current
+    when (data) {
+        is HtmlData.Empty -> Unit
+        is HtmlData.Failure -> HtmlInvalid(error = data)
+        is HtmlData.Success -> {
+            LazyColumn(
+                modifier = modifier
+                    .fillMaxSize(),
+                state = listState,
+                verticalArrangement = verticalArrangement,
+                content = {
+                    item(content = header)
 
+                    itemsIndexed(
+                        items = data.elements,
+                    ) { index, element ->
+                        when (element) {
+                            //TODO handle links
+                            is HtmlElement.Image -> image(element)
+                            is HtmlElement.Quote -> quote(element)
+                            is HtmlElement.Table -> table(element)
+                            is HtmlElement.Address -> address(element)
+                            is HtmlElement.TextBlock -> text(element)
+                            is HtmlElement.Title -> title(element)
+                            is HtmlElement.Code -> code(element)
+                            is HtmlElement.BasicList -> basicList(element)
+                            else -> throw IllegalStateException(
+                                "Element ${element.javaClass.simpleName} not supported yet!"
+                            )
+                        }
+                    }
 
-    if (data.error != null) {
-        HtmlInvalid(error = data.error)
-        return
-    }
-
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize(),
-        state = listState,
-        verticalArrangement = verticalArrangement,
-        content = {
-            item(content = header)
-
-            itemsIndexed(
-                items = data.elements,
-            ) { index, element ->
-                when (element) {
-                    //TODO handle links
-                    is HtmlElement.Image -> image(element)
-                    is HtmlElement.Quote -> quote(element)
-                    is HtmlElement.Table -> table(element)
-                    is HtmlElement.Address -> address(element)
-                    is HtmlElement.TextBlock -> text(element)
-                    is HtmlElement.Title -> title(element)
-                    is HtmlElement.Code -> code(element)
-                    is HtmlElement.BasicList -> basicList(element)
-                    else -> throw IllegalStateException(
-                        "Element ${element.javaClass.simpleName} not supported yet!"
-                    )
-                }
-            }
-
-            item(content = footer)
-
-            item {
-                Spacer(modifier = Modifier.height(height = dimensions.baseLinePadding))
-            }
-
-        },
-        contentPadding = contentPadding
-    )
-}
-
-
-object JetHtmlArticleDefaults {
-
-
-    @Composable
-    fun DefaultLoading() {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .safeContentPadding()
-                .padding(top = 64.dp, bottom = 128.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier
-            )
-            Text(
-                text = "Loading",
-                modifier = Modifier
+                    item(content = footer)
+                },
+                contentPadding = contentPadding
             )
         }
+
     }
 }

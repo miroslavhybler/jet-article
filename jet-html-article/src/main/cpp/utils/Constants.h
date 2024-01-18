@@ -16,7 +16,7 @@
 enum TagType {
     NO_CONTENT = -1,
     IMAGE = 1,
-    PARAGRAPH = 2,
+    TEXT = 2,
     QUOTE = 3,
     TITLE = 4,
     TABLE = 5,

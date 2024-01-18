@@ -36,7 +36,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
-import mir.oslav.jet.html.article.LocalHtmlDimensions
 import mir.oslav.jet.html.article.data.HtmlElement
 
 
@@ -45,15 +44,13 @@ import mir.oslav.jet.html.article.data.HtmlElement
  * @author Miroslav Hýbler <br>
  * created on 30.06.2023
  */
-//TODO set styles through one object
+//TODO maybe just func on LazyList to increase performance
 @Composable
 fun HtmlTable(
     modifier: Modifier = Modifier,
     data: HtmlElement.Table,
 ) {
     val density = LocalDensity.current
-    val dimensions = LocalHtmlDimensions.current.table
-
 
     val textMeasurer = rememberTextMeasurer()
     val typography = MaterialTheme.typography
@@ -69,13 +66,12 @@ fun HtmlTable(
     }
 
     val rowsCount = remember { data.rows.size }
-    val columnCount = remember { data.rows.firstOrNull()?.size ?: 0 }
+    val columnCount = remember { data.rows.firstOrNull()?.split("")?.size ?: 0 }
 
     Card(
         modifier = modifier
             .fillMaxWidth()
             .horizontalScroll(state = rememberScrollState())
-            .padding(horizontal = LocalHtmlDimensions.current.sidePadding)
             .clip(MaterialTheme.shapes.small),
         border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer),
     ) {
@@ -84,7 +80,11 @@ fun HtmlTable(
                 .background(color = MaterialTheme.colorScheme.secondaryContainer)
 
         ) {
-            data.rows.forEachIndexed { rowIndex, rowValues ->
+            data.rows.forEachIndexed { rowIndex, row ->
+                val rowValues = remember(key1= rowIndex) {
+                    //TODO
+                    row.split(";")
+                }
                 Row(
                     modifier = Modifier
                 ) {
@@ -101,12 +101,12 @@ fun HtmlTable(
                             if (widthForColumn != null) {
                                 if (widthDp > widthForColumn) {
                                     cellWidthsForColumns[columnIndex] = widthDp
-                                        .coerceAtLeast(minimumValue = dimensions.minCellWidth)
+                                        .coerceAtLeast(minimumValue = 128.dp)
                                     //     .coerceAtMost(maximumValue = dimensions.maxCellWidth)
                                 }
                             } else {
                                 cellWidthsForColumns[columnIndex] = widthDp
-                                    .coerceAtLeast(minimumValue = dimensions.minCellWidth)
+                                    .coerceAtLeast(minimumValue = 128.dp)
                                 //   .coerceAtMost(maximumValue = dimensions.maxCellWidth)
                             }
                         })
@@ -117,7 +117,7 @@ fun HtmlTable(
                             rowIndex = rowIndex,
                             rowCount = rowValues.size,
                             modifier = Modifier.defaultMinSize(
-                                minWidth = widthForColumn ?: dimensions.minCellWidth,
+                                minWidth = widthForColumn ?: 128.dp,
                                 //    height = dimensions.maxCellHeight
                             )
                         )
@@ -146,16 +146,9 @@ private fun TableCell(
     rowCount: Int,
 ) {
 
-    val dimensions = LocalHtmlDimensions.current.table
-
     Box(
         modifier = modifier
-            .sizeIn(
-                minWidth = dimensions.minCellWidth,
-                //      maxWidth = dimensions.maxCellWidth,
-                minHeight = dimensions.minCellHeight,
-                //      maxHeight = dimensions.maxCellHeight
-            )
+            .sizeIn(minWidth = 128.dp, minHeight = 32.dp,)
     ) {
         Text(
             text = value,
@@ -191,6 +184,7 @@ private fun TableCell(
 @Composable
 @Preview(showBackground = true)
 private fun TablePreview() {
+    /*
     HtmlTable(
         data = HtmlElement.Table(
             rows = listOf(
@@ -201,4 +195,5 @@ private fun TablePreview() {
             ),
         )
     )
+    */
 }

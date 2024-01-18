@@ -58,8 +58,8 @@ Java_mir_oslav_jet_html_article_ParserNative_doNextStep(
     jni::contentParser->doNextStep();
     if (jni::contentParser->hasParsedContentToBeProcessed()) {
         jni::isContentForVisualAvailable = jni::processor->isTagValidForNextProcessing(
-                jni::contentParser->actualTag,
-                jni::contentParser->actualTagBody
+                jni::contentParser->currentTag,
+                jni::contentParser->currentTagBody
         );
     }
 }
@@ -79,6 +79,32 @@ Java_mir_oslav_jet_html_article_ParserNative_getContent(
 ) {
     return environment->NewStringUTF(jni::contentParser->getTempContent().c_str());
 }
+
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_mir_oslav_jet_html_article_ParserNative_getCurrentTag(
+        JNIEnv *environment, jobject caller
+) {
+    return environment->NewStringUTF(jni::contentParser->currentTag.c_str());
+}
+
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_mir_oslav_jet_html_article_ParserNative_getTitle(
+        JNIEnv *environment, jobject caller
+) {
+    return environment->NewStringUTF(jni::contentParser->getTitle().c_str());
+}
+
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_mir_oslav_jet_html_article_ParserNative_getBase(
+        JNIEnv *environment, jobject caller
+) {
+    return environment->NewStringUTF(jni::contentParser->getBase().c_str());
+}
+
+
 
 extern "C" JNIEXPORT jint JNICALL
 Java_mir_oslav_jet_html_article_ParserNative_getContentListSize(
@@ -119,6 +145,22 @@ extern "C" JNIEXPORT void JNICALL
 Java_mir_oslav_jet_html_article_ParserNative_clearAllResources(
         JNIEnv *environment, jobject caller
 ) {
+    jni::contentParser->clearAllResources();
+    jni::processor->clearAllResources();
+}
+
+
+extern "C" JNIEXPORT void JNICALL
+Java_mir_oslav_jet_html_article_ParserNative_warmup(
+        JNIEnv *environment, jobject caller, jstring content
+) {
+    jboolean isCopy;
+    jni::contentParser->setInput(environment->GetStringUTFChars(content, &isCopy));
+
+    while (jni::contentParser->hasNextStep()) {
+        jni::contentParser->doNextStep();
+    }
+
     jni::contentParser->clearAllResources();
     jni::processor->clearAllResources();
 }

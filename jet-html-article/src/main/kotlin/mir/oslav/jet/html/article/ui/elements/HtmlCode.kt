@@ -15,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.text.toSpannable
-import mir.oslav.jet.html.article.LocalHtmlDimensions
 import mir.oslav.jet.html.article.data.HtmlElement
 import mir.oslav.jet.html.article.toAnnotatedString
 import mir.oslav.jet.html.article.toHtml
@@ -30,12 +29,11 @@ fun HtmlCode(
     modifier: Modifier = Modifier,
     code: HtmlElement.Code
 ) {
-    val dimensions = LocalHtmlDimensions.current
     val colorScheme = MaterialTheme.colorScheme
 
     Box(
         modifier = Modifier
-            .padding(horizontal = dimensions.sidePadding, vertical = 4.dp)
+            .padding(vertical = 4.dp)
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.surface,

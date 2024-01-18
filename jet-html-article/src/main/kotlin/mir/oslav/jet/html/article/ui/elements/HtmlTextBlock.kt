@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.text.toSpannable
-import mir.oslav.jet.html.article.LocalHtmlDimensions
 import mir.oslav.jet.html.article.data.HtmlElement
 import mir.oslav.jet.html.article.toAnnotatedString
 import mir.oslav.jet.html.article.toHtml
@@ -22,8 +21,6 @@ fun HtmlTextBlock(
     modifier: Modifier = Modifier,
     text: HtmlElement.TextBlock
 ) {
-
-    val dimensions = LocalHtmlDimensions.current
     val colorScheme = MaterialTheme.colorScheme
 
 //    var initialAlpha by rememberSaveable { mutableFloatStateOf(value = 0f) }
@@ -43,7 +40,6 @@ fun HtmlTextBlock(
                 .toAnnotatedString(primaryColor = colorScheme.primary)
         },
         modifier = modifier
-            .padding(horizontal = dimensions.sidePadding)
         //    .alpha(alpha = alpha.value)
 
     )

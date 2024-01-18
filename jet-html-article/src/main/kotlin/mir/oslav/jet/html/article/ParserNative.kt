@@ -10,6 +10,8 @@ import mir.oslav.jet.html.article.data.HtmlContentType
  * created on 03.01.2023
  * @since 1.0.0
  */
+//TODO public for making possible to create own parser ????
+//TODO warmup
 internal object ParserNative {
 
 
@@ -20,30 +22,35 @@ internal object ParserNative {
 
 
     /**
+     * @return
      * @since 1.0.0
      */
     external fun hasNextStep(): Boolean
 
 
     /**
+     * @return
      * @since 1.0.0
      */
     external fun hasContent(): Boolean
 
 
     /**
+     * @return
      * @since 1.0.0
      */
     external fun resetCurrentContent(): Unit
 
 
     /**
+     * @return
      * @since 1.0.0
      */
     external fun doNextStep(): Unit
 
 
     /**
+     * @return
      * @since 1.0.0
      */
     @HtmlContentType
@@ -51,9 +58,31 @@ internal object ParserNative {
 
 
     /**
+     * @return
      * @since 1.0.0
      */
     external fun getContent(): String
+
+
+    /**
+     * @return
+     * @since 1.0.0
+     */
+    external fun getTitle(): String
+
+
+    /**
+     * @return
+     * @since 1.0.0
+     */
+    external fun getBase(): String
+
+
+    /**
+     * @return
+     * @since 1.0.0
+     */
+    external fun getCurrentTag(): String
 
 
     /**
@@ -78,4 +107,10 @@ internal object ParserNative {
      * @since 1.0.0
      */
     external fun clearAllResources(): Unit
+
+
+    /**
+     * @since 1.0.0
+     */
+    external fun warmup(content: String): Unit
 }

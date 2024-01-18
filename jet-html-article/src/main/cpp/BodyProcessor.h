@@ -10,6 +10,9 @@
 #include <list>
 
 
+/**
+ * @since 1.0.0
+ */
 class BodyProcessor {
 
 private:

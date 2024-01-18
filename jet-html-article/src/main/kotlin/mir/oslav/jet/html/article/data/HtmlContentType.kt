@@ -13,21 +13,20 @@ import androidx.annotation.IntDef
 @IntDef(
     HtmlContentType.NO_CONTENT,
     HtmlContentType.IMAGE,
-    HtmlContentType.PARAGRAPH,
+    HtmlContentType.TEXT,
     HtmlContentType.QUOTE,
     HtmlContentType.TITLE,
     HtmlContentType.TABLE,
     HtmlContentType.ADDRESS,
     HtmlContentType.LIST,
     HtmlContentType.CODE,
-
-    )
+)
 internal annotation class HtmlContentType constructor() {
 
     companion object {
         internal const val NO_CONTENT: Int = -1
         internal const val IMAGE: Int = 1
-        internal const val PARAGRAPH: Int = 2
+        internal const val TEXT: Int = 2
         internal const val QUOTE: Int = 3
         internal const val TITLE: Int = 4
         internal const val TABLE: Int = 5

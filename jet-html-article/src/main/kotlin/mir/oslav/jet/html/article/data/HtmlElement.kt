@@ -1,3 +1,5 @@
+@file:Suppress("RedundantConstructorKeyword", "RedundantVisibilityModifier")
+
 package mir.oslav.jet.html.article.data
 
 /**
@@ -8,14 +10,13 @@ package mir.oslav.jet.html.article.data
 sealed class HtmlElement private constructor() {
 
 
-
     /**
      * @since 1.0.0
      */
-    data class Image constructor(
+    public data class Image internal constructor(
         val url: String,
         val description: String?,
-        ) : HtmlElement()
+    ) : HtmlElement()
 
 
     /**
@@ -24,10 +25,10 @@ sealed class HtmlElement private constructor() {
      * @since 1.0.0
      */
     //TODO html text a raw text pro talkback
-    data class TextBlock constructor(
+    public data class TextBlock internal constructor(
         val styledText: String,
         val cleanText: String,
-        ) : HtmlElement()
+    ) : HtmlElement()
 
 
     /**
@@ -35,7 +36,7 @@ sealed class HtmlElement private constructor() {
      * @param titleTag h1, h2, h3, ...
      * @since 1.0.0
      */
-    data class Title constructor(
+    public data class Title internal constructor(
         val text: String,
         val titleTag: String,
     ) : HtmlElement()
@@ -44,7 +45,7 @@ sealed class HtmlElement private constructor() {
     /**
      * @since 1.0.0
      */
-    data class Quote constructor(
+    public data class Quote internal constructor(
         val text: String,
     ) : HtmlElement()
 
@@ -52,15 +53,15 @@ sealed class HtmlElement private constructor() {
     /**
      * @since 1.0.0
      */
-    data class Table constructor(
-        val rows: List<List<String>>,
+    public data class Table internal constructor(
+        val rows: List<String>,
     ) : HtmlElement()
 
 
     /**
      * @since 1.0.0
      */
-    data class BasicList constructor(
+    public data class BasicList internal constructor(
         val items: List<String>,
         val isOrdered: Boolean,
     ) : HtmlElement()
@@ -69,7 +70,7 @@ sealed class HtmlElement private constructor() {
     /**
      * @since 1.0.0
      */
-    data class DescriptionList(
+    public data class DescriptionList internal constructor(
         val items: List<String>,
         val isOrdered: Boolean,
     ) : HtmlElement()
@@ -77,7 +78,7 @@ sealed class HtmlElement private constructor() {
     /**
      * @since 1.0.0
      */
-    data class Address constructor(
+    public data class Address internal constructor(
         val content: String,
     ) : HtmlElement()
 
@@ -85,7 +86,7 @@ sealed class HtmlElement private constructor() {
     /**
      * @since 1.0.0
      */
-    data class Code constructor(
+    public data class Code internal constructor(
         val content: String,
-        ) : HtmlElement()
+    ) : HtmlElement()
 }
