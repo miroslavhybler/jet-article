@@ -1,7 +1,6 @@
 package mir.oslav.jet.html.article
 
 import android.content.Context
-import android.util.Log
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -44,7 +43,7 @@ object JetHtmlArticleParser {
             ParserNative.setInput(content = content)
 
             if (!ParserNative.hasNextStep()) {
-                return@parser HtmlData.Failure(message = "Empty", cause = null)
+                return@parser HtmlData.Failure(message = "Content is empty", cause = null)
             }
 
             while (ParserNative.hasNextStep()) {
@@ -77,16 +76,27 @@ object JetHtmlArticleParser {
         }
         when (type) {
             HtmlContentType.IMAGE -> {
-                val url: String = ParserNative.getContentMapItem(attributeName = "src")
+                var url: String = ParserNative.getContentMapItem(attributeName = "src")
                 val alt: String = ParserNative.getContentMapItem(attributeName = "alt")
+
+                if (url.endsWith(suffix = ".svg")) {
+                    //Svg format not suppor
+                    return
+                }
+
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    val base = ParserNative.getBase().removeSuffix(suffix = "/")
+                    val end = url.removePrefix(prefix = "/")
+                    url = "$base/$end"
+                }
+
                 elements.add(element = HtmlElement.Image(url = url, description = alt))
             }
 
             HtmlContentType.TEXT -> {
                 elements.add(
                     element = HtmlElement.TextBlock(
-                        styledText = ParserNative.getContent(),
-                        cleanText = "TODO"
+                        text = ParserNative.getContent(),
                     )
                 )
             }

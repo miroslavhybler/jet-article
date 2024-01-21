@@ -20,19 +20,16 @@ sealed class HtmlElement private constructor() {
 
 
     /**
-     * @param styledText Styled text containing simple html formatting tags like b, i, u,...
-     * @param cleanText Text from styled text without any formatting. This is set for additional need.
+     * @param text Styled text containing simple html formatting tags like b, i, u,...
      * @since 1.0.0
      */
-    //TODO html text a raw text pro talkback
     public data class TextBlock internal constructor(
-        val styledText: String,
-        val cleanText: String,
+        val text: String,
     ) : HtmlElement()
 
 
     /**
-     * @param text Content text of title
+     * @param text Styled text, title
      * @param titleTag h1, h2, h3, ...
      * @since 1.0.0
      */

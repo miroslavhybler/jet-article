@@ -34,7 +34,7 @@ namespace utils {
      * @param input Input for searching substring
      * @param sub Substring you want to search
      * @param i Start index
-     * @throws Exception when TODO
+     * @throws Exception when sub was not found within input from i
      * @return index of first found substring
      * @since 1.0.0
      */

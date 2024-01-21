@@ -105,7 +105,6 @@ bool ContentParser::moveIndexToNextTag() {
 }
 
 
-//TODO parse out lang attribute from <html> tag
 void ContentParser::doNextStep() {
     if (!moveIndexToNextTag()) {
         //No tag to process
@@ -232,8 +231,6 @@ void ContentParser::parseNextTagWithinBodyContext(std::string tag, int tei) {
     tempContentIndexStart = index.getIndex();
     tempContentIndexEnd = ctsi;
 
-    //TODO more content types
-
     if (utils::fastCompare(tag, "p")
         || utils::fastCompare(tag, "span")
             ) {
@@ -249,11 +246,13 @@ void ContentParser::parseNextTagWithinBodyContext(std::string tag, int tei) {
         hasContentToProcess = true;
     } else if (utils::fastCompare(tag, "table")) {
         contentType = TABLE;
-        hasContentToProcess = true;
+        hasContentToProcess = false;
+        /*
         utils::groupPairTagContents(
                 input, "tr", index.getIndex(), ctsi, tempOutputList
         );
-        //TODO how to send table to native (if even so)
+         */
+
     } else if (utils::fastCompare(tag, "blockquote")) {
         contentType = QUOTE;
         hasContentToProcess = true;
@@ -277,7 +276,6 @@ void ContentParser::parseNextTagWithinBodyContext(std::string tag, int tei) {
         contentType = CODE;
         hasContentToProcess = true;
     } else {
-        //TODO maybe call recursively do step until have content?
         contentType = NO_CONTENT;
         hasContentToProcess = false;
         tempContentIndexStart = -1;

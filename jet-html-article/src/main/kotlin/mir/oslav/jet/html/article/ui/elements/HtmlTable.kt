@@ -44,7 +44,6 @@ import mir.oslav.jet.html.article.data.HtmlElement
  * @author Miroslav Hýbler <br>
  * created on 30.06.2023
  */
-//TODO maybe just func on LazyList to increase performance
 @Composable
 fun HtmlTable(
     modifier: Modifier = Modifier,
@@ -81,7 +80,7 @@ fun HtmlTable(
 
         ) {
             data.rows.forEachIndexed { rowIndex, row ->
-                val rowValues = remember(key1= rowIndex) {
+                val rowValues = remember(key1 = rowIndex) {
                     //TODO
                     row.split(";")
                 }
@@ -148,7 +147,7 @@ private fun TableCell(
 
     Box(
         modifier = modifier
-            .sizeIn(minWidth = 128.dp, minHeight = 32.dp,)
+            .sizeIn(minWidth = 128.dp, minHeight = 32.dp)
     ) {
         Text(
             text = value,

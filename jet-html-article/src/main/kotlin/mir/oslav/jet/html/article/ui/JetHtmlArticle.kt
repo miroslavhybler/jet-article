@@ -103,7 +103,6 @@ fun JetHtmlArticleContent(
                         items = data.elements,
                     ) { index, element ->
                         when (element) {
-                            //TODO handle links
                             is HtmlElement.Image -> image(element)
                             is HtmlElement.Quote -> quote(element)
                             is HtmlElement.Table -> table(element)

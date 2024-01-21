@@ -52,7 +52,6 @@ namespace utils {
     }
 
 
-    //TODO measure and maybe remove,slower than ==
     bool fastCompare(const std::string s1, const std::string s2) {
         //  return s1 == s2;
 
@@ -117,18 +116,6 @@ namespace utils {
 
 
     bool canProcessIncomingTag(std::string input, int l, IndexWrapper index) {
-        //TODO bug
-        if (input[index.getTempIndex()] != '<') {
-            std::string error = "Char at "
-                                + std::to_string(index.getTempIndex())
-                                + " != '<'   ::    char: '"
-                                + std::string(1, input[index.getTempIndex()])
-                                + "'";
-            utils::log("mirek", error);
-            throw error;
-        }
-
-
         int i = index.getTempIndex();
         if ((i + 3) < l) {
             int il = i + 3;
@@ -261,7 +248,6 @@ namespace utils {
     }
 
 
-    //TODO fix
     void groupPairTagContents(
             const std::string input,
             const std::string tag,
@@ -289,7 +275,6 @@ namespace utils {
 
             if (utils::fastCompare(tag, rawTagName)) {
                 std::string closingTag = "</" + tag + ">";
-                //TODO find closing needs index
                 int ctsi = utils::indexOfOrThrow(input, closingTag, tei);
                 std::string foundTag = input.substr(tei + 1, ctsi - tei - 1);
                 outputList.push_back(foundTag);

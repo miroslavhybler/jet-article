@@ -11,7 +11,6 @@ import mir.oslav.jet.html.article.data.HtmlContentType
  * @since 1.0.0
  */
 //TODO public for making possible to create own parser ????
-//TODO warmup
 internal object ParserNative {
 
 

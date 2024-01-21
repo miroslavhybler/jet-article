@@ -1,6 +1,5 @@
 package mir.oslav.jet.html.article.ui.elements
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,7 +34,7 @@ fun HtmlTextBlock(
 
     Text(
         text = remember(key1 = text) {
-            text.styledText.toHtml()
+            text.text.toHtml()
                 .toSpannable()
                 .toAnnotatedString(primaryColor = colorScheme.primary)
         },
