@@ -45,7 +45,7 @@ dependencies {
     implementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation("androidx.test.uiautomator:uiautomator:2.2.0")
     implementation("androidx.benchmark:benchmark-macro-junit4:1.2.2")
-    implementation(project(":jet-html-article"))
+    implementation(project(":jet-article"))
 }
 
 androidComponents {

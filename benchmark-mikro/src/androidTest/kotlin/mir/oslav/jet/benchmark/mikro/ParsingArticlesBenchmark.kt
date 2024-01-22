@@ -8,7 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import mir.oslav.jet.html.article.JetHtmlArticleParser
+import com.jet.article.JetHtmlArticleParser
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

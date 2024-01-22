@@ -13,8 +13,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import mir.oslav.jet.html.article.data.HtmlData
-import mir.oslav.jet.html.article.ui.JetHtmlArticle
+import com.jet.article.data.HtmlData
+import com.jet.article.ui.JetHtmlArticle
 
 @Composable
 fun ArticleScreen(

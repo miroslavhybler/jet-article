@@ -43,8 +43,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import mir.oslav.jet.html.article.ui.JetHtmlArticle
-import mir.oslav.jet.html.article.data.HtmlData
+import com.jet.article.ui.JetHtmlArticle
+import com.jet.article.data.HtmlData
 
 /**
  *

@@ -10,8 +10,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import mir.oslav.jet.html.article.data.HtmlData
-import mir.oslav.jet.html.article.JetHtmlArticleParser
+import com.jet.article.data.HtmlData
+import com.jet.article.JetHtmlArticleParser
 import javax.inject.Inject
 
 
