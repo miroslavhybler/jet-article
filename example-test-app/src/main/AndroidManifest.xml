@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:name=".JetHtmlArticleExampleApp"
+        android:name="jet.html.article.example.JetHtmlArticleExampleApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:enableOnBackInvokedCallback="true"
@@ -19,7 +19,7 @@
         tools:targetApi="31">
 
         <activity
-            android:name=".MainActivity"
+            android:name="jet.html.article.example.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.JetHtmlArticle"
             android:windowSoftInputMode="adjustResize">

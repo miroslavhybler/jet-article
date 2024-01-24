@@ -15,7 +15,6 @@ class IndexWrapper {
 
 private:
     int index = 0;
-    int tempIndex = 0;
 
 public:
     IndexWrapper();
@@ -31,36 +30,13 @@ public:
      */
     void moveIndex(int i);
 
-    /**
-     * Sets new tempIndex value.
-     * @param i New tempIndex value.
-     * @since 1.0.0
-     */
-    void moveTempIndex(int i);
-
-
-    /**
-     * Sets new index value based in temp index.
-     * @return
-     * @since 1.0.0
-     */
-    bool moveToTempIndex();
-
 
     /**
      *
      * @return Actual index value.
      * @since 1.0.0
      */
-    int getIndex();
-
-
-    /**
-     *
-     * @return Actual tempIndex value.
-     * @since 1.0.0
-     */
-    int getTempIndex();
+    const int getIndex();
 
 
     /**

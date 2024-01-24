@@ -20,8 +20,6 @@ fun HomePage(navHostController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-
-        Spacer(modifier = Modifier.weight(weight = 1f))
         Button(
             onClick = {
                 navHostController.navigate(route = "test")
@@ -57,18 +55,20 @@ fun HomePage(navHostController: NavHostController) {
                 Text(text = "Android docs")
             }
         )
-        Spacer(modifier = Modifier.weight(weight = 1f))
+        Button(
+            onClick = {
+                navHostController.navigate(route = "wikipedia")
+            }, content = {
+                Text(text = "Wikipedia")
+            }
+        )
 
-
-        Text(
-            text = buildString {
-                append(BuildConfig.VERSION_NAME)
-                append(" (build ${BuildConfig.VERSION_CODE})")
-            },
-            modifier = Modifier
-                .navigationBarsPadding()
-                .wrapContentSize()
-
+        Button(
+            onClick = {
+                navHostController.navigate(route = "medium")
+            }, content = {
+                Text(text = "Medium")
+            }
         )
     }
 }

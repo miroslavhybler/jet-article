@@ -8,6 +8,7 @@ add_library(
         BodyProcessor.h BodyProcessor.cpp
 
         ParserJNI.cpp
+        UtilsJNI.cpp
 )
 
 add_subdirectory(

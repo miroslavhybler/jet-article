@@ -10,16 +10,17 @@
 
 
 bool BodyProcessor::isTagValidForNextProcessing(
-        const std::string tag,
-        const std::string tagBody
+        const std::string &tag,
+        const std::string &tagBody
 ) {
 
     if (rules.empty()) {
+        //No exclude rules specified, tag is considered valid
         return true;
     }
 
-    std::list<Rule>::iterator iterator = rules.begin();
-    for (Rule rule: rules) {
+    std::vector<IgnoreRule>::iterator iterator = rules.begin();
+    for (IgnoreRule rule: rules) {
         if (utils::fastCompare(tag, rule.getTag())) {
             switch (rule.getType()) {
                 case TAG:
@@ -27,7 +28,14 @@ bool BodyProcessor::isTagValidForNextProcessing(
                     return false;
 
                 case CLAZZ:
-                    //TODO check on clazz
+                    utils::extractClasses(tagBody, tempClasses);
+                    for (std::string clazz: tempClasses) {
+                        if (utils::fastCompare(clazz, rule.getClazz())) {
+                            //Active rule found
+                            return false;
+                        }
+                    }
+
                     break;
             }
         }
@@ -37,7 +45,7 @@ bool BodyProcessor::isTagValidForNextProcessing(
 }
 
 
-void BodyProcessor::addRule(Rule rule) {
+void BodyProcessor::addRule(IgnoreRule rule) {
     rules.push_back(rule);
 }
 

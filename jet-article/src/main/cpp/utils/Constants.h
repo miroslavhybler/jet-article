@@ -23,9 +23,14 @@ enum TagType {
     ADDRESS = 6,
     LIST = 7,
     CODE = 8,
-    // TODO container
 };
 
+
+enum ErrorCode {
+    NO_ERROR = -1,
+    NO_INDEX_FOUND = 1,
+    NO_CLOSING_TAG_FOUND = 2,
+};
 
 #endif //JET_HTML_ARTICLE_CONSTANTS_H
 

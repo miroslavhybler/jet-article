@@ -5,10 +5,9 @@
 #ifndef JET_HTML_ARTICLE_BODYPROCESSOR_H
 #define JET_HTML_ARTICLE_BODYPROCESSOR_H
 
-#include "Rule.h"
+#include "IgnoreRule.h"
 #include <string>
-#include <list>
-
+#include <vector>
 
 /**
  * @since 1.0.0
@@ -16,7 +15,8 @@
 class BodyProcessor {
 
 private:
-    std::list<Rule> rules;
+    std::vector<IgnoreRule> rules;
+    std::vector<std::string> tempClasses;
 
 public:
 
@@ -30,13 +30,13 @@ public:
      * @since 1.0.0
      */
     bool isTagValidForNextProcessing(
-            const std::string tag,
-            const std::string tagBody
+            const std::string &tag,
+            const std::string &tagBody
     );
 
 
 
-    void addRule(Rule rule);
+    void addRule(IgnoreRule rule);
 
 
     void clearAllResources();

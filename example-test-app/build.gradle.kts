@@ -10,7 +10,7 @@ plugins {
 }
 
 android {
-    namespace = "jet.html.article.example"
+    namespace = "com.jet.article.test"
     compileSdk = 34
 
     defaultConfig {

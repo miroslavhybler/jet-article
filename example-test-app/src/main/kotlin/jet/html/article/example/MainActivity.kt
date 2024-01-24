@@ -8,43 +8,26 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import com.jet.article.ui.JetHtmlArticle
-import com.jet.article.data.HtmlData
 
 /**
  *
@@ -85,7 +68,16 @@ class MainActivity : ComponentActivity() {
                         composable(route = "default") { ArticleScreen(article = "default") }
                         composable(route = "simple") { ArticleScreen(article = "simple") }
                         composable(route = "mapbox") { ArticleScreen(article = "mapbox") }
-                        composable(route = "android") { ArticleScreen(article = "android") }
+                        composable(route = "medium") { ArticleScreen(article = "medium") }
+                        composable(route = "android") {
+                            ArticleScreen(
+                                article = "android",
+                                ignoreRules = rememberIgnoreRules(
+                                    "devsite-header" to "",
+                                )
+                            )
+                        }
+                        composable(route = "wikipedia") { ArticleScreen(article = "wikipedia") }
                     }
                 }
             }
@@ -101,7 +93,6 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
 @Composable
 fun JetHtmlArticleExampleTheme(
     isDarkTheme: Boolean = isSystemInDarkTheme(),
@@ -112,6 +103,7 @@ fun JetHtmlArticleExampleTheme(
             val context = LocalContext.current
             if (isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
+
         isDarkTheme -> darkColorScheme()
         else -> lightColorScheme()
     }

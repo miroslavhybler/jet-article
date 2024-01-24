@@ -1,3 +1,5 @@
+@file:Suppress("RedundantVisibilityModifier")
+
 package com.jet.article
 
 import android.graphics.Typeface
@@ -23,7 +25,7 @@ import androidx.core.text.HtmlCompat
  * @author Miroslav Hýbler <br>
  * created on 25.08.2023
  */
-fun String.toHtml(): Spanned {
+public fun String.toHtml(): Spanned {
     return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
 }
 
@@ -33,7 +35,7 @@ fun String.toHtml(): Spanned {
  * @author Miroslav Hýbler <br>
  * created on 26.08.2023
  */
-internal fun Spannable.toAnnotatedString(primaryColor: Color): AnnotatedString {
+public fun Spannable.toAnnotatedString(primaryColor: Color): AnnotatedString {
     val builder = AnnotatedString.Builder(this.toString())
     val copierContext = CopierContext(primaryColor)
     SpanCopier.entries.forEach { copier ->

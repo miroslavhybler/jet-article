@@ -1,8 +1,10 @@
 package com.jet.article.ui.elements
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -75,33 +77,30 @@ fun HtmlImage(
         }
 
         is AsyncImagePainter.State.Error -> {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .then(other = modifier)
-            ) {
-                Column {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_jet_html_error_image),
-                        contentDescription = null,
-                        modifier = Modifier.size(size = 24.dp),
-                        tint = MaterialTheme.colorScheme.error
-                    )
-
-                    Text(
-                        text = "Unable to load image",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
+            PhotoError()
         }
 
         is AsyncImagePainter.State.Empty -> {
 
         }
     }
+}
 
 
+@Composable
+private fun PhotoError() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colorScheme.errorContainer)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_broken_image),
+            contentDescription = null,
+            modifier = Modifier
+                .size(size = 32.dp)
+                .align(alignment = Alignment.Center),
+            tint = MaterialTheme.colorScheme.onErrorContainer,
+        )
+    }
 }

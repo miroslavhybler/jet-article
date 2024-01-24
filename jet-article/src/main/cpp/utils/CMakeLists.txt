@@ -6,7 +6,7 @@ add_library(
         Utils.h Utils.cpp
         IndexWrapper.h IndexWrapper.cpp
 #        StringRef.h StringRef.cpp,
-        Rule.h Rule.cpp
+        IgnoreRule.h IgnoreRule.cpp
         Constants.h
 )
 

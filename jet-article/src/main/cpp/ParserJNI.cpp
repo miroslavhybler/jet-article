@@ -11,6 +11,7 @@
 #include "BodyProcessor.h"
 #include "utils/Utils.h"
 #include "utils/Constants.h"
+#include "jni.h"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnusedParameter"
@@ -22,7 +23,6 @@ namespace jni {
     bool isContentForVisualAvailable = false;
     TagType tag = NO_CONTENT;
 }
-
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_jet_article_ParserNative_setInput(
@@ -56,11 +56,18 @@ Java_com_jet_article_ParserNative_doNextStep(
         JNIEnv *environment, jobject caller
 ) {
     jni::contentParser->doNextStep();
+
+    std::string currentTag = jni::contentParser->currentTag;
+
     if (jni::contentParser->hasParsedContentToBeProcessed()) {
         jni::isContentForVisualAvailable = jni::processor->isTagValidForNextProcessing(
-                jni::contentParser->currentTag,
+                currentTag,
                 jni::contentParser->currentTagBody
         );
+
+        if (!jni::isContentForVisualAvailable) {
+            jni::contentParser->tryMoveToClosing();
+        }
     }
 }
 
@@ -104,6 +111,22 @@ Java_com_jet_article_ParserNative_getBase(
     return environment->NewStringUTF(jni::contentParser->getBase().c_str());
 }
 
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_jet_article_ParserNative_isAbortingWithError(
+        JNIEnv *environment, jobject caller
+) {
+    return jni::contentParser->isAbortingWithError();
+}
+
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_jet_article_ParserNative_getErrorCode(
+        JNIEnv *environment, jobject caller
+) {
+    ErrorCode code = jni::contentParser->getErrorCode();
+    utils::log("mirek", "code: " + std::to_string(code));
+    return code;
+}
 
 
 extern "C" JNIEXPORT jint JNICALL
@@ -162,6 +185,37 @@ Java_com_jet_article_ParserNative_warmup(
     }
 
     jni::contentParser->clearAllResources();
+    jni::processor->clearAllResources();
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/////
+/////   Processor JNI
+/////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_jet_article_ProcessorNative_addRule(
+        JNIEnv *environment, jobject caller, jstring tag, jstring clazz
+) {
+    jboolean outIsCopy;
+    jni::processor->addRule(
+            IgnoreRule(
+                    TAG,
+                    environment->GetStringUTFChars(tag, &outIsCopy),
+                    environment->GetStringUTFChars(clazz, &outIsCopy)
+            )
+    );
+}
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_jet_article_ProcessorNative_clearAllResources(
+        JNIEnv *environment, jobject caller
+) {
     jni::processor->clearAllResources();
 }
 

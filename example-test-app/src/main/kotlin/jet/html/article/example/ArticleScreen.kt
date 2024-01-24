@@ -19,15 +19,15 @@ import com.jet.article.ui.JetHtmlArticle
 @Composable
 fun ArticleScreen(
     article: String,
-    viewModel: ArticleViewModel = hiltViewModel()
+    viewModel: ArticleViewModel = hiltViewModel(),
+    ignoreRules: List<Pair<String, String>> = emptyList()
+
 ) {
 
     val data: HtmlData by viewModel.articleData.collectAsState()
 
     LaunchedEffect(key1 = Unit, block = {
-        if (data is HtmlData.Empty) {
-            viewModel.parse(article = article)
-        }
+        viewModel.parse(article = article, ignoreRules = ignoreRules)
     })
 
     Scaffold(
@@ -35,7 +35,7 @@ fun ArticleScreen(
             TopAppBar(
                 title = {
                     Text(text = remember(key1 = data) {
-                        (data as? HtmlData.Success)?.headData?.title ?: "No title"
+                        data.headData.title ?: "No title"
                     })
                 }
             )
@@ -46,5 +46,13 @@ fun ArticleScreen(
             modifier = Modifier,
             contentPadding = paddingValues
         )
+    }
+}
+
+
+@Composable
+fun rememberIgnoreRules(vararg rules: Pair<String, String>): List<Pair<String, String>> {
+    return remember {
+        rules.toList()
     }
 }

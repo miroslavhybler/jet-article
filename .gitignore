@@ -33,3 +33,5 @@ google-services.json
 *.hprof
 
 github.properties
+/example-test-app/src/main/assets/
+/example-test-app/

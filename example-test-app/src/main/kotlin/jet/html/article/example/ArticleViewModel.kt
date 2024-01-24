@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.jet.article.data.HtmlData
-import com.jet.article.JetHtmlArticleParser
+import com.jet.article.ArticleParser
+import com.jet.article.ProcessorNative
 import javax.inject.Inject
 
 
@@ -26,19 +27,26 @@ class ArticleViewModel @Inject constructor(
 
     private val assets: AssetManager = context.assets
 
-    private val mArticleData: MutableStateFlow<HtmlData> = MutableStateFlow(value = HtmlData.Empty)
+    private val mArticleData: MutableStateFlow<HtmlData> = MutableStateFlow(value = HtmlData.empty)
     val articleData: StateFlow<HtmlData> get() = mArticleData
 
-    fun parse(article: String) {
+    fun parse(article: String, ignoreRules: List<Pair<String, String>>) {
         viewModelScope.launch {
+
+            ignoreRules.forEach {
+                ProcessorNative.addRule(it.first, it.second)
+            }
+
+            val startNano = System.nanoTime()
             val start = System.currentTimeMillis()
-            Log.d("mirek", "start: $start")
-            mArticleData.value = JetHtmlArticleParser.parse(
+            mArticleData.value = ArticleParser.parse(
                 content = getArticle(fileName = article),
             )
+            val endNano = System.nanoTime()
             val end = System.currentTimeMillis()
-            Log.d("mirek", "end: $end")
-            Log.d("mirek", "duration: ${end - start}")
+            Log.d("mirek", "duration: $ ${end - start}")
+            Log.d("mirek", "nano: $ ${endNano - startNano}")
+
         }
     }
 

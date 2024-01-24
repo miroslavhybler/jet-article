@@ -109,6 +109,18 @@ internal object ParserNative {
 
 
     /**
+     *
+     */
+    external fun isAbortingWithError(): Boolean
+
+
+    /**
+     *
+     */
+    external fun getErrorCode(): Int
+
+
+    /**
      * @since 1.0.0
      */
     external fun warmup(content: String): Unit

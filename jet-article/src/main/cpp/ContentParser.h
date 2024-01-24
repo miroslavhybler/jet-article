@@ -6,8 +6,8 @@
 // Created by Miroslav Hýbler on 03.01.2024.
 //
 #include <string>
-#include <list>
 #include <map>
+#include <vector>
 #include "utils/IndexWrapper.h"
 #include "utils/Constants.h"
 
@@ -26,11 +26,10 @@ class ContentParser {
 public:
     std::string title;
     std::string base;
-    std::string  lang;
+    std::string lang;
 
     std::string currentTag = "";
     std::string currentTagBody = "";
-    std::string currentTagContent = "";
     TagType contentType = NO_CONTENT;
 
 private:
@@ -40,12 +39,14 @@ private:
     bool hasContentToProcess;
     bool wasHeadParsed;
     std::string input;
-    std::string actualTagContext;
     IndexWrapper index;
     int tempContentIndexStart = -1;
     int tempContentIndexEnd = -1;
-    std::list<std::string> tempOutputList;
-    std::map<std::string , std::string> tempOutputMap;
+    std::vector<std::string> tempOutputList;
+    std::map<std::string, std::string> tempOutputMap;
+    bool isAbortingWithException;
+    ErrorCode error;
+    int temporaryOutIndex = 0;
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,6 +169,28 @@ public:
     std::string getBase();
 
 
+    /**
+     *
+     * @return
+     * @since 1.0.0
+     */
+    bool isAbortingWithError();
+
+
+    /**
+     *
+     * @return
+     * @since 1.0.0
+     */
+    ErrorCode getErrorCode();
+
+
+    /**
+     * @since 1.0.0
+     */
+    void tryMoveToClosing();
+
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     /////
     /////   Private Functions
@@ -199,7 +222,20 @@ private:
     void parseNextTagWithinBodyContext(std::string tag, int tei);
 
 
+    /**
+     *
+     * @param tei Tag end index, index of '>'
+     * @since 1.0.0
+     */
     void parseImageTag(int tei);
+
+
+    /**
+     *
+     * @param cause
+     * @since 1.0.0
+     */
+    void abortWithError(ErrorCode cause);
 };
 
 

@@ -19,40 +19,19 @@ IndexWrapper::~IndexWrapper() {
 
 void IndexWrapper::moveIndex(int i) {
     this->index = i;
-    this->tempIndex = i;
-
-}
-
-void IndexWrapper::moveTempIndex(int i) {
-    this->tempIndex = i;
-}
-
-bool IndexWrapper::moveToTempIndex() {
-    if (this->index < this->tempIndex) {
-        this->index = this->tempIndex;
-        return true;
-    }
-
-    return false;
 }
 
 
-int IndexWrapper::getIndex() {
+const int IndexWrapper::getIndex() {
     return index;
-}
-
-
-int IndexWrapper::getTempIndex() {
-    return tempIndex;
 }
 
 
 void IndexWrapper::reset() {
     index = 0;
-    tempIndex = 0;
 }
 
 
 std::string IndexWrapper::toString() {
-    return "index: " + std::to_string(index) + " tempIndex: " + std::to_string(tempIndex);
+    return "index: " + std::to_string(index);
 }

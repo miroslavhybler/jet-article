@@ -8,18 +8,23 @@ package com.jet.article.data
  * @author Miroslav Hýbler <br>
  * created on 15.07.2023
  */
-public sealed class HtmlData private constructor() {
+public class HtmlData internal constructor(
+    val elements: List<HtmlElement> = emptyList(),
+    val headData: HtmlHeadData = HtmlHeadData.empty,
+    val failure: Failure? = null
+) {
 
-    public data object Empty : HtmlData()
+    companion object {
+        val empty: HtmlData = HtmlData()
+    }
 
-    public data class Success internal constructor(
-        val elements: List<HtmlElement>,
-        val headData: HtmlHeadData,
-    ) : HtmlData()
+    val isEmpty: Boolean
+        get() = elements.isEmpty()
+                && failure == null
 
 
     public data class Failure internal constructor(
-        val message: String,
-        val cause: Throwable?
-    ) : HtmlData()
+        @ErrorCode val code: Int,
+        val message: String
+    )
 }

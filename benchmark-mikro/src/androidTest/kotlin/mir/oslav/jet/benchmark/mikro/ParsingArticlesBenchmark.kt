@@ -8,7 +8,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.jet.article.JetHtmlArticleParser
+import com.jet.article.ArticleParser
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,7 +32,7 @@ class ParsingArticlesBenchmark {
             val context: Context = ApplicationProvider.getApplicationContext()
             val article = String(context.assets.open("mapbox.html").readBytes())
             coroutineScope.launch {
-                JetHtmlArticleParser.parse(content = article)
+                ArticleParser.parse(content = article)
             }
         }
     }

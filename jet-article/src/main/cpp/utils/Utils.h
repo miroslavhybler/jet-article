@@ -5,7 +5,7 @@
 #ifndef JET_HTML_ARTICLE_UTILS_H
 #define JET_HTML_ARTICLE_UTILS_H
 
-#include <list>
+#include <vector>
 #include <map>
 #include <android/log.h>
 #include "IndexWrapper.h"
@@ -26,7 +26,7 @@ namespace utils {
      * @return index of first found substring, -1 if not found
      * @since 1.0.0
      */
-    int indexOf(const std::string &input, const std::string &sub, const int i);
+    int indexOf(const std::string &input, const std::string &sub, const int &i);
 
 
     /**
@@ -38,7 +38,7 @@ namespace utils {
      * @return index of first found substring
      * @since 1.0.0
      */
-    int indexOfOrThrow(const std::string &input, const std::string &sub, const int i);
+    int indexOfOrThrow(const std::string &input, const std::string &sub, const int &i);
 
 
     /**
@@ -47,7 +47,7 @@ namespace utils {
      * @return Lowercase tag name parsed out of tagBody
      * @since 1.0.0
      */
-    std::string getTagName(const std::string tagBody);
+    std::string getTagName(const std::string &tagBody);
 
 
     /**
@@ -58,7 +58,7 @@ namespace utils {
      */
     void log(
             const char *tag,
-            const std::string message,
+            const std::string &message,
             android_LogPriority prio = ANDROID_LOG_DEBUG
     );
 
@@ -71,7 +71,7 @@ namespace utils {
      * @return True when s1 and s2 are equeal strings, false otherwise.
      * @since 1.0.0
      */
-    bool fastCompare(const std::string s1, const std::string s2);
+    bool fastCompare(const std::string &s1, const std::string &s2);
 
 
     /**
@@ -89,9 +89,10 @@ namespace utils {
      * @since 1.0.0
      */
     bool canProcessIncomingTag(
-            const std::string input,
-            const int l,
-            IndexWrapper index
+            const std::string &input,
+            const int &l,
+            IndexWrapper &index,
+            int &outIndex
     );
 
 
@@ -117,10 +118,10 @@ namespace utils {
      * @since 1.0.0
      */
     int findClosingTag(
-            const std::string input,
-            const std::string tag,
-            IndexWrapper index,
-            const int e = 0
+            const std::string &input,
+            const std::string &tag,
+            IndexWrapper &index,
+            const int &e = 0
     );
 
 
@@ -135,11 +136,11 @@ namespace utils {
      * @since 1.0.0
      */
     void groupPairTagContents(
-            const std::string input,
-            const std::string tag,
-            const int s,
-            const int e,
-            std::list<std::string> &outputList
+            const std::string &input,
+            const std::string &tag,
+            const int &s,
+            const int &e,
+            std::vector<std::string> &outputList
     );
 
 
@@ -168,14 +169,51 @@ namespace utils {
 
 
     /**
+     *
+     * @param input
+     * @param separator
+     * @param outList
+     * @since 1.0.0
+     */
+    void split(std::string &input, const char &separator, std::vector<std::string> &outList);
+
+
+    /**
      * Process tagBody and parses out all attributes and it's values and stores it into outMap.
      * OutMap is cleared at the begging. OutMap can be empty when there are no attributes inside tagBody.
+     * Attribute names and values are trimmed.
      * @param tagBody Tag body with <> with brackets removed, e.g. 'img src="url"'
      * @param outMap Output map where result will be stored. Attrubute is key and attribute value
      * is value.
      * @since 1.0.0
      */
-    void getTagAttributes(std::string tagBody, std::map<std::string, std::string> &outMap);
+    void
+    getTagAttributes(
+            const std::string &tagBody,
+            std::map<std::string, std::string> &outMap
+    );
+
+
+    /**
+     *
+     * @param tagBody Tag body where to search for attribute
+     * @param attributeName Name of the attribute you want to get
+     * @return Found attribute value, or empty string when not found. Trimmed.
+     * @since 1.0.0
+     */
+    std::string getTagAttribute(const std::string &tagBody, const std::string &attributeName);
+
+
+    /**
+     *
+     * @param tagBody
+     * @param outList
+     * @since 1.0.0
+     */
+    void extractClasses(
+            const std::string &tagBody,
+            std::vector<std::string> &outList
+    );
 }
 
 #endif //JET_HTML_ARTICLE_UTILS_H
