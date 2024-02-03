@@ -1,7 +1,8 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package jet.html.article.example
+package jet.html.article.example.article
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -12,6 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jet.article.data.HtmlData
 import com.jet.article.ui.JetHtmlArticle
@@ -20,14 +22,14 @@ import com.jet.article.ui.JetHtmlArticle
 fun ArticleScreen(
     article: String,
     viewModel: ArticleViewModel = hiltViewModel(),
-    ignoreRules: List<Pair<String, String>> = emptyList()
+    ignoreRules: List<Pair<String, String>> = emptyList(),
 
 ) {
 
     val data: HtmlData by viewModel.articleData.collectAsState()
 
     LaunchedEffect(key1 = Unit, block = {
-        viewModel.parse(article = article, ignoreRules = ignoreRules)
+        viewModel.loadArticleFromResources(article = article, ignoreRules = ignoreRules)
     })
 
     Scaffold(
@@ -44,7 +46,14 @@ fun ArticleScreen(
         JetHtmlArticle(
             data = data,
             modifier = Modifier,
-            contentPadding = paddingValues
+            contentPadding = remember(key1 = paddingValues) {
+                PaddingValues(
+                    top = paddingValues.calculateTopPadding() + 32.dp,
+                    bottom = paddingValues.calculateBottomPadding() + 16.dp,
+                    start = 18.dp,
+                    end = 18.dp
+                )
+            }
         )
     }
 }

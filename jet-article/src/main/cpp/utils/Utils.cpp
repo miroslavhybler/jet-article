@@ -13,13 +13,16 @@
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
-//TODO string_view
 namespace utils {
 
-    int tempInt;
+    /**
+     * Temporary working integer, should be always used only within scope of one function.
+     * @since 1.0.0
+     */
+    int tempWorkingInt;
 
 
-    std::function<bool(unsigned char)> trimPred = [](unsigned char ch) {
+    std::function<bool(unsigned char)> trimPred = [](unsigned char ch) -> bool {
         return !std::isspace(ch);
     };
 
@@ -54,9 +57,9 @@ namespace utils {
 
 
     void split(
-            std::string input,
-            const char separator,
-            std::vector<std::string> &outList
+            std::string_view &input,
+            const char &separator,
+            std::vector<std::string_view> &outList
     ) {
         int s = 0;
         int i = 0;
@@ -72,7 +75,7 @@ namespace utils {
     }
 
 
-    bool fastCompare(const std::string &s1, const std::string &s2) {
+    bool fastCompare(const std::string_view &s1, const std::string_view &s2) {
         char ch1 = s1[0];
         char ch2 = s2[0];
         if (ch1 != ch2) {
@@ -82,10 +85,10 @@ namespace utils {
     }
 
 
-    int indexOf(const std::string &input, const std::string &sub, const int &i) {
-        typename std::string::const_iterator sit = input.begin();
+    int indexOf(const std::string_view &input, const std::string &sub, const int &i) {
+        typename std::string_view::const_iterator sit = input.begin();
         std::advance(sit, i);
-        typename std::string::const_iterator it = std::search(
+        typename std::string_view::const_iterator it = std::search(
                 sit,
                 input.end(),
                 sub.begin(),
@@ -99,14 +102,16 @@ namespace utils {
     }
 
 
-    int indexOfOrThrow(const std::string &input, const std::string &sub, const int &i) {
+    int indexOfOrThrow(const std::string_view &input, const std::string &sub, const int &i) {
         int index = indexOf(input, sub, i);
 
         if (index == -1) {
-            std::string error = "Unable to find index of " + sub
-                                + " from: " + std::to_string(i)
-                                + " until: " + std::to_string(input.length());
-            utils::log("UTILS", error);
+            utils::log(
+                    "UTILS",
+                    "Unable to find index of " + sub
+                    + " from: " + std::to_string(i)
+                    + " until: " + std::to_string(input.length())
+            );
             throw NO_INDEX_FOUND;
         }
 
@@ -114,8 +119,8 @@ namespace utils {
     }
 
 
-    std::string getTagName(const std::string &tagBody) {
-        std::string name = tagBody;
+    std::string getTagName(const std::string_view &tagBody) {
+        std::string name = std::string(tagBody);
 
         if (tagBody.find(' ')) {
             int ei = indexOf(tagBody, " ", 0);
@@ -134,26 +139,26 @@ namespace utils {
 
 
     bool canProcessIncomingTag(
-            const std::string &input,
+            const std::string_view &input,
             const int &l,
-            IndexWrapper &index,
+            const int &s,
             int &outIndex
     ) {
-        int i = index.getIndex();
+        int i = s;
         outIndex = i;
         if ((i + 3) < l) {
             int il = i + 3;
-            std::string sub = input.substr(i + 1, 3);
+            std::string_view sub = input.substr(i + 1, 3);
             if (utils::fastCompare(sub, "!--")) {
                 int ei = utils::indexOfOrThrow(input, "-->", il);
-                outIndex = ei + 4;
+                outIndex = ei + 3;
                 return false;
             }
         }
 
-        if ((i + 15) < l) {
-            int il = i + 15;
-            std::string sub = input.substr(i + 1, 14);
+        if ((i + 14) < l) {
+            int il = i + 14;
+            std::string_view sub = input.substr(i + 1, 14);
             if (utils::fastCompare(sub, "!doctype html>")) {
                 outIndex = il;
                 return false;
@@ -162,7 +167,7 @@ namespace utils {
 
         if (i + 12 < l) {
             int il = i + 12;
-            std::string sub = input.substr(i + 1, 12);
+            std::string_view sub = input.substr(i + 1, 12);
             if (utils::fastCompare(sub, "/![cdata[//>")) {
                 outIndex = il;
                 return false;
@@ -173,7 +178,7 @@ namespace utils {
 
 
     int findClosingTag(
-            const std::string &input,
+            const std::string_view &input,
             const std::string &searchedTag,
             IndexWrapper &index,
             const int &e
@@ -182,7 +187,7 @@ namespace utils {
         int outI = i;
         //Clearing tempStack before another use
 
-        tempInt = 0;
+        tempWorkingInt = 0;
 
         int end = e > 0 ? e : input.length();
         while (i >= index.getIndex() && i < end) {
@@ -194,7 +199,7 @@ namespace utils {
 
 
             //char is '<'
-            if (!utils::canProcessIncomingTag(input, input.length(), index, outI)) {
+            if (!utils::canProcessIncomingTag(input, input.length(), i, outI)) {
                 //Unable to process
                 if (i == outI) {
                     i += 1;
@@ -208,16 +213,18 @@ namespace utils {
             // -1 to remove '<' at the end
             int tagBodyLength = tei - i - 1;
             //tagbody within <>, i + 1 to remove '<'
-            std::string tagBody = input.substr(i + 1, tagBodyLength);
-            std::string rawTagName = utils::getTagName(tagBody);
+            std::string_view tagBody = input.substr(i + 1, tagBodyLength);
+            std::string_view rawTagName = utils::getTagName(tagBody);
             bool isClosingTag = rawTagName.find('/', 0) == 0;
             if (isClosingTag) {
-                std::string tagName = rawTagName.substr(1, rawTagName.length());
+                std::string_view tagName = rawTagName.substr(1, rawTagName.length());
                 bool isSearched = utils::fastCompare(tagName, searchedTag);
                 if (isSearched) {
-                    if (tempInt > 0) {
+                    if (tempWorkingInt > 0) {
                         //Stack is not empty, means that we found closing of inner same tag
-                        tempInt -= 1;
+                        tempWorkingInt -= 1;
+                        utils::log("UTILS", "pop at: " + std::to_string(i)
+                                            + " tempI: " + std::to_string(tempWorkingInt));
                     } else {
                         return i;
                     }
@@ -225,16 +232,19 @@ namespace utils {
             } else {
                 if (utils::fastCompare(searchedTag, rawTagName)) {
                     //Push because inside tag is another one, like p in p -> <p><p>...</p></p>
-                    tempInt += 1;
+                    std::string sub = std::string(input.substr(i, 40));
+                    utils::log("UTILS", "push at " + std::to_string(i) + ": " + sub);
+                    tempWorkingInt += 1;
                 }
             }
 
             i = tei + 1;
         }
 
-        std::string error = "Unable to find closing for: " + searchedTag
-                            + " at: " + index.toString();
-        utils::log("UTILS", error);
+        utils::log("UTILS",
+                   "Unable to find closing for: " + searchedTag
+                   + " at: " + index.toString()
+        );
         throw NO_CLOSING_TAG_FOUND;
     }
 
@@ -314,11 +324,11 @@ namespace utils {
 
 
     void groupPairTagContents(
-            const std::string &input,
+            const std::string_view &input,
             const std::string &tag,
             const int &s,
             const int &e,
-            std::vector<std::string> &outputList
+            std::vector<std::string_view> &outputList
     ) {
         if (!outputList.empty()) {
             outputList.clear();
@@ -335,13 +345,13 @@ namespace utils {
 
             int tei = utils::indexOfOrThrow(input, ">", i);
             int tagBodyLength = tei - i - 1;
-            std::string tagBody = input.substr(i + 1, tagBodyLength);
+            std::string tagBody = std::string(input.substr(i + 1, tagBodyLength));
             std::string rawTagName = utils::getTagName(tagBody);
 
             if (utils::fastCompare(tag, rawTagName)) {
                 std::string closingTag = "</" + tag + ">";
                 int ctsi = utils::indexOfOrThrow(input, closingTag, tei);
-                std::string foundTag = input.substr(tei + 1, ctsi - tei - 1);
+                std::string_view foundTag = input.substr(tei + 1, ctsi - tei - 1);
                 outputList.push_back(foundTag);
                 i = ctsi + 1;
             } else {
@@ -351,7 +361,10 @@ namespace utils {
     }
 
 
-    void extractClasses(const std::string &tagBody, std::vector<std::string> &outList) {
+    void extractClasses(
+            const std::string_view &tagBody,
+            std::vector<std::string_view> &outList
+    ) {
         std::string separator = "class=\"";
         int s = utils::indexOf(tagBody, separator, 0);
         if (s == -1) {
@@ -359,7 +372,7 @@ namespace utils {
             return;
         }
         int e = utils::indexOfOrThrow(tagBody, "\"", s + separator.length());
-        std::string classes = tagBody.substr(s, e - s);
+        std::string_view classes = tagBody.substr(s, e - s);
 
         if (!outList.empty()) {
             outList.clear();

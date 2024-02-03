@@ -16,7 +16,7 @@ class BodyProcessor {
 
 private:
     std::vector<IgnoreRule> rules;
-    std::vector<std::string> tempClasses;
+    std::vector<std::string_view> tempClasses;
 
 public:
 
@@ -33,7 +33,6 @@ public:
             const std::string &tag,
             const std::string &tagBody
     );
-
 
 
     void addRule(IgnoreRule rule);

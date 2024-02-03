@@ -9,13 +9,16 @@
 #include "IndexWrapper.h"
 #include "Utils.h"
 
+
 IndexWrapper::IndexWrapper() {
 
 }
 
+
 IndexWrapper::~IndexWrapper() {
 
 }
+
 
 void IndexWrapper::moveIndex(int i) {
     this->index = i;
@@ -28,7 +31,7 @@ const int IndexWrapper::getIndex() {
 
 
 void IndexWrapper::reset() {
-    index = 0;
+    this->index = 0;
 }
 
 

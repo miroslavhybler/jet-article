@@ -38,6 +38,7 @@ fun HtmlTextBlock(
                 .toSpannable()
                 .toAnnotatedString(primaryColor = colorScheme.primary)
         },
+        style = MaterialTheme.typography.bodyLarge,
         modifier = modifier
         //    .alpha(alpha = alpha.value)
 

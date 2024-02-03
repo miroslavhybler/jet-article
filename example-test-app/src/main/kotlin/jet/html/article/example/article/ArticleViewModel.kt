@@ -1,4 +1,4 @@
-package jet.html.article.example
+package jet.html.article.example.article
 
 import android.content.Context
 import android.content.res.AssetManager
@@ -30,7 +30,7 @@ class ArticleViewModel @Inject constructor(
     private val mArticleData: MutableStateFlow<HtmlData> = MutableStateFlow(value = HtmlData.empty)
     val articleData: StateFlow<HtmlData> get() = mArticleData
 
-    fun parse(article: String, ignoreRules: List<Pair<String, String>>) {
+    fun loadArticleFromResources(article: String, ignoreRules: List<Pair<String, String>>) {
         viewModelScope.launch {
 
             ignoreRules.forEach {
@@ -50,9 +50,13 @@ class ArticleViewModel @Inject constructor(
         }
     }
 
+    private fun getBenchmarkArticle(fileName: String): String {
+        return String(assets.open("benchmark/${fileName}.html").readBytes())
+    }
+
 
     private fun getArticle(fileName: String): String {
-        return String(assets.open("${fileName}.html").readBytes())
+        return String(assets.open("articles/${fileName}.html").readBytes())
     }
 
 }

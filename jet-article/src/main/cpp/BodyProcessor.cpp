@@ -29,7 +29,7 @@ bool BodyProcessor::isTagValidForNextProcessing(
 
                 case CLAZZ:
                     utils::extractClasses(tagBody, tempClasses);
-                    for (std::string clazz: tempClasses) {
+                    for (std::string_view clazz: tempClasses) {
                         if (utils::fastCompare(clazz, rule.getClazz())) {
                             //Active rule found
                             return false;

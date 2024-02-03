@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
+import com.jet.article.toHtml
 
 
 /**
@@ -29,7 +30,9 @@ public fun HtmlBasicList(
             Text(
                 text = remember(key1 = s) {
                     val text = if (list.isOrdered) "${index + 1}. $s" else s
-                    text.toSpannable().toAnnotatedString(primaryColor = colorScheme.primary)
+                    text.toHtml()
+                        .toSpannable()
+                        .toAnnotatedString(primaryColor = colorScheme.primary)
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground

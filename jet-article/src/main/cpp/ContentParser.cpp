@@ -23,9 +23,6 @@ ContentParser::ContentParser() {
 
 
 ContentParser::~ContentParser() {
-    mHasNextStep = false;
-    mHasBodyContext = false;
-    hasContentToProcess = false;
     clearAllResources();
 }
 
@@ -62,12 +59,10 @@ std::string ContentParser::getTempContent() {
 
 bool ContentParser::moveIndexToNextTag() {
     if (!mHasNextStep) {
-        utils::log("INDEX", "mNextStep is false");
         throw "mNextStep is false";
     }
 
     if (index.getIndex() >= length) {
-        utils::log("PARSER", "throwing because index >= length");
         throw "Throwing because index >= length";
     }
 
@@ -84,7 +79,7 @@ bool ContentParser::moveIndexToNextTag() {
     }
 
     //char is <
-    if (!utils::canProcessIncomingTag(input, length, index, temporaryOutIndex)) {
+    if (!utils::canProcessIncomingTag(input, length, index.getIndex(), temporaryOutIndex)) {
         //Char < is staring some special sequence like comment <!--
         //Moving cursor to the next '<' char
         index.moveIndex(temporaryOutIndex + 1);
@@ -104,7 +99,6 @@ void ContentParser::doNextStep() {
     //char is < and its probably start of valid tag
     //TagType end index, index of next '>'
 
-    utils::log("mirek", "NEXT-STEP: tag: " + currentTag + " " + index.toString());
 
     int tei;
     try {
@@ -113,11 +107,12 @@ void ContentParser::doNextStep() {
         abortWithError(e);
         return;
     }
+
     // -1 to remove '<' at the end
     int tagBodyLength = tei - index.getIndex() - 1;
     //tagbody within <>, i + 1 to remove '<'
-    std::string tagBody = input.substr(index.getIndex() + 1, tagBodyLength);
-    std::string tag = utils::getTagName(tagBody);
+    currentTagBody = input.substr(index.getIndex() + 1, tagBodyLength);
+    std::string tag = utils::getTagName(currentTagBody);
 
     //Move index to the next char after tag
     if (mHasBodyContext) {
@@ -129,7 +124,7 @@ void ContentParser::doNextStep() {
     index.moveIndex(tei + 1);
 
     if (utils::fastCompare(tag, "html")) {
-        lang = utils::getTagAttribute(tagBody, "lang");
+        lang = utils::getTagAttribute(currentTagBody, "lang");
     } else if (!wasHeadParsed && utils::fastCompare(tag, "head")) {
         try {
             //Closing tag start index
@@ -204,7 +199,7 @@ void ContentParser::parseHeadData(int e) {
 }
 
 
-void ContentParser::parseNextTagWithinBodyContext(std::string tag, int tei) {
+void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
     if (tag.find('/', 0) == 0) {
         //Skipping closing tag
         //its because after we parse out nested content, we don't know the "right" closing tag
@@ -215,10 +210,13 @@ void ContentParser::parseNextTagWithinBodyContext(std::string tag, int tei) {
     }
 
     if (utils::fastCompare(tag, "br/")
+        || utils::fastCompare(tag, "br")
         || utils::fastCompare(tag, "input")
         || utils::fastCompare(tag, "source")
+        || utils::fastCompare(tag, "meta")
             ) {
         index.moveIndex(tei + 1);
+        invalidateHasNextStep();
         return;
     }
 
@@ -239,6 +237,7 @@ void ContentParser::parseNextTagWithinBodyContext(std::string tag, int tei) {
             return;
         }
         index.moveIndex(ctsi + tag.length() + 3);
+        invalidateHasNextStep();
         return;
     }
 
@@ -252,7 +251,6 @@ void ContentParser::parseNextTagWithinBodyContext(std::string tag, int tei) {
     index.moveIndex(tei + 1);
     //closing tag start index
     int ctsi;
-
     try {
         ctsi = utils::findClosingTag(input, tag, index);
         tempContentIndexStart = index.getIndex();
@@ -277,8 +275,31 @@ void ContentParser::parseNextTagWithinBodyContext(std::string tag, int tei) {
             ) {
         contentType = TITLE;
         hasContentToProcess = true;
+    } else if (
+            utils::fastCompare(tag, "ul")
+            || utils::fastCompare(tag, "ol")
+            ) {
+        contentType = LIST;
+        hasContentToProcess = true;
+        utils::groupPairTagContents(
+                input, "li", index.getIndex(), ctsi, tempOutputList
+        );
+
+        /*
+        int next;
+        try {
+            next = utils::indexOfOrThrow(input, ">", ctsi);
+        } catch (ErrorCode e) {
+            abortWithError(e);
+            return;
+        }
+        index.moveIndex(next + 1);
+        return;
+        */
+
     } else if (utils::fastCompare(tag, "table")) {
         //Table is skipped temporary
+        //TODO figure out how to parse out table
         contentType = TABLE;
         hasContentToProcess = false;
         /*
@@ -303,28 +324,6 @@ void ContentParser::parseNextTagWithinBodyContext(std::string tag, int tei) {
     } else if (utils::fastCompare(tag, "address")) {
         contentType = ADDRESS;
         hasContentToProcess = true;
-    } else if (
-            utils::fastCompare(tag, "ul")
-            || utils::fastCompare(tag, "ol")
-            ) {
-        contentType = LIST;
-        hasContentToProcess = false;
-        /*
-        utils::groupPairTagContents(
-                input, "li", index.getIndex(), ctsi, tempOutputList
-        );
-         */
-
-        int next;
-        try {
-            next = utils::indexOfOrThrow(input, ">", ctsi);
-        } catch (ErrorCode e) {
-            abortWithError(e);
-            return;
-        }
-        index.moveIndex(next + 1);
-        return;
-
     } else if (utils::fastCompare(tag, "code")) {
         contentType = CODE;
         hasContentToProcess = true;
@@ -391,7 +390,7 @@ int ContentParser::getTempListSize() {
 }
 
 
-std::string ContentParser::getTempListItem(int i) {
+std::string_view ContentParser::getTempListItem(int i) {
     auto iterator = tempOutputList.begin();
     std::advance(iterator, i);
     return *iterator;
@@ -422,18 +421,30 @@ ErrorCode ContentParser::getErrorCode() {
 }
 
 
+std::string ContentParser::getErrorMessage() {
+    return errorMessage;
+}
+
+
 void ContentParser::abortWithError(ErrorCode cause) {
     this->error = cause;
     isAbortingWithException = true;
     hasContentToProcess = false;
     mHasNextStep = false;
+
+    errorMessage = "ABORTING PARSING WITH ERROR WITH CAUSE: " + std::to_string(cause) + "\n"
+                   + index.toString() + "\n"
+                   + "body: " + currentTagBody;
+
+    utils::log("PARSER", errorMessage, ANDROID_LOG_ERROR);
+
+
     index.moveIndex(length);
 }
 
 //TODO check if it's working correct
 //TODO wikipedia and then android throws error
 void ContentParser::clearAllResources() {
-    length = 0;
     input = "";
     title = "";
     base = "";
@@ -443,12 +454,14 @@ void ContentParser::clearAllResources() {
     contentType = NO_CONTENT;
 
     hasContentToProcess = false;
-    mHasBodyContext= false;
+    mHasBodyContext = false;
     wasHeadParsed = false;
     isAbortingWithException = false;
     error = NO_ERROR;
+    errorMessage = "";
     index.reset();
 
+    length = 0;
     tempContentIndexStart = -1;
     tempContentIndexEnd = -1;
     temporaryOutIndex = 0;

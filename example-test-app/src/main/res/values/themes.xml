@@ -2,4 +2,10 @@
 <resources>
 
     <style name="Theme.JetHtmlArticle" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.JetHtmlArticle.Splash" parent="Theme.SplashScreen">
+        <item name="postSplashScreenTheme">@style/Theme.JetHtmlArticle</item>
+        <item name="windowSplashScreenBackground">?background</item>
+
+    </style>
 </resources>

@@ -1,8 +1,10 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
 ///
 /// Java Native Interface (JNI) for the parser library.
 ///
 /// Created by Miroslav Hýbler on 03.01.2024
 ///
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <jni.h>
 #include <string>
@@ -128,6 +130,15 @@ Java_com_jet_article_ParserNative_getErrorCode(
     return code;
 }
 
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_jet_article_ParserNative_getErrorMessage(
+        JNIEnv *environment, jobject caller
+) {
+    std::string msg = jni::contentParser->getErrorMessage();
+
+    return environment->NewStringUTF(msg.c_str());
+}
+
 
 extern "C" JNIEXPORT jint JNICALL
 Java_com_jet_article_ParserNative_getContentListSize(
@@ -140,7 +151,8 @@ extern "C" JNIEXPORT jstring JNICALL
 Java_com_jet_article_ParserNative_getContentListItem(
         JNIEnv *environment, jobject caller, jint index
 ) {
-    return environment->NewStringUTF(jni::contentParser->getTempListItem(index).c_str());
+    std::string_view item = jni::contentParser->getTempListItem(index);
+    return environment->NewStringUTF(std::string(item).c_str());
 }
 
 

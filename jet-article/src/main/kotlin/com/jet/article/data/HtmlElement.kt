@@ -2,6 +2,8 @@
 
 package com.jet.article.data
 
+import androidx.compose.ui.unit.IntSize
+
 /**
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
@@ -16,6 +18,8 @@ sealed class HtmlElement private constructor() {
     public data class Image internal constructor(
         val url: String,
         val description: String?,
+        val defaultSize: IntSize,
+        val alt: String?
     ) : HtmlElement()
 
 

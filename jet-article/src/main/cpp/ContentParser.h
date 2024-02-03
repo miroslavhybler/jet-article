@@ -42,10 +42,11 @@ private:
     IndexWrapper index;
     int tempContentIndexStart = -1;
     int tempContentIndexEnd = -1;
-    std::vector<std::string> tempOutputList;
+    std::vector<std::string_view> tempOutputList;
     std::map<std::string, std::string> tempOutputMap;
     bool isAbortingWithException;
     ErrorCode error;
+    std::string errorMessage = "";
     int temporaryOutIndex = 0;
 
 
@@ -122,6 +123,7 @@ public:
 
 
     /**
+     * Clear o
      * @since 1.0.0
      */
     void clearAllResources();
@@ -141,7 +143,7 @@ public:
      * @return
      * @since 1.0.0
      */
-    std::string getTempListItem(int i);
+    std::string_view getTempListItem(int i);
 
 
     /**
@@ -179,10 +181,17 @@ public:
 
     /**
      *
-     * @return
+     * @return Errror code from abortion.
      * @since 1.0.0
      */
     ErrorCode getErrorCode();
+
+
+    /**
+     *
+     * @return
+     */
+    std::string getErrorMessage();
 
 
     /**
@@ -219,20 +228,21 @@ private:
     /**
      * @since 1.0.0
      */
-    void parseNextTagWithinBodyContext(std::string tag, int tei);
+    void parseNextTagWithinBodyContext(std::string &tag, int &tei);
 
 
     /**
-     *
-     * @param tei Tag end index, index of '>'
+     * Parses image information from image tag.
+     * @param tei Tag end index, index of '>', helping with speeding up
      * @since 1.0.0
      */
     void parseImageTag(int tei);
 
 
     /**
-     *
-     * @param cause
+     * When error in parsing occurs e.g. when closing tag of pair tag is not found, process should
+     * be aborted.
+     * @param cause Error that causes process abortion. See error code enum.
      * @since 1.0.0
      */
     void abortWithError(ErrorCode cause);

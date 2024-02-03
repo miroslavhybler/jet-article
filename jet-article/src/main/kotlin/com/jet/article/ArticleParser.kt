@@ -1,6 +1,8 @@
 package com.jet.article
 
 import android.content.Context
+import androidx.compose.ui.unit.IntSize
+import coil.size.Size
 import com.jet.article.data.ErrorCode
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
@@ -82,7 +84,7 @@ object ArticleParser {
                         baseUrl = ParserNative.getBase()
                     ),
                     failure = HtmlData.Failure(
-                        message = "Error while processing $tag",
+                        message = "Error while processing $tag, original message:\n" + ParserNative.getErrorMessage(),
                         code = ParserNative.getErrorCode(),
                     )
                 )
@@ -113,7 +115,6 @@ object ArticleParser {
         when (type) {
             HtmlContentType.IMAGE -> {
                 var url: String = ParserNative.getContentMapItem(attributeName = "src")
-                val alt: String = ParserNative.getContentMapItem(attributeName = "alt")
 
                 if (url.endsWith(suffix = ".svg")) {
                     //Svg format not suppor
@@ -127,7 +128,21 @@ object ArticleParser {
                     url = "$base/$end"
                 }
 
-                elements.add(element = HtmlElement.Image(url = url, description = alt))
+                val w = ParserNative.getContentMapItem(attributeName = "width").toIntOrNull()
+                val h = ParserNative.getContentMapItem(attributeName = "height").toIntOrNull()
+                val alt = ParserNative.getContentMapItem(attributeName = "alt")
+                val size = if (w != null && h != null)
+                    IntSize(width = w, height = h)
+                else
+                    IntSize.Zero
+                elements.add(
+                    element = HtmlElement.Image(
+                        url = url,
+                        description = alt,
+                        defaultSize = size,
+                        alt = alt
+                    )
+                )
             }
 
             HtmlContentType.TEXT -> {
@@ -140,7 +155,7 @@ object ArticleParser {
                 elements.add(
                     element = HtmlElement.Title(
                         text = ParserNative.getContent(),
-                        titleTag = "h3"
+                        titleTag = ParserNative.getCurrentTag()
                     )
                 )
             }
@@ -168,12 +183,14 @@ object ArticleParser {
             }
 
             HtmlContentType.TABLE -> {
-                elements.add(element = HtmlElement.Table(rows = ArrayList<String>().apply {
-                    val listSize = ParserNative.getContentListSize()
-                    for (i in 0 until listSize) {
-                        add(ParserNative.getContentListItem(index = i))
-                    }
-                }));
+                elements.add(
+                    element = HtmlElement.Table(rows = ArrayList<String>().apply {
+                        val listSize = ParserNative.getContentListSize()
+                        for (i in 0 until listSize) {
+                            add(ParserNative.getContentListItem(index = i))
+                        }
+                    })
+                )
             }
 
             else -> {}

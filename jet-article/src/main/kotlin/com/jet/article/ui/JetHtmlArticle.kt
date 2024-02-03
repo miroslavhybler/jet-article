@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -86,47 +87,49 @@ fun JetHtmlArticleContent(
     contentPadding: PaddingValues = PaddingValues(all = 0.dp),
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(space = 8.dp)
 ) {
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize(),
-        state = listState,
-        verticalArrangement = verticalArrangement,
-        content = {
-            item(content = header)
+    SelectionContainer {
 
-            itemsIndexed(
-                items = data.elements,
-            ) { index, element ->
-                when (element) {
-                    is HtmlElement.Image -> image(element)
-                    is HtmlElement.Quote -> quote(element)
-                    is HtmlElement.Table -> table(element)
-                    is HtmlElement.Address -> address(element)
-                    is HtmlElement.TextBlock -> text(element)
-                    is HtmlElement.Title -> title(element)
-                    is HtmlElement.Code -> code(element)
-                    is HtmlElement.BasicList -> basicList(element)
-                    else -> throw IllegalStateException(
-                        "Element ${element.javaClass.simpleName} not supported yet!"
-                    )
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize(),
+            state = listState,
+            verticalArrangement = verticalArrangement,
+            content = {
+                item(content = header)
+
+                itemsIndexed(
+                    items = data.elements,
+                ) { index, element ->
+                    when (element) {
+                        is HtmlElement.Image -> image(element)
+                        is HtmlElement.Quote -> quote(element)
+                        is HtmlElement.Table -> table(element)
+                        is HtmlElement.Address -> address(element)
+                        is HtmlElement.TextBlock -> text(element)
+                        is HtmlElement.Title -> title(element)
+                        is HtmlElement.Code -> code(element)
+                        is HtmlElement.BasicList -> basicList(element)
+                        else -> throw IllegalStateException(
+                            "Element ${element.javaClass.simpleName} not supported yet!"
+                        )
+                    }
                 }
-            }
 
-            if (data.isEmpty) {
-                item {
-                    Text(text = "EMPTY",)
+                if (data.isEmpty) {
+                    item {
+                        Text(text = "EMPTY")
+                    }
                 }
-            }
-            if (data.failure != null) {
-                item {
-                    HtmlInvalid(error = data.failure)
+                if (data.failure != null) {
+                    item {
+                        HtmlInvalid(error = data.failure)
+                    }
                 }
-            }
 
-            item(content = footer)
-        },
-        contentPadding = contentPadding
-    )
+                item(content = footer)
+            },
+            contentPadding = contentPadding
+        )
 
-
+    }
 }

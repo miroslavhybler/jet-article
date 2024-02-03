@@ -26,7 +26,7 @@ namespace utils {
      * @return index of first found substring, -1 if not found
      * @since 1.0.0
      */
-    int indexOf(const std::string &input, const std::string &sub, const int &i);
+    int indexOf(const std::string_view &input, const std::string &sub, const int &i);
 
 
     /**
@@ -38,7 +38,7 @@ namespace utils {
      * @return index of first found substring
      * @since 1.0.0
      */
-    int indexOfOrThrow(const std::string &input, const std::string &sub, const int &i);
+    int indexOfOrThrow(const std::string_view &input, const std::string &sub, const int &i);
 
 
     /**
@@ -47,13 +47,16 @@ namespace utils {
      * @return Lowercase tag name parsed out of tagBody
      * @since 1.0.0
      */
-    std::string getTagName(const std::string &tagBody);
+    std::string getTagName(const std::string_view &tagBody);
 
 
     /**
-     * Logs message in logcat
-     * @param tag TagType of the message
+     * Logs message in andorid logcat. Keep in mind that logging should be used for development purpouses
+     * only, any release of library should not include much logs from proccessing because it's slowing
+     * it down.
+     * @param tag Tag of the message
      * @param message Message body
+     * @param prio Priority of the log
      * @since 1.0.0
      */
     void log(
@@ -71,7 +74,7 @@ namespace utils {
      * @return True when s1 and s2 are equeal strings, false otherwise.
      * @since 1.0.0
      */
-    bool fastCompare(const std::string &s1, const std::string &s2);
+    bool fastCompare(const std::string_view &s1, const std::string_view &s2);
 
 
     /**
@@ -89,9 +92,9 @@ namespace utils {
      * @since 1.0.0
      */
     bool canProcessIncomingTag(
-            const std::string &input,
+            const std::string_view &input,
             const int &l,
-            IndexWrapper &index,
+            const int &s,
             int &outIndex
     );
 
@@ -118,7 +121,7 @@ namespace utils {
      * @since 1.0.0
      */
     int findClosingTag(
-            const std::string &input,
+            const std::string_view &input,
             const std::string &tag,
             IndexWrapper &index,
             const int &e = 0
@@ -136,11 +139,11 @@ namespace utils {
      * @since 1.0.0
      */
     void groupPairTagContents(
-            const std::string &input,
+            const std::string_view &input,
             const std::string &tag,
             const int &s,
             const int &e,
-            std::vector<std::string> &outputList
+            std::vector<std::string_view> &outputList
     );
 
 
@@ -175,7 +178,11 @@ namespace utils {
      * @param outList
      * @since 1.0.0
      */
-    void split(std::string &input, const char &separator, std::vector<std::string> &outList);
+    void split(
+            std::string_view &input,
+            const char &separator,
+            std::vector<std::string_view> &outList
+    );
 
 
     /**
@@ -211,8 +218,8 @@ namespace utils {
      * @since 1.0.0
      */
     void extractClasses(
-            const std::string &tagBody,
-            std::vector<std::string> &outList
+            const std::string_view &tagBody,
+            std::vector<std::string_view> &outList
     );
 }
 

@@ -121,6 +121,12 @@ internal object ParserNative {
 
 
     /**
+     *
+     */
+    external fun getErrorMessage(): String
+
+
+    /**
      * @since 1.0.0
      */
     external fun warmup(content: String): Unit

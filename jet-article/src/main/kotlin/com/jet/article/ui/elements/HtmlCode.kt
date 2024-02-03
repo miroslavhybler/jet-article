@@ -52,8 +52,7 @@ fun HtmlCode(
                     .toAnnotatedString(primaryColor = colorScheme.primary)
             },
             modifier = modifier
-                .wrapContentWidth()
-                .horizontalScroll(state = rememberScrollState())
+                .fillMaxWidth()
                 .padding(horizontal = 6.dp, vertical = 4.dp)
         )
     }

@@ -1,8 +1,13 @@
 @file:Suppress("UnstableApiUsage")
 
+import org.jetbrains.dokka.DokkaConfiguration
+import org.jetbrains.dokka.DokkaConfiguration.Visibility
+
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.dokka")
+    id("maven-publish")
 }
 
 android {
@@ -49,6 +54,12 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.7"
     }
+    publishing {
+        multipleVariants {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 }
 
 dependencies {
@@ -63,11 +74,12 @@ dependencies {
     /** Compose */
     val composeVersion = "1.5.4"
     implementation("androidx.compose.ui:ui:$composeVersion")
+    debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
+    implementation("androidx.compose.animation:animation-graphics:$composeVersion")
     implementation("androidx.activity:activity-compose:1.8.2")
     implementation("androidx.compose.material3:material3:1.1.2")
     implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
-    implementation("androidx.compose.animation:animation-graphics:1.5.4")
 
 
     /** Accompanist & Experimental */
@@ -81,5 +93,34 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
+}
+
+tasks.dokkaHtml.configure {
+    outputDirectory.set(buildDir.resolve("dokkaHtml"))
+    dokkaSourceSets {
+
+        configureEach {
+            pluginsMapConfiguration.set(
+                mutableMapOf(
+                    "org.jetbrains.dokka.base.DokkaBase" to """{ "separateInheritedMembers": true}"""
+                )
+            )
+
+            documentedVisibilities.set(
+                mutableListOf(
+                    Visibility.PUBLIC,
+                    Visibility.PRIVATE,
+                    Visibility.PROTECTED,
+                    Visibility.INTERNAL,
+                    Visibility.PACKAGE
+                )
+            )
+
+            skipEmptyPackages.set(true)
+            includeNonPublic.set(true)
+            skipDeprecated.set(false)
+            reportUndocumented.set(true)
+            includes.from("${projectDir}/packages.md")
+        }
+    }
 }

@@ -45,16 +45,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             var url by remember { mutableStateOf(value = "") }
-            var htmlData: HtmlData by remember { mutableStateOf(value = HtmlData.Empty) }
+            var htmlData: HtmlData by remember { mutableStateOf(value = HtmlData.empty) }
             val coroutineScope = rememberCoroutineScope()
 
-            BackHandler(enabled = htmlData !is HtmlData.Empty) {
-                htmlData = HtmlData.Empty
+            BackHandler(enabled = htmlData != HtmlData.empty) {
+                htmlData = HtmlData.empty
             }
 
             JetHtmlArticleTheme {
                 Surface {
-                    if (htmlData !is HtmlData.Empty) {
+                    if (htmlData != HtmlData.empty) {
                         JetHtmlArticle(data = htmlData)
                     } else {
                         Column(
