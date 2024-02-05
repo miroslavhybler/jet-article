@@ -36,7 +36,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
+import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
+import com.jet.article.toAnnotatedString
+import com.jet.article.toHtml
 
 
 /**
@@ -65,7 +68,7 @@ fun HtmlTable(
     }
 
     val rowsCount = remember { data.rows.size }
-    val columnCount = remember { data.rows.firstOrNull()?.split("")?.size ?: 0 }
+    val columnCount = remember { data.rows.firstOrNull()?.size ?: 0 }
 
     Card(
         modifier = modifier
@@ -80,14 +83,10 @@ fun HtmlTable(
 
         ) {
             data.rows.forEachIndexed { rowIndex, row ->
-                val rowValues = remember(key1 = rowIndex) {
-                    //TODO
-                    row.split(";")
-                }
                 Row(
                     modifier = Modifier
                 ) {
-                    rowValues.forEachIndexed { columnIndex, value ->
+                    row.forEachIndexed { columnIndex, value ->
                         val widthForColumn = cellWidthsForColumns[columnIndex]
 
                         LaunchedEffect(key1 = Unit, block = {
@@ -114,7 +113,7 @@ fun HtmlTable(
                             value = value,
                             columnIndex = columnIndex,
                             rowIndex = rowIndex,
-                            rowCount = rowValues.size,
+                            rowCount = data.rows.size,
                             modifier = Modifier.defaultMinSize(
                                 minWidth = widthForColumn ?: 128.dp,
                                 //    height = dimensions.maxCellHeight
@@ -145,17 +144,22 @@ private fun TableCell(
     rowCount: Int,
 ) {
 
+    val colorScheme = MaterialTheme.colorScheme
     Box(
         modifier = modifier
             .sizeIn(minWidth = 128.dp, minHeight = 32.dp)
     ) {
         Text(
-            text = value,
+            text = remember(value) {
+                value.toHtml()
+                    .toSpannable()
+                    .toAnnotatedString(primaryColor = colorScheme.primary)
+            },
             modifier = Modifier
                 .align(alignment = Alignment.Center)
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp, vertical = 2.dp),
-            style = if (rowIndex == 0 || columnIndex == 0)
+            style = if (rowIndex == 0)
                 MaterialTheme.typography.titleSmall
             else
                 MaterialTheme.typography.bodySmall,
@@ -163,7 +167,6 @@ private fun TableCell(
             color = MaterialTheme.colorScheme.onSecondaryContainer,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
-
         )
     }
 
@@ -183,7 +186,6 @@ private fun TableCell(
 @Composable
 @Preview(showBackground = true)
 private fun TablePreview() {
-    /*
     HtmlTable(
         data = HtmlElement.Table(
             rows = listOf(
@@ -194,5 +196,4 @@ private fun TablePreview() {
             ),
         )
     )
-    */
 }

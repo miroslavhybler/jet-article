@@ -7,6 +7,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,9 +39,9 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import jet.html.article.example.ArticlesScreen
 import jet.html.article.example.BenchmarksScreen
+import jet.html.article.example.data.ExcludeRule
 import jet.html.article.example.article.ArticleScreen
 import jet.html.article.example.HomeScreen
-import jet.html.article.example.article.rememberIgnoreRules
 import jet.html.article.example.benchmark.BenchmarkScreen
 
 /**
@@ -87,34 +91,48 @@ class MainActivity : ComponentActivity() {
                         composable(route = "home") {
                             HomeScreen(navHostController = navHostController)
                         }
-                        composable(route = "articles") {
+                        composable(
+                            route = "articles",
+                            enterTransition = { fadeIn() },
+                            exitTransition = { fadeOut() }
+                        ) {
                             ArticlesScreen(navHostController = navHostController)
                         }
-                        composable(route = "benchmarks") {
+                        composable(
+                            route = "benchmarks",
+                            enterTransition = { fadeIn() },
+                            exitTransition = { fadeOut() }
+                        ) {
                             BenchmarksScreen(navHostController = navHostController)
                         }
                         composable(
                             route = "article-screen?article={article}",
-                            arguments = listOf(navArgument(name = "article") {
-                                type = NavType.StringType
-                                nullable = false
-                            })
+                            enterTransition = { slideInHorizontally { it } },
+                            exitTransition = { slideOutHorizontally { it } },
+                            arguments = listOf(
+                                navArgument(name = "article") {
+                                    type = NavType.StringType
+                                    nullable = false
+                                },
+                            )
                         ) {
                             val res = it.arguments?.getString("article")
                                 ?: throw NullPointerException("")
-
                             ArticleScreen(article = res)
                         }
                         composable(
                             route = "benchmark-screen?article={article}",
-                            arguments = listOf(navArgument(name = "article") {
-                                type = NavType.StringType
-                                nullable = false
-                            })
+                            enterTransition = { slideInHorizontally { it } },
+                            exitTransition = { slideOutHorizontally { it } },
+                            arguments = listOf(
+                                navArgument(name = "article") {
+                                    type = NavType.StringType
+                                    nullable = false
+                                },
+                            )
                         ) {
                             val res = it.arguments?.getString("article")
                                 ?: throw NullPointerException("")
-
                             BenchmarkScreen(article = res)
                         }
                     }
@@ -152,18 +170,26 @@ fun JetHtmlArticleExampleTheme(
     )
 }
 
-fun benchmarkRoute(name: String): String {
+fun benchmarkRoute(name: String, excludeRules: List<ExcludeRule>): String {
+    ExcludeRule.globalRules = excludeRules
     return "benchmark-screen?article=$name"
 }
 
-fun articleRoute(name: String): String {
+fun articleRoute(name: String, excludeRules: List<ExcludeRule>): String {
+    ExcludeRule.globalRules = excludeRules
     return "article-screen?article=$name"
 }
 
-fun NavHostController.navigateToArticle(name: String) {
-    navigate(route = articleRoute(name = name))
+fun NavHostController.navigateToArticle(
+    name: String,
+    excludeRules: List<ExcludeRule> = emptyList()
+) {
+    navigate(route = articleRoute(name = name, excludeRules = excludeRules))
 }
 
-fun NavHostController.navigateToBenchmark(name: String) {
-    navigate(route = benchmarkRoute(name = name))
+fun NavHostController.navigateToBenchmark(
+    name: String,
+    excludeRules: List<ExcludeRule> = emptyList()
+) {
+    navigate(route = benchmarkRoute(name = name, excludeRules = excludeRules))
 }

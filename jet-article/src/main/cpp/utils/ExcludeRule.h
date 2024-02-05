@@ -12,37 +12,24 @@
 /**
  * @since 1.0.0
  */
-enum RuleType {
-    TAG,
-    CLAZZ
-};
-
-
-/**
- * @since 1.0.0
- */
-class IgnoreRule {
+class ExcludeRule {
 
 private:
     std::string mTag;
     std::string mClazz;
-    RuleType mType;
 
 public:
-    IgnoreRule(RuleType type);
 
-    IgnoreRule(RuleType type, std::string tag);
+    ExcludeRule(std::string tag);
 
-    IgnoreRule(RuleType type, std::string tag, std::string clazz);
+    ExcludeRule(std::string tag, std::string clazz);
 
 
-    ~IgnoreRule();
+    ~ExcludeRule();
 
     std::string getTag();
 
     std::string getClazz();
-
-    RuleType getType();
 };
 
 

@@ -2,9 +2,6 @@
 /// Created by Miroslav Hýbler on 03.01.2024
 ///
 
-//
-// Created by Miroslav Hýbler on 03.01.2024.
-//
 #include <string>
 #include <map>
 #include <vector>
@@ -42,7 +39,8 @@ private:
     IndexWrapper index;
     int tempContentIndexStart = -1;
     int tempContentIndexEnd = -1;
-    std::vector<std::string_view> tempOutputList;
+    std::vector<std::string_view> tempOutputVector;
+    std::vector<std::vector<std::string_view>> tableHolder;
     std::map<std::string, std::string> tempOutputMap;
     bool isAbortingWithException;
     ErrorCode error;
@@ -98,6 +96,14 @@ public:
 
     /**
      *
+     * @return
+     * @since 1.0.0
+     */
+    bool hasBodyContext();
+
+
+    /**
+     *
      * @param hasContent
      * @since 1.0.0
      */
@@ -135,6 +141,14 @@ public:
      * @since 1.0.0
      */
     int getTempListSize();
+
+
+    /**
+     *
+     * @return
+     * @since 1.0.0
+     */
+    std::vector<std::vector<std::string_view>> getTable();
 
 
     /**
@@ -190,6 +204,7 @@ public:
     /**
      *
      * @return
+     * @since 1.0.0
      */
     std::string getErrorMessage();
 
@@ -236,7 +251,11 @@ private:
      * @param tei Tag end index, index of '>', helping with speeding up
      * @since 1.0.0
      */
-    void parseImageTag(int tei);
+
+    void parseImageTag(const int &tei);
+
+
+    void parseTableTag(const int &ctsi);
 
 
     /**

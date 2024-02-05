@@ -61,7 +61,7 @@ Java_com_jet_article_ParserNative_doNextStep(
 
     std::string currentTag = jni::contentParser->currentTag;
 
-    if (jni::contentParser->hasParsedContentToBeProcessed()) {
+    if (jni::contentParser->hasBodyContext()) {
         jni::isContentForVisualAvailable = jni::processor->isTagValidForNextProcessing(
                 currentTag,
                 jni::contentParser->currentTagBody
@@ -167,6 +167,40 @@ Java_com_jet_article_ParserNative_getContentMapItem(
 }
 
 
+extern "C" JNIEXPORT jint JNICALL
+Java_com_jet_article_ParserNative_getTableColumnCount(
+        JNIEnv *environment, jobject caller
+) {
+
+    std::vector<std::vector<std::string_view>> table = jni::contentParser->getTable();
+
+    if (table.size() == 0) {
+        return 0;
+    }
+
+    return table[0].size();
+}
+
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_jet_article_ParserNative_getTableRowsCount(
+        JNIEnv *environment, jobject caller
+) {
+    return jni::contentParser->getTable().size();
+}
+
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_jet_article_ParserNative_getTableCell(
+        JNIEnv *environment, jobject caller, jint column, jint row
+) {
+    std::vector<std::vector<std::string_view>> table = jni::contentParser->getTable();
+    std::vector<std::string_view> r = table[row];
+    std::string_view cell = r[column];
+    return environment->NewStringUTF(std::string(cell).c_str());
+}
+
+
 extern "C" JNIEXPORT void JNICALL
 Java_com_jet_article_ParserNative_resetCurrentContent(
         JNIEnv *environment, jobject caller
@@ -216,8 +250,7 @@ Java_com_jet_article_ProcessorNative_addRule(
 ) {
     jboolean outIsCopy;
     jni::processor->addRule(
-            IgnoreRule(
-                    TAG,
+            ExcludeRule(
                     environment->GetStringUTFChars(tag, &outIsCopy),
                     environment->GetStringUTFChars(clazz, &outIsCopy)
             )

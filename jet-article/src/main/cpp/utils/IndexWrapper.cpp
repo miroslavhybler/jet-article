@@ -2,9 +2,6 @@
 /// Created by Miroslav Hýbler  on 03.01.2024
 ///
 
-//
-// Created by Miroslav Hýbler on 03.01.2024.
-//
 
 #include "IndexWrapper.h"
 #include "Utils.h"

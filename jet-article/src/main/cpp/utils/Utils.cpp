@@ -64,10 +64,19 @@ namespace utils {
         int s = 0;
         int i = 0;
         int l = input.length();
+
+        if (input.find(separator, 0) == -1) {
+            //Unable to split,
+            outList.push_back(input);
+            return;
+        }
+
         while (i < l) {
             char ch = input[i];
             if (ch == separator) {
-                outList.push_back(input.substr(s, i - s));
+                std::string_view sub = input.substr(s, i - s);
+                utils::log("UTILS", "Pushing " + std::string(sub));
+                outList.push_back(sub);
                 s = i;
             }
             i += 1;
@@ -223,8 +232,6 @@ namespace utils {
                     if (tempWorkingInt > 0) {
                         //Stack is not empty, means that we found closing of inner same tag
                         tempWorkingInt -= 1;
-                        utils::log("UTILS", "pop at: " + std::to_string(i)
-                                            + " tempI: " + std::to_string(tempWorkingInt));
                     } else {
                         return i;
                     }
@@ -233,7 +240,6 @@ namespace utils {
                 if (utils::fastCompare(searchedTag, rawTagName)) {
                     //Push because inside tag is another one, like p in p -> <p><p>...</p></p>
                     std::string sub = std::string(input.substr(i, 40));
-                    utils::log("UTILS", "push at " + std::to_string(i) + ": " + sub);
                     tempWorkingInt += 1;
                 }
             }
@@ -372,7 +378,10 @@ namespace utils {
             return;
         }
         int e = utils::indexOfOrThrow(tagBody, "\"", s + separator.length());
-        std::string_view classes = tagBody.substr(s, e - s);
+        std::string_view classes = tagBody.substr(
+                s + separator.length(),
+                e - (s + separator.length())
+        );
 
         if (!outList.empty()) {
             outList.clear();

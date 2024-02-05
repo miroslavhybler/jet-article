@@ -45,6 +45,11 @@ bool ContentParser::hasParsedContentToBeProcessed() {
 }
 
 
+bool ContentParser::hasBodyContext() {
+    return mHasBodyContext;
+}
+
+
 void ContentParser::hasParsedContentToBeProcessed(bool hasContent) {
     this->hasContentToProcess = hasContent;
     this->contentType = NO_CONTENT;
@@ -282,41 +287,13 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
         contentType = LIST;
         hasContentToProcess = true;
         utils::groupPairTagContents(
-                input, "li", index.getIndex(), ctsi, tempOutputList
+                input, "li", index.getIndex(), ctsi, tempOutputVector
         );
-
-        /*
-        int next;
-        try {
-            next = utils::indexOfOrThrow(input, ">", ctsi);
-        } catch (ErrorCode e) {
-            abortWithError(e);
-            return;
-        }
-        index.moveIndex(next + 1);
-        return;
-        */
-
     } else if (utils::fastCompare(tag, "table")) {
         //Table is skipped temporary
-        //TODO figure out how to parse out table
         contentType = TABLE;
-        hasContentToProcess = false;
-        /*
-        utils::groupPairTagContents(
-                input, "tr", index.getIndex(), ctsi, tempOutputList
-        );
-         */
-
-        int next;
-        try {
-            next = utils::indexOfOrThrow(input, ">", ctsi);
-        } catch (ErrorCode e) {
-            abortWithError(e);
-            return;
-        }
-        index.moveIndex(next + 1);
-        return;
+        hasContentToProcess = true;
+        parseTableTag(ctsi);
 
     } else if (utils::fastCompare(tag, "blockquote")) {
         contentType = QUOTE;
@@ -353,7 +330,7 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
 }
 
 
-void ContentParser::parseImageTag(int tei) {
+void ContentParser::parseImageTag(const int &tei) {
     contentType = IMAGE;
     hasContentToProcess = true;
     tempContentIndexStart = index.getIndex();
@@ -369,6 +346,25 @@ void ContentParser::parseImageTag(int tei) {
     invalidateHasNextStep();
 }
 
+
+void ContentParser::parseTableTag(const int &ctsi) {
+    bool wasHeaderRowParsed = false;
+    utils::groupPairTagContents(
+            input, "tr", index.getIndex(), ctsi, tempOutputVector
+    );
+    for (int i = 0; i < tempOutputVector.size(); i++) {
+        std::vector<std::string_view> columns;
+        std::string_view row = tempOutputVector[i];
+
+        if (!wasHeaderRowParsed) {
+            utils::groupPairTagContents(row, "th", 0, row.length(), columns);
+            wasHeaderRowParsed = true;
+        } else {
+            utils::groupPairTagContents(row, "td", 0, row.length(), columns);
+        }
+        tableHolder.push_back(columns);
+    }
+}
 
 void ContentParser::tryMoveToClosing() {
     std::string closing = "</" + currentTag + ">";
@@ -386,12 +382,17 @@ void ContentParser::invalidateHasNextStep() {
 
 
 int ContentParser::getTempListSize() {
-    return tempOutputList.size();
+    return tempOutputVector.size();
+}
+
+
+std::vector<std::vector<std::string_view>> ContentParser::getTable() {
+    return tableHolder;
 }
 
 
 std::string_view ContentParser::getTempListItem(int i) {
-    auto iterator = tempOutputList.begin();
+    auto iterator = tempOutputVector.begin();
     std::advance(iterator, i);
     return *iterator;
 }
@@ -460,12 +461,13 @@ void ContentParser::clearAllResources() {
     error = NO_ERROR;
     errorMessage = "";
     index.reset();
+    tableHolder.clear();
 
     length = 0;
     tempContentIndexStart = -1;
     tempContentIndexEnd = -1;
     temporaryOutIndex = 0;
 
-    tempOutputList.clear();
+    tempOutputVector.clear();
     tempOutputMap.clear();
 }

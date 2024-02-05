@@ -1,6 +1,7 @@
 package com.jet.article
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.ui.unit.IntSize
 import coil.size.Size
 import com.jet.article.data.ErrorCode
@@ -107,7 +108,7 @@ object ArticleParser {
     /**
      * @since 1.0.0
      */
-    private fun onElement(elements: MutableList<HtmlElement>) {
+    private suspend fun onElement(elements: MutableList<HtmlElement>) {
         val type = ParserNative.getContentType()
         if (type == HtmlContentType.NO_CONTENT) {
             return
@@ -183,14 +184,21 @@ object ArticleParser {
             }
 
             HtmlContentType.TABLE -> {
-                elements.add(
-                    element = HtmlElement.Table(rows = ArrayList<String>().apply {
-                        val listSize = ParserNative.getContentListSize()
-                        for (i in 0 until listSize) {
-                            add(ParserNative.getContentListItem(index = i))
-                        }
-                    })
-                )
+                val rows = ArrayList<List<String>>()
+
+                val columnCount = ParserNative.getTableColumnCount()
+                val rowsCount = ParserNative.getTableRowsCount()
+
+                for (i in 0 until rowsCount) {
+                    val columns = ArrayList<String>()
+                    for (j in 0 until columnCount) {
+                        val el = ParserNative.getTableCell(row = i, column = j)
+                        columns.add(element = el)
+                    }
+                    rows.add(columns)
+                }
+
+                elements.add(element = HtmlElement.Table(rows = rows))
             }
 
             else -> {}

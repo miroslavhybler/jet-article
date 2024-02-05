@@ -7,9 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,6 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import jet.html.article.example.composables.SimpleTopaBar
 import jet.html.article.example.composables.HomeCard
 import jet.html.article.example.composables.spacedCard
+import jet.html.article.example.data.ExcludeRule
 import jet.html.article.example.main.JetHtmlArticleExampleTheme
 import jet.html.article.example.main.navigateToArticle
 
@@ -81,7 +80,17 @@ fun ArticlesScreen(
                 title = "Android docs",
                 description = "Docs about AI Core features with gemini nano",
                 onClick = {
-                    navHostController.navigateToArticle(name = "android")
+                    navHostController.navigateToArticle(
+                        name = "android",
+                        excludeRules = listOf(
+                            ExcludeRule(tag = "devsite-header"),
+                            ExcludeRule(tag = "devsite-book-nav"),
+                            ExcludeRule(tag = "devsite-footer-linkboxes"),
+                            ExcludeRule(tag = "devsite-footer-linkboxes"),
+                            ExcludeRule(tag = "devsite-footer-promos"),
+                            ExcludeRule(tag = "devsite-footer-utility")
+                        )
+                    )
                 },
                 modifier = Modifier.spacedCard()
             )

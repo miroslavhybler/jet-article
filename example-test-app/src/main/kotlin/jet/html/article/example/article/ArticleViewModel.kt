@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import com.jet.article.data.HtmlData
 import com.jet.article.ArticleParser
 import com.jet.article.ProcessorNative
+import jet.html.article.example.data.ExcludeRule
 import javax.inject.Inject
 
 
@@ -30,11 +31,11 @@ class ArticleViewModel @Inject constructor(
     private val mArticleData: MutableStateFlow<HtmlData> = MutableStateFlow(value = HtmlData.empty)
     val articleData: StateFlow<HtmlData> get() = mArticleData
 
-    fun loadArticleFromResources(article: String, ignoreRules: List<Pair<String, String>>) {
+    fun loadArticleFromResources(article: String, excludeRules: List<ExcludeRule>) {
         viewModelScope.launch {
 
-            ignoreRules.forEach {
-                ProcessorNative.addRule(it.first, it.second)
+            excludeRules.forEach {
+                ProcessorNative.addRule(tag = it.tag, clazz = it.clazz)
             }
 
             val startNano = System.nanoTime()
@@ -49,11 +50,6 @@ class ArticleViewModel @Inject constructor(
 
         }
     }
-
-    private fun getBenchmarkArticle(fileName: String): String {
-        return String(assets.open("benchmark/${fileName}.html").readBytes())
-    }
-
 
     private fun getArticle(fileName: String): String {
         return String(assets.open("articles/${fileName}.html").readBytes())

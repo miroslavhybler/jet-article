@@ -5,7 +5,7 @@
 #ifndef JET_HTML_ARTICLE_BODYPROCESSOR_H
 #define JET_HTML_ARTICLE_BODYPROCESSOR_H
 
-#include "IgnoreRule.h"
+#include "ExcludeRule.h"
 #include <string>
 #include <vector>
 
@@ -15,7 +15,7 @@
 class BodyProcessor {
 
 private:
-    std::vector<IgnoreRule> rules;
+    std::vector<ExcludeRule> rules;
     std::vector<std::string_view> tempClasses;
 
 public:
@@ -35,10 +35,37 @@ public:
     );
 
 
-    void addRule(IgnoreRule rule);
+    /**
+     *
+     * @param rule
+     * @since 1.0.0
+     */
+    void addRule(ExcludeRule rule);
 
 
+    /**
+     * @since 1.0.0
+     */
     void clearAllResources();
+
+
+private:
+
+
+    /**
+     *
+     * @param tag
+     * @param tagBody
+     * @param rule
+     * @return
+     * @since 1.0.0
+     */
+    bool isValidBasedOnRule(
+            const std::string &tag,
+            const std::string &tagBody,
+            ExcludeRule &rule
+    );
+
 };
 
 

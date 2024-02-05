@@ -105,6 +105,24 @@ internal object ParserNative {
     /**
      * @since 1.0.0
      */
+    external fun getTableColumnCount(): Int
+
+
+    /**
+     * @since 1.0.0
+     */
+    external fun getTableRowsCount(): Int
+
+
+    /**
+     * @since 1.0.0
+     */
+    external fun getTableCell(column: Int, row: Int): String
+
+
+    /**
+     * @since 1.0.0
+     */
     external fun clearAllResources(): Unit
 
 

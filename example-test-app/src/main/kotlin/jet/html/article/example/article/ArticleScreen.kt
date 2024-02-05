@@ -17,19 +17,21 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jet.article.data.HtmlData
 import com.jet.article.ui.JetHtmlArticle
+import jet.html.article.example.data.ExcludeRule
 
 @Composable
 fun ArticleScreen(
     article: String,
     viewModel: ArticleViewModel = hiltViewModel(),
-    ignoreRules: List<Pair<String, String>> = emptyList(),
-
 ) {
 
     val data: HtmlData by viewModel.articleData.collectAsState()
 
     LaunchedEffect(key1 = Unit, block = {
-        viewModel.loadArticleFromResources(article = article, ignoreRules = ignoreRules)
+        viewModel.loadArticleFromResources(
+            article = article,
+            excludeRules = ExcludeRule.globalRules
+        )
     })
 
     Scaffold(

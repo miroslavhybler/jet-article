@@ -55,7 +55,7 @@ sealed class HtmlElement private constructor() {
      * @since 1.0.0
      */
     public data class Table internal constructor(
-        val rows: List<String>,
+        val rows: List<List<String>>,
     ) : HtmlElement()
 
 

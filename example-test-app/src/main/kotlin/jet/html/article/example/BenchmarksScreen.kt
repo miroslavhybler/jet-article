@@ -17,7 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import jet.html.article.example.composables.HomeCard
 import jet.html.article.example.composables.SimpleTopaBar
 import jet.html.article.example.composables.spacedCard
-import jet.html.article.example.main.navigateToArticle
+import jet.html.article.example.data.ExcludeRule
 import jet.html.article.example.main.navigateToBenchmark
 
 
@@ -44,10 +44,26 @@ fun BenchmarksScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             HomeCard(
-                title = "Ignore options",
-                description = "Temporary content for debbuging problematic html codes",
+                title = "Exclude rules",
+                description = "Testing excuding some content, simple test of exclude rules",
                 onClick = {
-                    navHostController.navigateToBenchmark(name = "ignore-test")
+                    navHostController.navigateToBenchmark(
+                        name = "ignore-test",
+                        excludeRules = listOf(
+                            ExcludeRule(tag = "div", clazz = "menu"),
+                            ExcludeRule(tag = "div", clazz = "resources")
+                        )
+                    )
+                },
+                modifier = Modifier.spacedCard()
+            )
+            HomeCard(
+                title = "Performance",
+                description = "Large file for performance test",
+                onClick = {
+                    navHostController.navigateToBenchmark(
+                        name = "performance-test",
+                    )
                 },
                 modifier = Modifier.spacedCard()
             )

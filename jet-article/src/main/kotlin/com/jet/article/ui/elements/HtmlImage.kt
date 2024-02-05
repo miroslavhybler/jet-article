@@ -35,7 +35,8 @@ import mir.oslav.jet.html.article.R
 @Composable
 fun HtmlImage(
     modifier: Modifier = Modifier,
-    data: HtmlElement.Image
+    data: HtmlElement.Image,
+    showErrorPlaceholder: Boolean = false,
 ) {
 
     val painter = rememberAsyncImagePainter(
@@ -68,18 +69,16 @@ fun HtmlImage(
                         .size(size = 24.dp)
                         .align(alignment = Alignment.Center)
                 )
-
-
             }
         }
 
         is AsyncImagePainter.State.Error -> {
-            PhotoError()
+            if (showErrorPlaceholder) {
+                PhotoError()
+            }
         }
 
-        is AsyncImagePainter.State.Empty -> {
-
-        }
+        is AsyncImagePainter.State.Empty -> Unit
     }
 }
 

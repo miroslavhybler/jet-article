@@ -7,6 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
+    id("kotlin-parcelize")
 }
 
 android {
@@ -117,6 +118,10 @@ dependencies {
     implementation("androidx.hilt:hilt-common:$hiltCompilerVersion")
     kapt("androidx.hilt:hilt-compiler:$hiltCompilerVersion")
     implementation("androidx.hilt:hilt-navigation-compose:$hiltCompilerVersion")
+
+
+    implementation("com.google.code.gson:gson:2.10.1")
+
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
