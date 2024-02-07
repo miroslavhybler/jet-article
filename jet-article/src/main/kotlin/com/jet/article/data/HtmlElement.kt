@@ -9,7 +9,10 @@ import androidx.compose.ui.unit.IntSize
  * @author Miroslav Hýbler <br>
  * created on 30.06.2023
  */
-sealed class HtmlElement private constructor() {
+//TODO solve ids
+sealed class HtmlElement private constructor(
+    open val id: String?
+) {
 
 
     /**
@@ -19,8 +22,9 @@ sealed class HtmlElement private constructor() {
         val url: String,
         val description: String?,
         val defaultSize: IntSize,
-        val alt: String?
-    ) : HtmlElement()
+        val alt: String?,
+        override val id: String?,
+    ) : HtmlElement(id = id)
 
 
     /**
@@ -29,7 +33,8 @@ sealed class HtmlElement private constructor() {
      */
     public data class TextBlock internal constructor(
         val text: String,
-    ) : HtmlElement()
+        override val id: String?,
+    ) : HtmlElement(id = id)
 
 
     /**
@@ -40,7 +45,8 @@ sealed class HtmlElement private constructor() {
     public data class Title internal constructor(
         val text: String,
         val titleTag: String,
-    ) : HtmlElement()
+        override val id: String?,
+    ) : HtmlElement(id = id)
 
 
     /**
@@ -48,7 +54,8 @@ sealed class HtmlElement private constructor() {
      */
     public data class Quote internal constructor(
         val text: String,
-    ) : HtmlElement()
+        override val id: String?,
+    ) : HtmlElement(id = id)
 
 
     /**
@@ -56,7 +63,8 @@ sealed class HtmlElement private constructor() {
      */
     public data class Table internal constructor(
         val rows: List<List<String>>,
-    ) : HtmlElement()
+        override val id: String?,
+    ) : HtmlElement(id = id)
 
 
     /**
@@ -65,7 +73,8 @@ sealed class HtmlElement private constructor() {
     public data class BasicList internal constructor(
         val items: List<String>,
         val isOrdered: Boolean,
-    ) : HtmlElement()
+        override val id: String?,
+    ) : HtmlElement(id = id)
 
 
     /**
@@ -74,14 +83,16 @@ sealed class HtmlElement private constructor() {
     public data class DescriptionList internal constructor(
         val items: List<String>,
         val isOrdered: Boolean,
-    ) : HtmlElement()
+        override val id: String?,
+    ) : HtmlElement(id = id)
 
     /**
      * @since 1.0.0
      */
     public data class Address internal constructor(
         val content: String,
-    ) : HtmlElement()
+        override val id: String?,
+    ) : HtmlElement(id = id)
 
 
     /**
@@ -89,5 +100,6 @@ sealed class HtmlElement private constructor() {
      */
     public data class Code internal constructor(
         val content: String,
-    ) : HtmlElement()
+        override val id: String?,
+    ) : HtmlElement(id = id)
 }

@@ -1,14 +1,29 @@
+@file:OptIn(ExperimentalTextApi::class)
+
 package com.jet.article.ui.elements
 
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.unit.IntSize
 import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
+import com.jet.article.ui.LocalBaseArticleUrl
+import com.jet.article.ui.LocalContentPadding
+import com.jet.article.ui.LocalHtmlData
+import com.jet.article.ui.LocalLinkHandler
+import mir.oslav.jet.utils.dpToPx
+import mir.oslav.jet.utils.screenHeightPx
 
 
 /**
@@ -18,9 +33,24 @@ import com.jet.article.toHtml
 @Composable
 fun HtmlTextBlock(
     modifier: Modifier = Modifier,
-    text: HtmlElement.TextBlock
+    text: HtmlElement.TextBlock,
 ) {
+    val linkClickHandler = LocalLinkHandler.current
+    val articleUrl = LocalBaseArticleUrl.current
+    val data = LocalHtmlData.current
+    val configuration = LocalConfiguration.current
+    val contentPadding = LocalContentPadding.current
+    val density = LocalDensity.current
     val colorScheme = MaterialTheme.colorScheme
+
+    val screenHeightPx = configuration.screenHeightPx.toInt()
+    var size by remember { mutableStateOf(value = IntSize.Zero) }
+
+    val formattedText = remember(key1 = text) {
+        text.text.toHtml()
+            .toSpannable()
+            .toAnnotatedString(primaryColor = colorScheme.primary)
+    }
 
 //    var initialAlpha by rememberSaveable { mutableFloatStateOf(value = 0f) }
 //    val alpha = remember { Animatable(initialValue = initialAlpha) }
@@ -32,16 +62,24 @@ fun HtmlTextBlock(
 //        initialAlpha = 1f
 //    })
 
-    Text(
-        text = remember(key1 = text) {
-            text.text.toHtml()
-                .toSpannable()
-                .toAnnotatedString(primaryColor = colorScheme.primary)
+    //TODO do basic composable for title and text, almost the same
+    ClickableText(
+        text = formattedText,
+        style = MaterialTheme.typography.bodyLarge.copy(color = colorScheme.onBackground),
+        onClick = { offset ->
+            linkClickHandler?.handleLink(
+                clickedText = formattedText,
+                clickOffset = offset,
+                articleUrl = articleUrl,
+                data = data,
+                scrollOffset = screenHeightPx
+                        - size.height
+                        - density.dpToPx(dp = contentPadding.calculateTopPadding())
+                    .toInt()
+            )
         },
-        style = MaterialTheme.typography.bodyLarge,
         modifier = modifier
-        //    .alpha(alpha = alpha.value)
+        //    .alpha(alpha = alpha.value),
 
     )
-
 }

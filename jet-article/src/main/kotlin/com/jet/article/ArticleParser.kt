@@ -26,7 +26,7 @@ object ArticleParser {
      * Version of the parsing library
      * @since 1.0.0
      */
-    const val version: String = "1.0.0-alpha01"
+    const val version: String = "1.0.0"
 
 
     /**
@@ -43,10 +43,13 @@ object ArticleParser {
 
 
     /**
+     * @param content
+     * @param url Original url of the article
      * @since 1.0.0
      */
     suspend fun parse(
-        content: String
+        content: String,
+        url: String,
     ): HtmlData {
         return withContext(context = safeCoroutineContext) parser@{
             val elements = ArrayList<HtmlElement>()
@@ -59,10 +62,8 @@ object ArticleParser {
                         code = ErrorCode.NO_ERROR
                     ),
                     elements = elements,
-                    headData = HtmlHeadData(
-                        title = ParserNative.getTitle(),
-                        baseUrl = ParserNative.getBase()
-                    )
+                    headData = HtmlHeadData(title = ParserNative.getTitle()),
+                    url = url
                 )
             }
 
@@ -71,32 +72,30 @@ object ArticleParser {
                 if (ParserNative.hasContent()) {
                     onElement(elements = elements)
                     ParserNative.resetCurrentContent()
+                    ProcessorNative.clearAllResources()
                 }
             }
 
             if (ParserNative.isAbortingWithError()) {
                 val tag = ParserNative.getCurrentTag()
-                ParserNative.clearAllResources()
-
-                return@parser HtmlData(
+                val data = HtmlData(
                     elements = elements,
-                    headData = HtmlHeadData(
-                        title = ParserNative.getTitle(),
-                        baseUrl = ParserNative.getBase()
-                    ),
+                    headData = HtmlHeadData(title = ParserNative.getTitle()),
                     failure = HtmlData.Failure(
-                        message = "Error while processing $tag, original message:\n" + ParserNative.getErrorMessage(),
+                        message = "Error while processing $tag\nOriginal message:\n" + ParserNative.getErrorMessage(),
                         code = ParserNative.getErrorCode(),
-                    )
+                    ),
+                    url = url,
                 )
+                ParserNative.clearAllResources()
+                ProcessorNative.clearAllResources()
+                return@parser data
             }
 
             val data = HtmlData(
                 elements = elements,
-                headData = HtmlHeadData(
-                    title = ParserNative.getTitle(),
-                    baseUrl = ParserNative.getBase()
-                )
+                headData = HtmlHeadData(title = ParserNative.getTitle()),
+                url = url,
             )
             ParserNative.clearAllResources()
             ProcessorNative.clearAllResources()
@@ -116,17 +115,14 @@ object ArticleParser {
         when (type) {
             HtmlContentType.IMAGE -> {
                 var url: String = ParserNative.getContentMapItem(attributeName = "src")
-
                 if (url.endsWith(suffix = ".svg")) {
-                    //Svg format not suppor
+                    //Svg format not supported
                     return
                 }
-
-                //FIX
                 if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                    val base = ParserNative.getBase().removeSuffix(suffix = "/")
+                    val base = url.toDomainName().removeSuffix(suffix = "/")
                     val end = url.removePrefix(prefix = "/")
-                    url = "$base/$end"
+                    url = "www.$base/$end"
                 }
 
                 val w = ParserNative.getContentMapItem(attributeName = "width").toIntOrNull()
@@ -141,14 +137,16 @@ object ArticleParser {
                         url = url,
                         description = alt,
                         defaultSize = size,
-                        alt = alt
+                        alt = alt,
+                        id = ParserNative.getCurrentTagId()
                     )
                 )
             }
 
             HtmlContentType.TEXT -> {
                 val content = ParserNative.getContent()
-                val text = HtmlElement.TextBlock(text = content)
+                val text =
+                    HtmlElement.TextBlock(text = content, id = ParserNative.getCurrentTagId())
                 elements.add(element = text)
             }
 
@@ -156,7 +154,8 @@ object ArticleParser {
                 elements.add(
                     element = HtmlElement.Title(
                         text = ParserNative.getContent(),
-                        titleTag = ParserNative.getCurrentTag()
+                        titleTag = ParserNative.getCurrentTag(),
+                        id = ParserNative.getCurrentTagId()
                     )
                 )
             }
@@ -170,17 +169,28 @@ object ArticleParser {
                             for (i in 0 until listSize) {
                                 add(ParserNative.getContentListItem(index = i))
                             }
-                        }
+                        },
+                        id = ParserNative.getCurrentTagId()
                     )
                 )
             }
 
             HtmlContentType.QUOTE -> {
-                elements.add(element = HtmlElement.Quote(text = ParserNative.getContent()))
+                elements.add(
+                    element = HtmlElement.Quote(
+                        text = ParserNative.getContent(),
+                        id = ParserNative.getCurrentTagId()
+                    ),
+                )
             }
 
             HtmlContentType.CODE -> {
-                elements.add(element = HtmlElement.Code(content = ParserNative.getContent()))
+                elements.add(
+                    element = HtmlElement.Code(
+                        content = ParserNative.getContent(),
+                        id = ParserNative.getCurrentTagId()
+                    )
+                )
             }
 
             HtmlContentType.TABLE -> {
@@ -198,7 +208,12 @@ object ArticleParser {
                     rows.add(columns)
                 }
 
-                elements.add(element = HtmlElement.Table(rows = rows))
+                elements.add(
+                    element = HtmlElement.Table(
+                        rows = rows,
+                        id = ParserNative.getCurrentTagId()
+                    )
+                )
             }
 
             else -> {}

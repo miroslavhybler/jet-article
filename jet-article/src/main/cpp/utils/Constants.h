@@ -30,6 +30,8 @@ enum ErrorCode {
     NO_ERROR = -1,
     NO_INDEX_FOUND = 1,
     NO_CLOSING_TAG_FOUND = 2,
+
+    CONTENT_NOT_HTML = 100000
 };
 
 #endif //JET_HTML_ARTICLE_CONSTANTS_H

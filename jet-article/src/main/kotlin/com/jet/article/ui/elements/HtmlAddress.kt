@@ -45,7 +45,8 @@ private fun HtmlAddressPreview() {
                     "    Visit us at:<br>\n" +
                     "    Example.com<br>\n" +
                     "    Box 564, Disneyland<br>\n" +
-                    "    USA\n"
+                    "    USA\n",
+            id = ""
         )
     )
 }

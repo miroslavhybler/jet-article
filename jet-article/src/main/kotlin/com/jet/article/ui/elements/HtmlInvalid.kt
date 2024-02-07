@@ -28,7 +28,7 @@ public fun HtmlInvalid(
 
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = "Invalid",
+            text = "Error occurs while processing article",
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.error
         )

@@ -74,14 +74,14 @@ internal object ParserNative {
      * @return
      * @since 1.0.0
      */
-    external fun getBase(): String
+    external fun getCurrentTag(): String
 
 
     /**
      * @return
      * @since 1.0.0
      */
-    external fun getCurrentTag(): String
+    external fun getCurrentTagId(): String
 
 
     /**
@@ -127,19 +127,19 @@ internal object ParserNative {
 
 
     /**
-     *
+     * @since 1.0.0
      */
     external fun isAbortingWithError(): Boolean
 
 
     /**
-     *
+     * @since 1.0.0
      */
     external fun getErrorCode(): Int
 
 
     /**
-     *
+     * @since 1.0.0
      */
     external fun getErrorMessage(): String
 

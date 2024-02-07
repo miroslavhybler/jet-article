@@ -46,6 +46,7 @@ class BenchmarkViewModel @Inject constructor(
             }
             mArticleData.value = ArticleParser.parse(
                 content = getArticle(fileName = article),
+                url = "https://www.example.com"
             )
         }
     }
@@ -59,7 +60,10 @@ class BenchmarkViewModel @Inject constructor(
                 val startNano = System.nanoTime()
                 val start = System.currentTimeMillis()
 
-                ArticleParser.parse(content = getArticle(fileName = article))
+                ArticleParser.parse(
+                    content = getArticle(fileName = article),
+                    url = "https://www.example.com"
+                )
 
                 val endNano = System.nanoTime()
                 val end = System.currentTimeMillis()

@@ -194,6 +194,7 @@ private fun TablePreview() {
                 listOf("2", "John", "Doe", "24. 5. 1989"),
                 listOf("3232", "King Carl III.", "God Save the king!", "1. 6. 1960")
             ),
+            id = ""
         )
     )
 }

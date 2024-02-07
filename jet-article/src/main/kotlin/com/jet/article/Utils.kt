@@ -2,7 +2,10 @@
 
 package com.jet.article
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.Typeface
+import android.net.Uri
 import android.text.Spannable
 import android.text.Spanned
 import android.text.style.CharacterStyle
@@ -10,14 +13,17 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.text.style.URLSpan
 import android.text.style.UnderlineSpan
-import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
+import java.net.URI
+import java.net.URISyntaxException
+import kotlin.jvm.Throws
 
 
 /**
@@ -27,6 +33,16 @@ import androidx.core.text.HtmlCompat
  */
 public fun String.toHtml(): Spanned {
     return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
+}
+
+
+@Throws(URISyntaxException::class)
+public fun String.toDomainName(): String {
+    val uri = URI(this)
+    val domain = uri.host
+    return if (domain.startsWith(prefix = "www.")) {
+        domain.substring(startIndex = 4,)
+    } else domain
 }
 
 
@@ -46,9 +62,11 @@ public fun Spannable.toAnnotatedString(primaryColor: Color): AnnotatedString {
     return builder.toAnnotatedString()
 }
 
+
 private data class CopierContext(
     val primaryColor: Color,
 )
+
 
 private enum class SpanCopier {
     URL {
@@ -146,4 +164,53 @@ private enum class SpanCopier {
         destination: AnnotatedString.Builder,
         context: CopierContext
     )
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/////
+/////   Context utils
+/////
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * @since 1.0.0
+ */
+fun Context.openEmailApp(email: String, subject: String? = null, text: String? = null) {
+    startActivity(
+        Intent.createChooser(
+            Intent(Intent.ACTION_SENDTO)
+                .setData(Uri.parse("mailto:"))
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .putExtra(Intent.EXTRA_SUBJECT, subject)
+                .putExtra(Intent.EXTRA_TEXT, text)
+                .putExtra(Intent.EXTRA_EMAIL, arrayOf(email)),
+            ""
+        )
+    )
+}
+
+
+/**
+ * @since 1.0.0
+ */
+fun Context.openDialApp(phoneNumber: String) {
+    startActivity(
+        Intent.createChooser(
+            Intent(Intent.ACTION_DIAL)
+                .setData("tel:${phoneNumber}".toUri())
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            ""
+        )
+    )
+}
+
+
+/**
+ * @since 1.0.0
+ */
+fun Context.openMapsApp(address: String) {
+    val url = "http://maps.google.com/maps?daddr=$address"
+    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
 }

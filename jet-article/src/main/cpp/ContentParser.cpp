@@ -9,16 +9,7 @@
 #include "utils/Constants.h"
 
 ContentParser::ContentParser() {
-    mHasNextStep = false;
-    mHasBodyContext = false;
-    hasContentToProcess = false;
-    wasHeadParsed = false;
     index = IndexWrapper();
-    length = 0;
-    input = "";
-    title = "";
-    base = "";
-    lang = "";
 }
 
 
@@ -74,7 +65,7 @@ bool ContentParser::moveIndexToNextTag() {
     //actual index within input
     char ch = input[index.getIndex()];
     while (ch != '<' && index.getIndex() < length) {
-        //continuing next, no valid html content to parse
+        //continuing next, no valid content to parse
         index.moveIndex(index.getIndex() + 1);
         invalidateHasNextStep();
         if (!mHasNextStep) {
@@ -117,6 +108,7 @@ void ContentParser::doNextStep() {
     int tagBodyLength = tei - index.getIndex() - 1;
     //tagbody within <>, i + 1 to remove '<'
     currentTagBody = input.substr(index.getIndex() + 1, tagBodyLength);
+    currentTagId = utils::getTagAttribute(currentTagBody, "id");
     std::string tag = utils::getTagName(currentTagBody);
 
     //Move index to the next char after tag
@@ -129,6 +121,7 @@ void ContentParser::doNextStep() {
     index.moveIndex(tei + 1);
 
     if (utils::fastCompare(tag, "html")) {
+        mWasHtmlTagFound = true;
         lang = utils::getTagAttribute(currentTagBody, "lang");
     } else if (!wasHeadParsed && utils::fastCompare(tag, "head")) {
         try {
@@ -182,20 +175,9 @@ void ContentParser::parseHeadData(int e) {
                 abortWithError(e);
                 return;
             }
-        } else if (utils::fastCompare(tag, "base")) {
-            try {
-                int ctsi = utils::findClosingTag(input, tag, index, e);
-                std::string baseContent = input.substr(tei, ctsi - 1);
-                base = baseContent;
-                int i = index.getIndex() + ctsi + 6;
-                index.moveIndex(i);
-            } catch (ErrorCode e) {
-                abortWithError(e);
-                return;
-            }
         }
 
-        if (!title.empty() && !base.empty()) {
+        if (!title.empty()) {
             break;
         }
     }
@@ -294,7 +276,6 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
         contentType = TABLE;
         hasContentToProcess = true;
         parseTableTag(ctsi);
-
     } else if (utils::fastCompare(tag, "blockquote")) {
         contentType = QUOTE;
         hasContentToProcess = true;
@@ -408,10 +389,6 @@ std::string ContentParser::getTitle() {
 }
 
 
-std::string ContentParser::getBase() {
-    return base;
-}
-
 bool ContentParser::isAbortingWithError() {
     return isAbortingWithException;
 }
@@ -443,19 +420,19 @@ void ContentParser::abortWithError(ErrorCode cause) {
     index.moveIndex(length);
 }
 
-//TODO check if it's working correct
-//TODO wikipedia and then android throws error
+
 void ContentParser::clearAllResources() {
     input = "";
     title = "";
-    base = "";
     lang = "";
     currentTag = "";
     currentTagBody = "";
+    currentTagId = "";
     contentType = NO_CONTENT;
 
     hasContentToProcess = false;
     mHasBodyContext = false;
+    mWasHtmlTagFound = false;
     wasHeadParsed = false;
     isAbortingWithException = false;
     error = NO_ERROR;

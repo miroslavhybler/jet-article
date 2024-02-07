@@ -67,6 +67,16 @@ fun BenchmarksScreen(
                 },
                 modifier = Modifier.spacedCard()
             )
+            HomeCard(
+                title = "Links",
+                description = "Testing links",
+                onClick = {
+                    navHostController.navigateToBenchmark(
+                        name = "links-test",
+                    )
+                },
+                modifier = Modifier.spacedCard()
+            )
         }
     }
 }

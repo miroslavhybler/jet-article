@@ -21,17 +21,17 @@ class ContentParser {
 
 
 public:
-    std::string title;
-    std::string base;
-    std::string lang;
-
+    std::string title = "";
+    std::string lang = "";
     std::string currentTag = "";
     std::string currentTagBody = "";
+    std::string currentTagId = "";
     TagType contentType = NO_CONTENT;
 
 private:
     bool mHasNextStep;
     bool mHasBodyContext;
+    bool mWasHtmlTagFound;
     int length;
     bool hasContentToProcess;
     bool wasHeadParsed;
@@ -175,14 +175,6 @@ public:
      * @since 1.0.0
      */
     std::string getTitle();
-
-
-    /**
-     *
-     * @return
-     * @since 1.0.0
-     */
-    std::string getBase();
 
 
     /**

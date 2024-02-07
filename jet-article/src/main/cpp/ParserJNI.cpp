@@ -97,6 +97,15 @@ Java_com_jet_article_ParserNative_getCurrentTag(
     return environment->NewStringUTF(jni::contentParser->currentTag.c_str());
 }
 
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_jet_article_ParserNative_getCurrentTagId(
+        JNIEnv *environment, jobject caller
+) {
+    return environment->NewStringUTF(jni::contentParser->currentTagId.c_str());
+}
+
+
+
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_com_jet_article_ParserNative_getTitle(
@@ -105,13 +114,6 @@ Java_com_jet_article_ParserNative_getTitle(
     return environment->NewStringUTF(jni::contentParser->getTitle().c_str());
 }
 
-
-extern "C" JNIEXPORT jstring JNICALL
-Java_com_jet_article_ParserNative_getBase(
-        JNIEnv *environment, jobject caller
-) {
-    return environment->NewStringUTF(jni::contentParser->getBase().c_str());
-}
 
 extern "C" JNIEXPORT jboolean JNICALL
 Java_com_jet_article_ParserNative_isAbortingWithError(

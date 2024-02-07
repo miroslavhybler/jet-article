@@ -21,7 +21,7 @@ implementation("com.github.miroslavhybler:jet-html-article:1.0.0-alpha01")
 ### Usage
 Add Internet permission to your application's manifest. Internet is required for loading images.
 ```xml
-    <uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.INTERNET" />
 ```
 
 ```kotlin

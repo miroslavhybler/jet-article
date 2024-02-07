@@ -42,6 +42,7 @@ class ArticleViewModel @Inject constructor(
             val start = System.currentTimeMillis()
             mArticleData.value = ArticleParser.parse(
                 content = getArticle(fileName = article),
+                url = "https://www.example.com"
             )
             val endNano = System.nanoTime()
             val end = System.currentTimeMillis()

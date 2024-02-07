@@ -9,10 +9,9 @@ package com.jet.article.data
  */
 public data class HtmlHeadData internal constructor(
     val title: String?,
-    val baseUrl: String?,
 ) {
 
     companion object {
-        val empty: HtmlHeadData = HtmlHeadData(title = null, baseUrl = null)
+        val empty: HtmlHeadData = HtmlHeadData(title = null)
     }
 }

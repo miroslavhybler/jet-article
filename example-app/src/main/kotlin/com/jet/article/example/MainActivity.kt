@@ -75,7 +75,8 @@ class MainActivity : ComponentActivity() {
                                 if (URLUtil.isValidUrl(url)) {
                                     coroutineScope.launch {
                                         htmlData = ArticleParser.parse(
-                                            content = loadFromUrl(url = url)
+                                            content = loadFromUrl(url = url),
+                                            url = url
                                         )
                                     }
                                 }

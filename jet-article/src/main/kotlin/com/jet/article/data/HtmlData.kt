@@ -12,6 +12,7 @@ package com.jet.article.data
  * created on 15.07.2023
  */
 public class HtmlData internal constructor(
+    val url: String,
     val elements: List<HtmlElement> = emptyList(),
     val headData: HtmlHeadData = HtmlHeadData.empty,
     val failure: Failure? = null
@@ -23,7 +24,7 @@ public class HtmlData internal constructor(
          * Empty html data, can be used to avoid nullability
          * @since 1.0.0
          */
-        val empty: HtmlData = HtmlData()
+        val empty: HtmlData = HtmlData(url = "")
     }
 
 

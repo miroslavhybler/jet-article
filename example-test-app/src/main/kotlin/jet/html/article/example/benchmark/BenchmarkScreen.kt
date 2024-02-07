@@ -88,9 +88,7 @@ fun BenchmarkScreen(
             }
         },
         bottomBar = {
-            BenchBottomBar(onTest = {
-                viewModel.runTest()
-            })
+            BenchBottomBar(onTest = viewModel::runTest)
         }
     )
 }
