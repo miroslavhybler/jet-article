@@ -1,0 +1,3 @@
+INPUT = src/main/cpp
+OUTPUT_DIRECTORY = build/docs/cpp
+RECURSIVE = YES

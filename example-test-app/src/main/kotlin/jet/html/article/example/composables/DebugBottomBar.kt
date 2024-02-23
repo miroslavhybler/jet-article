@@ -1,4 +1,4 @@
-package jet.html.article.example.benchmark
+package jet.html.article.example.composables
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -14,9 +14,10 @@ import androidx.compose.ui.Modifier
  * created on 05.02.2024
  */
 @Composable
-fun BenchBottomBar(
+fun DebugBottomBar(
     modifier: Modifier = Modifier,
-    onTest: () -> Unit
+    onTest: () -> Unit,
+    onAnalyzer: () -> Unit
 ) {
 
     BottomAppBar(
@@ -26,6 +27,10 @@ fun BenchBottomBar(
     ) {
         Button(onClick = onTest) {
             Text(text = "Run Test")
+        }
+        
+        Button(onClick = onAnalyzer) {
+            Text(text = "Analyzer")
         }
     }
 }

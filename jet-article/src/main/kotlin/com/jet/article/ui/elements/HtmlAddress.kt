@@ -1,6 +1,5 @@
 package com.jet.article.ui.elements
 
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -11,6 +10,7 @@ import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
+import com.jet.article.ui.LocalColorScheme
 
 
 /**
@@ -22,16 +22,9 @@ fun HtmlAddress(
     modifier: Modifier = Modifier,
     address: HtmlElement.Address
 ) {
-    val colorScheme = MaterialTheme.colorScheme
-
-    Text(
-        text = remember {
-            address.content.toHtml()
-                .toSpannable()
-                .toAnnotatedString(primaryColor = colorScheme.primary)
-        },
-        modifier = modifier,
-        fontStyle = FontStyle.Italic
+    HtmlTextBlock(
+        text = address.content,
+        modifier = modifier
     )
 }
 

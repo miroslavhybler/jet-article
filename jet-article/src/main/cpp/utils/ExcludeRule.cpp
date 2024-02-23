@@ -16,14 +16,25 @@ ExcludeRule::ExcludeRule(std::string tag, std::string clazz) {
 }
 
 
+ExcludeRule::ExcludeRule(std::string tag, std::string clazz, std::string id) {
+    this->mTag = tag;
+    this->mClazz = clazz;
+    this->mId = id;
+}
+
+
 ExcludeRule::~ExcludeRule() {
 
 }
 
-std::string ExcludeRule::getTag() {
+const std::string ExcludeRule::getTag() {
     return mTag;
 }
 
-std::string ExcludeRule::getClazz() {
+const std::string ExcludeRule::getClazz() {
     return mClazz;
+}
+
+const std::string ExcludeRule::getId() {
+    return mId;
 }

@@ -9,14 +9,16 @@
 #include <jni.h>
 #include <string>
 #include <map>
-#include "ContentParser.h"
-#include "BodyProcessor.h"
+#include "core/ContentParser.h"
+#include "core/BodyProcessor.h"
+#include "core/ContentAnalyzer.h"
 #include "utils/Utils.h"
 #include "utils/Constants.h"
 #include "jni.h"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnusedParameter"
+
 
 namespace jni {
     ContentParser *contentParser = new ContentParser();
@@ -78,7 +80,7 @@ extern "C" JNIEXPORT jint JNICALL
 Java_com_jet_article_ParserNative_getContentType(
         JNIEnv *environment, jobject caller
 ) {
-    return jni::contentParser->contentType;
+    return jni::contentParser->currentContentType;
 }
 
 
@@ -248,13 +250,15 @@ Java_com_jet_article_ParserNative_warmup(
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_jet_article_ProcessorNative_addRule(
-        JNIEnv *environment, jobject caller, jstring tag, jstring clazz
+        JNIEnv *environment, jobject caller, jstring tag, jstring clazz, jstring id
 ) {
     jboolean outIsCopy;
     jni::processor->addRule(
             ExcludeRule(
                     environment->GetStringUTFChars(tag, &outIsCopy),
-                    environment->GetStringUTFChars(clazz, &outIsCopy)
+                    environment->GetStringUTFChars(clazz, &outIsCopy),
+                    environment->GetStringUTFChars(id, &outIsCopy)
+
             )
     );
 }

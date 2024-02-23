@@ -2,6 +2,7 @@ package com.jet.article.ui.elements
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,10 @@ import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
+import com.jet.article.ui.LocalColorScheme
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.withContext
+import java.util.concurrent.Executors
 
 
 /**
@@ -53,6 +58,7 @@ fun HtmlTable(
     data: HtmlElement.Table,
 ) {
     val density = LocalDensity.current
+    val colorScheme = LocalColorScheme.current
 
     val textMeasurer = rememberTextMeasurer()
     val typography = MaterialTheme.typography
@@ -70,68 +76,66 @@ fun HtmlTable(
     val rowsCount = remember { data.rows.size }
     val columnCount = remember { data.rows.firstOrNull()?.size ?: 0 }
 
-    Card(
+
+    Column(
         modifier = modifier
             .fillMaxWidth()
             .horizontalScroll(state = rememberScrollState())
-            .clip(MaterialTheme.shapes.small),
-        border = BorderStroke(width = 1.dp, color = MaterialTheme.colorScheme.onSecondaryContainer),
+            .clip(MaterialTheme.shapes.small)
+            .border(
+                width = 1.dp,
+                color = colorScheme.tableBackgroundColor,
+                shape = MaterialTheme.shapes.small
+            ),
     ) {
-        Column(
-            modifier = Modifier
-                .background(color = MaterialTheme.colorScheme.secondaryContainer)
+        data.rows.forEachIndexed { rowIndex, row ->
+            Row(
+                modifier = Modifier
+            ) {
+                row.forEachIndexed { columnIndex, value ->
+                    val widthForColumn = cellWidthsForColumns[columnIndex]
 
-        ) {
-            data.rows.forEachIndexed { rowIndex, row ->
-                Row(
-                    modifier = Modifier
-                ) {
-                    row.forEachIndexed { columnIndex, value ->
-                        val widthForColumn = cellWidthsForColumns[columnIndex]
+                    LaunchedEffect(key1 = Unit, block = {
+                        val requiredWidth = textMeasurer.measure(
+                            text = value,
+                            style = typography.titleSmall
+                        ).size.width
+                        val widthDp = with(density) { requiredWidth.toDp() }
 
-                        LaunchedEffect(key1 = Unit, block = {
-                            val requiredWidth = textMeasurer.measure(
-                                text = value,
-                                style = typography.titleSmall
-                            ).size.width
-                            val widthDp = with(density) { requiredWidth.toDp() }
-
-                            if (widthForColumn != null) {
-                                if (widthDp > widthForColumn) {
-                                    cellWidthsForColumns[columnIndex] = widthDp
-                                        .coerceAtLeast(minimumValue = 128.dp)
-                                    //     .coerceAtMost(maximumValue = dimensions.maxCellWidth)
-                                }
-                            } else {
+                        if (widthForColumn != null) {
+                            if (widthDp > widthForColumn) {
                                 cellWidthsForColumns[columnIndex] = widthDp
                                     .coerceAtLeast(minimumValue = 128.dp)
-                                //   .coerceAtMost(maximumValue = dimensions.maxCellWidth)
                             }
-                        })
+                        } else {
+                            cellWidthsForColumns[columnIndex] = widthDp
+                                .coerceAtLeast(minimumValue = 128.dp)
+                        }
+                    })
 
-                        TableCell(
-                            value = value,
-                            columnIndex = columnIndex,
-                            rowIndex = rowIndex,
-                            rowCount = data.rows.size,
-                            modifier = Modifier.defaultMinSize(
-                                minWidth = widthForColumn ?: 128.dp,
-                                //    height = dimensions.maxCellHeight
-                            )
+                    TableCell(
+                        value = value,
+                        columnIndex = columnIndex,
+                        rowIndex = rowIndex,
+                        rowCount = data.rows.size,
+                        modifier = Modifier.defaultMinSize(
+                            minWidth = widthForColumn ?: 128.dp,
+                            //    height = dimensions.maxCellHeight
                         )
-                    }
+                    )
                 }
-
-                Divider(
-                    modifier = Modifier.width(width = with(density) {
-                        fullRowWidth.toFloat().toDp() + 1.dp * columnCount
-                    }),
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    thickness = 1.dp
-                )
             }
+
+            Divider(
+                modifier = Modifier.width(width = with(density) {
+                    fullRowWidth.toFloat().toDp() + 1.dp * columnCount
+                }),
+                color = colorScheme.tableTextColor,
+                thickness = 1.dp
+            )
         }
     }
+
 }
 
 
@@ -144,7 +148,7 @@ private fun TableCell(
     rowCount: Int,
 ) {
 
-    val colorScheme = MaterialTheme.colorScheme
+    val colorScheme = LocalColorScheme.current
     Box(
         modifier = modifier
             .sizeIn(minWidth = 128.dp, minHeight = 32.dp)
@@ -153,7 +157,7 @@ private fun TableCell(
             text = remember(value) {
                 value.toHtml()
                     .toSpannable()
-                    .toAnnotatedString(primaryColor = colorScheme.primary)
+                    .toAnnotatedString(primaryColor = colorScheme.linkColor)
             },
             modifier = Modifier
                 .align(alignment = Alignment.Center)
@@ -164,7 +168,7 @@ private fun TableCell(
             else
                 MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            color = colorScheme.tableTextColor,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )

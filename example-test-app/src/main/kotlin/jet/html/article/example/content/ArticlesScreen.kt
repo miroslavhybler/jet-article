@@ -1,4 +1,4 @@
-package jet.html.article.example
+package jet.html.article.example.content
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -18,8 +18,8 @@ import jet.html.article.example.composables.SimpleTopaBar
 import jet.html.article.example.composables.HomeCard
 import jet.html.article.example.composables.spacedCard
 import jet.html.article.example.data.ExcludeRule
-import jet.html.article.example.main.JetHtmlArticleExampleTheme
-import jet.html.article.example.main.navigateToArticle
+import jet.html.article.example.JetHtmlArticleExampleTheme
+import jet.html.article.example.navigateToArticle
 
 
 /**
@@ -30,6 +30,7 @@ import jet.html.article.example.main.navigateToArticle
 fun ArticlesScreen(
     navHostController: NavHostController,
 ) {
+
     Scaffold(
         topBar = {
             SimpleTopaBar(text = "Articles")
@@ -52,18 +53,27 @@ fun ArticlesScreen(
                 modifier = Modifier.spacedCard()
             )
             HomeCard(
-                title = "Elements test",
-                description = "Simple preview of supported attributes",
+                title = "Temporary test",
+                description = "Temporary content for debbuging problematic html codes",
                 onClick = {
-                    navHostController.navigateToArticle(name = "elements-test")
+                    navHostController.navigateToArticle(name = "test")
                 },
                 modifier = Modifier.spacedCard()
             )
             HomeCard(
-                title = "Simple file",
-                description = "",
+                title = "Finex",
+                description = "Finex web article",
                 onClick = {
-                    navHostController.navigateToArticle(name = "simple")
+                    navHostController.navigateToArticle(name = "finex")
+                },
+                modifier = Modifier.spacedCard()
+            )
+
+            HomeCard(
+                title = "ASCOD",
+                description = "Armadni noviny",
+                onClick = {
+                    navHostController.navigateToArticle(name = "ascod")
                 },
                 modifier = Modifier.spacedCard()
             )

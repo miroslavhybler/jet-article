@@ -10,7 +10,6 @@ import com.jet.article.data.HtmlContentType
  * created on 03.01.2023
  * @since 1.0.0
  */
-//TODO public for making possible to create own parser ????
 internal object ParserNative {
 
 

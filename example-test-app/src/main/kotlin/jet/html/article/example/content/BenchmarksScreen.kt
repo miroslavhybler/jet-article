@@ -1,4 +1,4 @@
-package jet.html.article.example
+package jet.html.article.example.content
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +18,7 @@ import jet.html.article.example.composables.HomeCard
 import jet.html.article.example.composables.SimpleTopaBar
 import jet.html.article.example.composables.spacedCard
 import jet.html.article.example.data.ExcludeRule
-import jet.html.article.example.main.navigateToBenchmark
+import jet.html.article.example.navigateToBenchmark
 
 
 /**
@@ -77,6 +77,24 @@ fun BenchmarksScreen(
                 },
                 modifier = Modifier.spacedCard()
             )
+
+            HomeCard(
+                title = "Elements test",
+                description = "Simple preview of supported attributes",
+                onClick = {
+                    navHostController.navigateToBenchmark(name = "elements-test")
+                },
+                modifier = Modifier.spacedCard()
+            )
+            HomeCard(
+                title = "Simple file",
+                description = "",
+                onClick = {
+                    navHostController.navigateToBenchmark(name = "simple")
+                },
+                modifier = Modifier.spacedCard()
+            )
+
         }
     }
 }

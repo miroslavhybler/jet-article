@@ -1,8 +1,10 @@
 @file:SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@file:Suppress("RedundantVisibilityModifier")
 
 package com.jet.article.ui
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,19 +15,22 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocal
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import mir.oslav.jet.annotations.JetExperimental
 import com.jet.article.ui.elements.HtmlAddress
@@ -36,7 +41,7 @@ import com.jet.article.ui.elements.HtmlQuoete
 import com.jet.article.ui.elements.HtmlTable
 import com.jet.article.ui.elements.HtmlTextBlock
 import com.jet.article.ui.elements.HtmlTitle
-import com.jet.article.data.HtmlData
+import com.jet.article.data.HtmlArticleData
 import com.jet.article.data.HtmlElement
 import com.jet.article.ui.elements.HtmlBasicList
 
@@ -50,19 +55,22 @@ import com.jet.article.ui.elements.HtmlBasicList
  */
 @Composable
 @JetExperimental
-fun JetHtmlArticle(
+public fun JetHtmlArticle(
     modifier: Modifier = Modifier,
-    data: HtmlData,
+    data: HtmlArticleData,
     listState: LazyListState = rememberLazyListState(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     contentPadding: PaddingValues = PaddingValues(all = 0.dp),
     header: @Composable LazyItemScope.() -> Unit = {},
     footer: @Composable LazyItemScope.() -> Unit = {},
-    linkClickHandler: LinkClickHandler = rememberLinkClickHandler(
-        lazyListState = listState,
+    linkClickCallback: LinkClickHandler.LinkCallback = rememberDefaultLinkCallback(
         snackbarHostState = snackbarHostState,
-        data = data
-    )
+        coroutineScope = rememberCoroutineScope(),
+    ),
+    colors: JetHtmlArticleColors = if (isSystemInDarkTheme())
+        JetHtmlArticleDefaults.darkColorScheme
+    else
+        JetHtmlArticleDefaults.lightColorScheme
 ) {
     JetHtmlArticleContent(
         modifier = modifier,
@@ -71,8 +79,9 @@ fun JetHtmlArticle(
         contentPadding = contentPadding,
         header = header,
         footer = footer,
-        linkHandler = linkClickHandler,
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        colors = colors,
+        linkClickCallback = linkClickCallback
     )
 }
 
@@ -83,7 +92,7 @@ fun JetHtmlArticle(
 @Composable
 public fun JetHtmlArticleContent(
     modifier: Modifier = Modifier,
-    data: HtmlData,
+    data: HtmlArticleData,
     listState: LazyListState = rememberLazyListState(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     image: @Composable (HtmlElement.Image) -> Unit = { HtmlImage(data = it) },
@@ -98,18 +107,28 @@ public fun JetHtmlArticleContent(
     footer: @Composable LazyItemScope.() -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(all = 0.dp),
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(space = 8.dp),
-    linkHandler: LinkClickHandler = rememberLinkClickHandler(
+    linkClickCallback: LinkClickHandler.LinkCallback = rememberDefaultLinkCallback(
+        snackbarHostState = snackbarHostState,
+        coroutineScope = rememberCoroutineScope(),
+    ),
+    colors: JetHtmlArticleColors = if (isSystemInDarkTheme())
+        JetHtmlArticleDefaults.darkColorScheme
+    else
+        JetHtmlArticleDefaults.lightColorScheme
+) {
+
+    val linkHandler = rememberLinkClickHandler(
         lazyListState = listState,
         snackbarHostState = snackbarHostState,
-        data = data
+        callback = linkClickCallback
     )
-) {
 
     CompositionLocalProvider(
         LocalBaseArticleUrl provides data.url,
         LocalLinkHandler provides linkHandler,
-        LocalHtmlData provides data,
-        LocalContentPadding provides contentPadding
+        LocalHtmlArticleData provides data,
+        LocalContentPadding provides contentPadding,
+        LocalColorScheme provides colors
     ) {
         Scaffold(
             content = {
@@ -178,7 +197,58 @@ public fun JetHtmlArticleContent(
  */
 public object JetHtmlArticleDefaults {
 
+
+    /**
+     * @since 1.0.0
+     */
+    val lightColorScheme: JetHtmlArticleColors = getDefaultColors(
+        colorScheme = lightColorScheme()
+    )
+
+
+    /**
+     * @since 1.0.0
+     */
+    val darkColorScheme: JetHtmlArticleColors = getDefaultColors(
+        colorScheme = darkColorScheme()
+    )
+
+
+    /**
+     * @since 1.0.0
+     */
+    private fun getDefaultColors(
+        colorScheme: ColorScheme
+    ): JetHtmlArticleColors = JetHtmlArticleColors(
+        textColor = colorScheme.onBackground,
+        linkColor = colorScheme.primary,
+        quoteTextColor = colorScheme.onBackground,
+        quoteBarColor = colorScheme.tertiary,
+
+        codeBackgroundColor = colorScheme.surface,
+        codeBorderColor = colorScheme.primary,
+        codeTextColor = colorScheme.onSurface,
+
+        tableTextColor = colorScheme.onPrimaryContainer,
+        tableBackgroundColor = colorScheme.primaryContainer
+    )
 }
+
+
+/**
+ * @since 1.0.0
+ */
+public class JetHtmlArticleColors public constructor(
+    val textColor: Color,
+    val linkColor: Color,
+    val quoteTextColor: Color,
+    val quoteBarColor: Color,
+    val codeBorderColor: Color,
+    val codeBackgroundColor: Color,
+    val codeTextColor: Color,
+    val tableBackgroundColor: Color,
+    val tableTextColor: Color,
+)
 
 
 /**
@@ -200,8 +270,8 @@ internal val LocalBaseArticleUrl: ProvidableCompositionLocal<String> = compositi
 /**
  * @since 1.0.0
  */
-internal val LocalHtmlData: ProvidableCompositionLocal<HtmlData> = compositionLocalOf(
-    defaultFactory = HtmlData::empty
+internal val LocalHtmlArticleData: ProvidableCompositionLocal<HtmlArticleData> = compositionLocalOf(
+    defaultFactory = HtmlArticleData::empty
 )
 
 
@@ -211,3 +281,12 @@ internal val LocalHtmlData: ProvidableCompositionLocal<HtmlData> = compositionLo
 internal val LocalContentPadding: ProvidableCompositionLocal<PaddingValues> = compositionLocalOf(
     defaultFactory = { PaddingValues() }
 )
+
+
+/**
+ * @since 1.0.0
+ */
+internal val LocalColorScheme: ProvidableCompositionLocal<JetHtmlArticleColors> =
+    compositionLocalOf(
+        defaultFactory = JetHtmlArticleDefaults::lightColorScheme
+    )

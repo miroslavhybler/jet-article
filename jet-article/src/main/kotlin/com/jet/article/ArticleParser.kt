@@ -1,15 +1,13 @@
 package com.jet.article
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.ui.unit.IntSize
-import coil.size.Size
 import com.jet.article.data.ErrorCode
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.jet.article.data.HtmlContentType
-import com.jet.article.data.HtmlData
+import com.jet.article.data.HtmlArticleData
 import com.jet.article.data.HtmlElement
 import com.jet.article.data.HtmlHeadData
 import kotlin.coroutines.CoroutineContext
@@ -50,14 +48,14 @@ object ArticleParser {
     suspend fun parse(
         content: String,
         url: String,
-    ): HtmlData {
+    ): HtmlArticleData {
         return withContext(context = safeCoroutineContext) parser@{
             val elements = ArrayList<HtmlElement>()
             ParserNative.setInput(content = content)
 
             if (!ParserNative.hasNextStep()) {
-                return@parser HtmlData(
-                    failure = HtmlData.Failure(
+                return@parser HtmlArticleData(
+                    failure = HtmlArticleData.Failure(
                         message = "Content is empty",
                         code = ErrorCode.NO_ERROR
                     ),
@@ -70,7 +68,7 @@ object ArticleParser {
             while (ParserNative.hasNextStep()) {
                 ParserNative.doNextStep()
                 if (ParserNative.hasContent()) {
-                    onElement(elements = elements)
+                    onElement(elements = elements, articleUrl = url)
                     ParserNative.resetCurrentContent()
                     ProcessorNative.clearAllResources()
                 }
@@ -78,10 +76,10 @@ object ArticleParser {
 
             if (ParserNative.isAbortingWithError()) {
                 val tag = ParserNative.getCurrentTag()
-                val data = HtmlData(
+                val data = HtmlArticleData(
                     elements = elements,
                     headData = HtmlHeadData(title = ParserNative.getTitle()),
-                    failure = HtmlData.Failure(
+                    failure = HtmlArticleData.Failure(
                         message = "Error while processing $tag\nOriginal message:\n" + ParserNative.getErrorMessage(),
                         code = ParserNative.getErrorCode(),
                     ),
@@ -92,7 +90,7 @@ object ArticleParser {
                 return@parser data
             }
 
-            val data = HtmlData(
+            val data = HtmlArticleData(
                 elements = elements,
                 headData = HtmlHeadData(title = ParserNative.getTitle()),
                 url = url,
@@ -107,22 +105,28 @@ object ArticleParser {
     /**
      * @since 1.0.0
      */
-    private suspend fun onElement(elements: MutableList<HtmlElement>) {
+    private suspend fun onElement(
+        elements: MutableList<HtmlElement>,
+        articleUrl: String
+    ) {
         val type = ParserNative.getContentType()
         if (type == HtmlContentType.NO_CONTENT) {
             return
         }
         when (type) {
             HtmlContentType.IMAGE -> {
-                var url: String = ParserNative.getContentMapItem(attributeName = "src")
-                if (url.endsWith(suffix = ".svg")) {
+                var imageUrl: String = ParserNative.getContentMapItem(attributeName = "src")
+                if (
+                    imageUrl.isEmpty()
+                    || imageUrl.endsWith(suffix = ".svg")
+                ) {
                     //Svg format not supported
                     return
                 }
-                if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                    val base = url.toDomainName().removeSuffix(suffix = "/")
-                    val end = url.removePrefix(prefix = "/")
-                    url = "www.$base/$end"
+                if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
+                    val base = articleUrl.toDomainName().removeSuffix(suffix = "/")
+                    val end = imageUrl.removePrefix(prefix = "/")
+                    imageUrl = "www.$base/$end"
                 }
 
                 val w = ParserNative.getContentMapItem(attributeName = "width").toIntOrNull()
@@ -134,7 +138,7 @@ object ArticleParser {
                     IntSize.Zero
                 elements.add(
                     element = HtmlElement.Image(
-                        url = url,
+                        url = imageUrl,
                         description = alt,
                         defaultSize = size,
                         alt = alt,

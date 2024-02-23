@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package jet.html.article.example.main
+package jet.html.article.example
 
 import android.os.Build
 import android.os.Bundle
@@ -29,6 +29,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -37,12 +38,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
-import jet.html.article.example.ArticlesScreen
-import jet.html.article.example.BenchmarksScreen
+import jet.html.article.example.content.ArticlesScreen
+import jet.html.article.example.content.BenchmarksScreen
 import jet.html.article.example.data.ExcludeRule
-import jet.html.article.example.article.ArticleScreen
-import jet.html.article.example.HomeScreen
-import jet.html.article.example.benchmark.BenchmarkScreen
+import jet.html.article.example.content.article.ArticleScreen
+import jet.html.article.example.content.HomeScreen
+import jet.html.article.example.analyzer.AnalyzerScreen
+import jet.html.article.example.content.benchmark.BenchmarkScreen
 
 /**
  *
@@ -118,7 +120,11 @@ class MainActivity : ComponentActivity() {
                         ) {
                             val res = it.arguments?.getString("article")
                                 ?: throw NullPointerException("")
-                            ArticleScreen(article = res)
+                            ArticleScreen(
+                                article = res,
+                                navHostController = navHostController,
+                                viewModel = hiltViewModel(),
+                            )
                         }
                         composable(
                             route = "benchmark-screen?article={article}",
@@ -133,7 +139,31 @@ class MainActivity : ComponentActivity() {
                         ) {
                             val res = it.arguments?.getString("article")
                                 ?: throw NullPointerException("")
-                            BenchmarkScreen(article = res)
+                            BenchmarkScreen(
+                                article = res,
+                                viewModel = hiltViewModel(),
+                                navHostController = navHostController
+                            )
+                        }
+
+                        composable(
+                            route = "analyzer?articlePath={articlePath}",
+                            arguments = listOf(
+                                navArgument(name = "articlePath") {
+                                    type = NavType.StringType
+                                    nullable = false
+                                },
+                            )
+                        ) {
+
+                            val articleFilePath = it.arguments?.getString("articlePath")
+                                ?: throw NullPointerException("articleFilePath is null")
+
+                            AnalyzerScreen(
+                                viewModel = hiltViewModel(),
+                                navHostController = navHostController,
+                                articleFilePath = articleFilePath
+                            )
                         }
                     }
                 }

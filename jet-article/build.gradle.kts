@@ -72,14 +72,16 @@ dependencies {
     implementation("androidx.startup:startup-runtime:1.1.1")
 
     /** Compose */
-    val composeVersion = "1.5.4"
+    val composeVersion = "1.6.2"
     implementation("androidx.compose.ui:ui:$composeVersion")
     debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
     implementation("androidx.compose.animation:animation-graphics:$composeVersion")
     implementation("androidx.activity:activity-compose:1.8.2")
-    implementation("androidx.compose.material3:material3:1.1.2")
-    implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
+
+    val material3Version = "1.2.0"
+    implementation("androidx.compose.material3:material3:$material3Version")
+    implementation("androidx.compose.material3:material3-window-size-class:$material3Version")
 
 
     /** Accompanist & Experimental */
@@ -95,32 +97,54 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
 
-tasks.dokkaHtml.configure {
-    outputDirectory.set(buildDir.resolve("dokkaHtml"))
-    dokkaSourceSets {
 
-        configureEach {
-            pluginsMapConfiguration.set(
-                mutableMapOf(
-                    "org.jetbrains.dokka.base.DokkaBase" to """{ "separateInheritedMembers": true}"""
+//
+// For C++ docs run
+//doxygen doxyfile from cpp directory
+//
+
+
+tasks {
+
+    dokkaHtml.configure {
+        outputDirectory.set(buildDir.resolve("docs/kotlin"))
+        dokkaSourceSets {
+
+            configureEach {
+                pluginsMapConfiguration.set(
+                    mutableMapOf(
+                        "org.jetbrains.dokka.base.DokkaBase" to """{ "separateInheritedMembers": true}"""
+                    )
                 )
-            )
 
-            documentedVisibilities.set(
-                mutableListOf(
-                    Visibility.PUBLIC,
-                    Visibility.PRIVATE,
-                    Visibility.PROTECTED,
-                    Visibility.INTERNAL,
-                    Visibility.PACKAGE
+                documentedVisibilities.set(
+                    mutableListOf(
+                        Visibility.PUBLIC,
+                        Visibility.PRIVATE,
+                        Visibility.PROTECTED,
+                        Visibility.INTERNAL,
+                        Visibility.PACKAGE
+                    )
                 )
-            )
 
-            skipEmptyPackages.set(true)
-            includeNonPublic.set(true)
-            skipDeprecated.set(false)
-            reportUndocumented.set(true)
-            includes.from("${projectDir}/packages.md")
+                skipEmptyPackages.set(true)
+                includeNonPublic.set(true)
+                skipDeprecated.set(false)
+                reportUndocumented.set(true)
+                includes.from("${projectDir}/packages.md")
+            }
         }
+    }
+
+    //TODO
+    create(name = "generateCppDocs", type = Exec::class) {
+        val outputDir = buildDir.resolve(relative = "docs/cpp")
+        if (!outputDir.exists()) { outputDir.mkdirs() }
+        commandLine("doxygen")
+    }
+
+
+    create(name ="generateFullDocs", type = Task::class) {
+        dependsOn("dokkaHtml", "generateCppDocs")
     }
 }

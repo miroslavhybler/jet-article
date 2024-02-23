@@ -1,3 +1,5 @@
+@file:Suppress("RedundantVisibilityModifier")
+
 package jet.html.article.example.data
 
 import android.os.Parcelable
@@ -10,9 +12,10 @@ import kotlinx.parcelize.Parcelize
  * @since 1.0.0
  */
 @Parcelize
-data class ExcludeRule constructor(
+public data class ExcludeRule public constructor(
     val tag: String,
-    val clazz: String = ""
+    val clazz: String = "",
+    val id: String = ""
 ) : Parcelable {
 
 

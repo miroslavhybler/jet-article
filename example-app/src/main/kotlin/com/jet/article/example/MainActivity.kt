@@ -25,7 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jet.article.ArticleParser
-import com.jet.article.data.HtmlData
+import com.jet.article.data.HtmlArticleData
 import com.jet.article.example.ui.theme.JetHtmlArticleTheme
 import com.jet.article.ui.JetHtmlArticle
 import io.ktor.client.request.get
@@ -45,17 +45,17 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             var url by remember { mutableStateOf(value = "") }
-            var htmlData: HtmlData by remember { mutableStateOf(value = HtmlData.empty) }
+            var htmlArticleData: HtmlArticleData by remember { mutableStateOf(value = HtmlArticleData.empty) }
             val coroutineScope = rememberCoroutineScope()
 
-            BackHandler(enabled = htmlData != HtmlData.empty) {
-                htmlData = HtmlData.empty
+            BackHandler(enabled = htmlArticleData != HtmlArticleData.empty) {
+                htmlArticleData = HtmlArticleData.empty
             }
 
             JetHtmlArticleTheme {
                 Surface {
-                    if (htmlData != HtmlData.empty) {
-                        JetHtmlArticle(data = htmlData)
+                    if (htmlArticleData != HtmlArticleData.empty) {
+                        JetHtmlArticle(data = htmlArticleData)
                     } else {
                         Column(
                             modifier = Modifier.fillMaxSize(),
@@ -65,7 +65,9 @@ class MainActivity : ComponentActivity() {
 
                             OutlinedTextField(
                                 value = url,
-                                onValueChange = { url = it },
+                                onValueChange = {
+                                    url = it
+                                                },
                                 modifier = Modifier
                                     .padding(horizontal = 20.dp)
                                     .fillMaxWidth()
@@ -74,7 +76,7 @@ class MainActivity : ComponentActivity() {
                             Button(onClick = {
                                 if (URLUtil.isValidUrl(url)) {
                                     coroutineScope.launch {
-                                        htmlData = ArticleParser.parse(
+                                        htmlArticleData = ArticleParser.parse(
                                             content = loadFromUrl(url = url),
                                             url = url
                                         )

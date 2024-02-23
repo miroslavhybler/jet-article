@@ -13,6 +13,8 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.text.style.URLSpan
 import android.text.style.UnderlineSpan
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle

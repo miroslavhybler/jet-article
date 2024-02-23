@@ -5,7 +5,7 @@
 #ifndef JET_HTML_ARTICLE_BODYPROCESSOR_H
 #define JET_HTML_ARTICLE_BODYPROCESSOR_H
 
-#include "ExcludeRule.h"
+#include "../utils/ExcludeRule.h"
 #include <string>
 #include <vector>
 

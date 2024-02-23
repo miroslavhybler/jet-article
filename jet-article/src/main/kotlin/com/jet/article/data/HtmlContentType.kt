@@ -1,3 +1,5 @@
+@file:Suppress("RedundantVisibilityModifier", "RemoveEmptyPrimaryConstructor")
+
 package com.jet.article.data
 
 import androidx.annotation.IntDef
@@ -21,7 +23,7 @@ import androidx.annotation.IntDef
     HtmlContentType.LIST,
     HtmlContentType.CODE,
 )
-internal annotation class HtmlContentType constructor() {
+public annotation class HtmlContentType constructor() {
 
     companion object {
         internal const val NO_CONTENT: Int = -1
@@ -33,5 +35,21 @@ internal annotation class HtmlContentType constructor() {
         internal const val ADDRESS: Int = 6
         internal const val LIST: Int = 7
         internal const val CODE: Int = 8
+
+
+        fun toString(@HtmlContentType value: Int): String {
+            return when (value) {
+                NO_CONTENT -> "No Content"
+                IMAGE -> "Image"
+                TEXT -> "Text"
+                QUOTE -> "Quoete"
+                TITLE -> "Title"
+                TABLE -> "Table"
+                ADDRESS -> "Address"
+                LIST -> "List"
+                CODE -> "Code"
+                else -> "Unknown"
+            }
+        }
     }
 }

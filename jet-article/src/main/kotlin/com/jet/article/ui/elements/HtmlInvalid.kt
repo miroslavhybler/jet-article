@@ -2,16 +2,13 @@
 
 package com.jet.article.ui.elements
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.jet.article.data.HtmlData
+import com.jet.article.data.HtmlArticleData
 
 
 /**
@@ -22,7 +19,7 @@ import com.jet.article.data.HtmlData
 @Composable
 public fun HtmlInvalid(
     modifier: Modifier = Modifier,
-    error: HtmlData.Failure
+    error: HtmlArticleData.Failure
 ) {
 
 

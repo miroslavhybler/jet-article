@@ -147,6 +147,9 @@ namespace utils {
     );
 
 
+
+
+
     /**
      * Trims s from the left side, removing white chars from the text.
      * @param s String you want to trim. Will be modified.

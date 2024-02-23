@@ -1,8 +1,7 @@
-package jet.html.article.example.main
+package jet.html.article.example.composables
 
 import android.content.Intent
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

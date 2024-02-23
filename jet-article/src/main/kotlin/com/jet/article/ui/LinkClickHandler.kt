@@ -12,7 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
-import com.jet.article.data.HtmlData
+import com.jet.article.data.HtmlArticleData
 import com.jet.article.openDialApp
 import com.jet.article.openEmailApp
 import com.jet.article.toDomainName
@@ -23,6 +23,7 @@ import java.net.URISyntaxException
 
 
 /**
+ * @see LinkCallback
  * @see rememberLinkClickHandler
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
@@ -38,7 +39,7 @@ public class LinkClickHandler internal constructor(
         clickedText: AnnotatedString,
         clickOffset: Int,
         articleUrl: String,
-        data: HtmlData,
+        data: HtmlArticleData,
         scrollOffset: Int
     ) {
         val anotations = clickedText.getStringAnnotations(start = clickOffset, end = clickOffset)
@@ -54,8 +55,7 @@ public class LinkClickHandler internal constructor(
     }
 
 
-    //TODO
-    private fun onLink(link: Link, articleUrl: String, data: HtmlData, scrollOffset: Int) {
+    private fun onLink(link: Link, articleUrl: String, data: HtmlArticleData, scrollOffset: Int) {
         when (link) {
             is Link.UriLink -> {
                 callback.onUriLink(link = link, context = context)
@@ -95,13 +95,46 @@ public class LinkClickHandler internal constructor(
         } catch (e: URISyntaxException) {
             null
         }
-        if (mDomain != null && rawLink.startsWith(prefix = mDomain)) {
-            //TODO make final link
-            return Link.SameDomainLink(rawLink = rawLink)
+        val linkDomain = try {
+            rawLink.toDomainName()
+        } catch (e: URISyntaxException) {
+            null
         }
 
-        return Link.OtherDomainLink(rawLink = rawLink)
+        val fullLink = validateLink(rawLink = rawLink, articleUrl = articleUrl)
+
+        if (
+            (mDomain != null && rawLink.startsWith(prefix = mDomain))
+            || linkDomain == null
+        ) {
+            //Must be link within same domain
+            return Link.SameDomainLink(rawLink = rawLink, fullLink = fullLink)
+        }
+
+
+        return Link.OtherDomainLink(rawLink = rawLink, fullLink = fullLink)
     }
+
+
+    private fun validateLink(rawLink: String, articleUrl: String): String {
+        var fullLink = rawLink
+        if (!rawLink.startsWith(prefix = "http://") && !rawLink.startsWith(prefix = "https://")) {
+            val base = articleUrl.toDomainName().removeSuffix(suffix = "/")
+            val end = rawLink.removePrefix(prefix = "/")
+            fullLink = "www.$base/$end"
+        }
+
+        return fullLink
+    }
+
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    /////
+    /////   LinkCallback Class
+    /////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
     public open class LinkCallback public constructor() {
@@ -109,7 +142,7 @@ public class LinkClickHandler internal constructor(
         public open fun onSectionLink(
             link: Link.SectionLink,
             lazyListState: LazyListState,
-            data: HtmlData,
+            data: HtmlArticleData,
             scrollOffset: Int,
         ): Unit = Unit
 
@@ -131,11 +164,19 @@ public class LinkClickHandler internal constructor(
     }
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    /////
+    /////   DefaultLinkCallback Class
+    /////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
     /**
      * @see rememberDefaultLinkCallback
      * @since 1.0.0
      */
-    public class DefaultLinkCallback internal constructor(
+    public open class DefaultLinkCallback public constructor(
         private val snackbarHostState: SnackbarHostState,
         private val coroutineScope: CoroutineScope,
         private val context: Context,
@@ -144,7 +185,7 @@ public class LinkClickHandler internal constructor(
         override fun onSectionLink(
             link: Link.SectionLink,
             lazyListState: LazyListState,
-            data: HtmlData,
+            data: HtmlArticleData,
             scrollOffset: Int,
         ) {
             coroutineScope.launch {
@@ -176,21 +217,21 @@ public class LinkClickHandler internal constructor(
                 }
 
                 else -> {
-                    showSnackBar(stringRes = R.string.jet_article_unkonw_uri_link)
+                    showNotSupportedSnackBar(stringRes = R.string.jet_article_unkonw_uri_link)
                 }
             }
         }
 
         override fun onSameDomainLink(link: Link.SameDomainLink) {
-            showSnackBar()
+            showNotSupportedSnackBar()
         }
 
         override fun onOtherDomainLink(link: Link.OtherDomainLink) {
-            showSnackBar()
+            showNotSupportedSnackBar()
         }
 
 
-        private fun showSnackBar(
+        private fun showNotSupportedSnackBar(
             @StringRes stringRes: Int = R.string.jet_article_links_supported
         ) {
             coroutineScope.launch {
@@ -203,6 +244,15 @@ public class LinkClickHandler internal constructor(
         }
     }
 }
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+/////
+/////   Link Class
+/////
+////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 /**
@@ -220,11 +270,13 @@ public sealed class Link private constructor(
 
     data class SameDomainLink internal constructor(
         override val rawLink: String,
+        val fullLink: String,
     ) : Link(rawLink = rawLink)
 
 
     data class OtherDomainLink internal constructor(
         override val rawLink: String,
+        val fullLink: String,
     ) : Link(rawLink = rawLink)
 
 
@@ -234,15 +286,21 @@ public sealed class Link private constructor(
 }
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////
+/////
+/////   Compose Functions
+/////
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 @Composable
 internal fun rememberLinkClickHandler(
     lazyListState: LazyListState,
     snackbarHostState: SnackbarHostState,
-    data: HtmlData,
     callback: LinkClickHandler.LinkCallback = rememberDefaultLinkCallback(
         snackbarHostState = snackbarHostState,
         coroutineScope = rememberCoroutineScope(),
-        data = data
     )
 ): LinkClickHandler {
     val context = LocalContext.current
@@ -260,7 +318,6 @@ internal fun rememberLinkClickHandler(
 public fun rememberDefaultLinkCallback(
     snackbarHostState: SnackbarHostState,
     coroutineScope: CoroutineScope,
-    data: HtmlData,
     context: Context = LocalContext.current,
 ): LinkClickHandler.LinkCallback {
     return remember {

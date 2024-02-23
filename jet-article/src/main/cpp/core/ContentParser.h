@@ -5,8 +5,9 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "utils/IndexWrapper.h"
-#include "utils/Constants.h"
+#include "../utils/IndexWrapper.h"
+#include "../utils/Constants.h"
+#include "ParserComponent.h"
 
 #ifndef JET_HTML_ARTICLE_CONTENTPARSER_H
 #define JET_HTML_ARTICLE_CONTENTPARSER_H
@@ -17,35 +18,23 @@
  * @since 1.0.0
  * @author Miroslav Hýbler
  */
-class ContentParser {
+class ContentParser : public AbstractParserComponent {
 
 
 public:
     std::string title = "";
     std::string lang = "";
-    std::string currentTag = "";
-    std::string currentTagBody = "";
-    std::string currentTagId = "";
-    TagType contentType = NO_CONTENT;
 
 private:
     bool mHasNextStep;
-    bool mHasBodyContext;
     bool mWasHtmlTagFound;
-    int length;
     bool hasContentToProcess;
     bool wasHeadParsed;
-    std::string input;
-    IndexWrapper index;
     int tempContentIndexStart = -1;
     int tempContentIndexEnd = -1;
     std::vector<std::string_view> tempOutputVector;
     std::vector<std::vector<std::string_view>> tableHolder;
     std::map<std::string, std::string> tempOutputMap;
-    bool isAbortingWithException;
-    ErrorCode error;
-    std::string errorMessage = "";
-    int temporaryOutIndex = 0;
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,9 +45,17 @@ private:
 
 public:
 
+    /**
+     * @since 1.0.0
+     */
     ContentParser();
 
+
+    /**
+     * @since 1.0:0
+     */
     ~ContentParser();
+
 
     /**
      * Sets the html content input to parse. Setting new input will always clear previous work and
@@ -75,14 +72,6 @@ public:
      * @since 1.0.0
      */
     void doNextStep();
-
-
-    /**
-     * Checks if index is same as the input length.
-     * @return True when parser is not done parsing yet.
-     * @since 1.0.0
-     */
-    bool hasNextStep();
 
 
     /**
@@ -108,16 +97,6 @@ public:
      * @since 1.0.0
      */
     void hasParsedContentToBeProcessed(bool hasContent);
-
-
-    /**
-     * Moves index to the next '<' char. When the next text is invalid sequence (like: comments)
-     * index is moved at the end of sequence and false is returned.
-     * @return True if index is pointing at the char '<' which is probably start of tag to process
-     * and further processing is required. False otherwise.
-     * @since 1.0.0
-     */
-    bool moveIndexToNextTag();
 
 
     /**
@@ -215,12 +194,6 @@ public:
 
 private:
 
-    /**
-     * Checks if the index is at the end and sets mHasNextStep value.
-     * @since 1.0.0
-     */
-    void invalidateHasNextStep();
-
 
     /**
      * Tries to parse out head data. Parsing out between index.getIndex() and e. Tries to get the
@@ -247,15 +220,15 @@ private:
     void parseImageTag(const int &tei);
 
 
+    /**
+     *
+     * @param ctsi Closing tag start index. Start index of </table> tag.
+     * @since 1.0.0
+     */
     void parseTableTag(const int &ctsi);
 
 
-    /**
-     * When error in parsing occurs e.g. when closing tag of pair tag is not found, process should
-     * be aborted.
-     * @param cause Error that causes process abortion. See error code enum.
-     * @since 1.0.0
-     */
+
     void abortWithError(ErrorCode cause);
 };
 

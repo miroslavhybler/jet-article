@@ -3,10 +3,12 @@
 ///
 
 
+#include <string>
 #include "ContentParser.h"
 #include "BodyProcessor.h"
-#include "utils/Utils.h"
-#include "utils/Constants.h"
+#include "../utils/Utils.h"
+#include "../utils/Constants.h"
+
 
 ContentParser::ContentParser() {
     index = IndexWrapper();
@@ -14,7 +16,7 @@ ContentParser::ContentParser() {
 
 
 ContentParser::~ContentParser() {
-    clearAllResources();
+
 }
 
 
@@ -23,11 +25,6 @@ void ContentParser::setInput(std::string content) {
     this->input = content;
     length = content.length();
     invalidateHasNextStep();
-}
-
-
-bool ContentParser::hasNextStep() {
-    return mHasNextStep;
 }
 
 
@@ -43,46 +40,13 @@ bool ContentParser::hasBodyContext() {
 
 void ContentParser::hasParsedContentToBeProcessed(bool hasContent) {
     this->hasContentToProcess = hasContent;
-    this->contentType = NO_CONTENT;
+    this->currentContentType = NO_CONTENT;
 }
 
 
 std::string ContentParser::getTempContent() {
     int n = tempContentIndexEnd - tempContentIndexStart;
     return input.substr(tempContentIndexStart, n);
-}
-
-
-bool ContentParser::moveIndexToNextTag() {
-    if (!mHasNextStep) {
-        throw "mNextStep is false";
-    }
-
-    if (index.getIndex() >= length) {
-        throw "Throwing because index >= length";
-    }
-
-    //actual index within input
-    char ch = input[index.getIndex()];
-    while (ch != '<' && index.getIndex() < length) {
-        //continuing next, no valid content to parse
-        index.moveIndex(index.getIndex() + 1);
-        invalidateHasNextStep();
-        if (!mHasNextStep) {
-            return false;
-        }
-        ch = input[index.getIndex()];
-    }
-
-    //char is <
-    if (!utils::canProcessIncomingTag(input, length, index.getIndex(), temporaryOutIndex)) {
-        //Char < is staring some special sequence like comment <!--
-        //Moving cursor to the next '<' char
-        index.moveIndex(temporaryOutIndex + 1);
-        invalidateHasNextStep();
-        return false;
-    }
-    return true;
 }
 
 
@@ -96,6 +60,7 @@ void ContentParser::doNextStep() {
     //TagType end index, index of next '>'
 
 
+    //Tag end index
     int tei;
     try {
         tei = utils::indexOfOrThrow(input, ">", index.getIndex());
@@ -198,6 +163,8 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
 
     if (utils::fastCompare(tag, "br/")
         || utils::fastCompare(tag, "br")
+        || utils::fastCompare(tag, "hr")
+        || utils::fastCompare(tag, "hr/")
         || utils::fastCompare(tag, "input")
         || utils::fastCompare(tag, "source")
         || utils::fastCompare(tag, "meta")
@@ -250,7 +217,7 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
     if (utils::fastCompare(tag, "p")
         || utils::fastCompare(tag, "span")
             ) {
-        contentType = TEXT;
+        currentContentType = TEXT;
         hasContentToProcess = true;
     } else if (utils::fastCompare(tag, "h1")
                || utils::fastCompare(tag, "h2")
@@ -260,33 +227,36 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
                || utils::fastCompare(tag, "h6")
                || utils::fastCompare(tag, "h7")
             ) {
-        contentType = TITLE;
+        currentContentType = TITLE;
         hasContentToProcess = true;
     } else if (
             utils::fastCompare(tag, "ul")
             || utils::fastCompare(tag, "ol")
             ) {
-        contentType = LIST;
+        currentContentType = LIST;
         hasContentToProcess = true;
         utils::groupPairTagContents(
                 input, "li", index.getIndex(), ctsi, tempOutputVector
         );
+    } else if (utils::fastCompare(tag, "picture")) {
+        //TODO maybe? handle picture, get image url from srcset from  source tag
+        hasContentToProcess = false;
     } else if (utils::fastCompare(tag, "table")) {
         //Table is skipped temporary
-        contentType = TABLE;
+        currentContentType = TABLE;
         hasContentToProcess = true;
         parseTableTag(ctsi);
     } else if (utils::fastCompare(tag, "blockquote")) {
-        contentType = QUOTE;
+        currentContentType = QUOTE;
         hasContentToProcess = true;
     } else if (utils::fastCompare(tag, "address")) {
-        contentType = ADDRESS;
+        currentContentType = ADDRESS;
         hasContentToProcess = true;
     } else if (utils::fastCompare(tag, "code")) {
-        contentType = CODE;
+        currentContentType = CODE;
         hasContentToProcess = true;
     } else {
-        contentType = NO_CONTENT;
+        currentContentType = NO_CONTENT;
         hasContentToProcess = false;
         tempContentIndexStart = -1;
         tempContentIndexEnd = -1;
@@ -312,7 +282,7 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
 
 
 void ContentParser::parseImageTag(const int &tei) {
-    contentType = IMAGE;
+    currentContentType = IMAGE;
     hasContentToProcess = true;
     tempContentIndexStart = index.getIndex();
     tempContentIndexEnd = tei;
@@ -354,11 +324,6 @@ void ContentParser::tryMoveToClosing() {
         return;
     }
     index.moveIndex(ctsi + closing.length() + 1);
-}
-
-
-void ContentParser::invalidateHasNextStep() {
-    mHasNextStep = index.getIndex() < length;
 }
 
 
@@ -428,7 +393,7 @@ void ContentParser::clearAllResources() {
     currentTag = "";
     currentTagBody = "";
     currentTagId = "";
-    contentType = NO_CONTENT;
+    currentContentType = NO_CONTENT;
 
     hasContentToProcess = false;
     mHasBodyContext = false;

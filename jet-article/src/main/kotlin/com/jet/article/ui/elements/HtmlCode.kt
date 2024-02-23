@@ -2,12 +2,9 @@ package com.jet.article.ui.elements
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +15,7 @@ import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
+import com.jet.article.ui.LocalColorScheme
 
 
 /**
@@ -29,19 +27,19 @@ fun HtmlCode(
     modifier: Modifier = Modifier,
     code: HtmlElement.Code
 ) {
-    val colorScheme = MaterialTheme.colorScheme
+    val colorScheme = LocalColorScheme.current
 
     Box(
         modifier = Modifier
             .padding(vertical = 4.dp)
             .fillMaxWidth()
             .background(
-                color = MaterialTheme.colorScheme.surface,
+                color = colorScheme.codeBackgroundColor,
                 shape = MaterialTheme.shapes.small
             )
             .border(
                 shape = MaterialTheme.shapes.small,
-                color = MaterialTheme.colorScheme.primary,
+                color = colorScheme.codeBorderColor,
                 width = 1.dp
             )
     ) {
@@ -49,11 +47,12 @@ fun HtmlCode(
             text = remember(key1 = code) {
                 code.content.toHtml()
                     .toSpannable()
-                    .toAnnotatedString(primaryColor = colorScheme.primary)
+                    .toAnnotatedString(primaryColor = colorScheme.linkColor)
             },
             modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 6.dp, vertical = 4.dp)
+                .padding(horizontal = 6.dp, vertical = 4.dp),
+            color = colorScheme.codeTextColor
         )
     }
 }

@@ -17,6 +17,7 @@ class ExcludeRule {
 private:
     std::string mTag;
     std::string mClazz;
+    std::string mId;
 
 public:
 
@@ -24,12 +25,17 @@ public:
 
     ExcludeRule(std::string tag, std::string clazz);
 
+    ExcludeRule(std::string tag, std::string clazz, std::string id);
+
 
     ~ExcludeRule();
 
-    std::string getTag();
+    const std::string getTag();
 
-    std::string getClazz();
+    const std::string getClazz();
+
+    const std::string getId();
+
 };
 
 

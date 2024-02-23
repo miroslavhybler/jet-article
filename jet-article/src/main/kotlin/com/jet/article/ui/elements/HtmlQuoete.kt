@@ -26,6 +26,7 @@ import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
+import com.jet.article.ui.LocalColorScheme
 
 
 /**
@@ -39,7 +40,7 @@ fun HtmlQuoete(
     data: HtmlElement.Quote
 ) {
 
-    val colorScheme = MaterialTheme.colorScheme
+    val colorScheme = LocalColorScheme.current
     val density = LocalDensity.current
 
     var dividerHeight by remember { mutableStateOf(0.dp) }
@@ -55,7 +56,7 @@ fun HtmlQuoete(
                 .height(height = dividerHeight)
                 .width(width = 5.dp)
                 .clip(shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp)),
-            color = MaterialTheme.colorScheme.tertiary,
+            color = colorScheme.quoteBarColor,
             thickness = 5.dp,
         )
 
@@ -65,7 +66,7 @@ fun HtmlQuoete(
             text = remember {
                 data.text.toHtml()
                     .toSpannable()
-                    .toAnnotatedString(primaryColor = colorScheme.primary)
+                    .toAnnotatedString(primaryColor = colorScheme.quoteTextColor)
             },
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier

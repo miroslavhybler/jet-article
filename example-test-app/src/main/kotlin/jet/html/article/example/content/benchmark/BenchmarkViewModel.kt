@@ -1,13 +1,12 @@
-package jet.html.article.example.benchmark
+package jet.html.article.example.content.benchmark
 
 import android.content.Context
 import android.content.res.AssetManager
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jet.article.ArticleParser
 import com.jet.article.ProcessorNative
-import com.jet.article.data.HtmlData
+import com.jet.article.data.HtmlArticleData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jet.html.article.example.data.ExcludeRule
@@ -29,8 +28,9 @@ class BenchmarkViewModel @Inject constructor(
 
     private val assets: AssetManager = context.assets
 
-    private val mArticleData: MutableStateFlow<HtmlData> = MutableStateFlow(value = HtmlData.empty)
-    val articleData: StateFlow<HtmlData> get() = mArticleData
+    private val mArticleData: MutableStateFlow<HtmlArticleData> =
+        MutableStateFlow(value = HtmlArticleData.empty)
+    val articleData: StateFlow<HtmlArticleData> get() = mArticleData
 
 
     val testResults: MutableStateFlow<TestResults?> = MutableStateFlow(value = null)
@@ -42,7 +42,7 @@ class BenchmarkViewModel @Inject constructor(
         this.article = article
         viewModelScope.launch {
             ignoreRules.forEach {
-                ProcessorNative.addRule(tag = it.tag, clazz = it.clazz)
+                ProcessorNative.addRule(tag = it.tag, clazz = it.clazz, id = it.id)
             }
             mArticleData.value = ArticleParser.parse(
                 content = getArticle(fileName = article),

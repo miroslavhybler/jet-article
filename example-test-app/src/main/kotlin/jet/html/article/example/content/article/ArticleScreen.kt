@@ -1,4 +1,6 @@
-package jet.html.article.example.benchmark
+@file:OptIn(ExperimentalMaterial3Api::class)
+
+package jet.html.article.example.content.article
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,40 +22,39 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import com.jet.article.data.HtmlArticleData
 import com.jet.article.ui.JetHtmlArticle
-import jet.html.article.example.data.ExcludeRule
+import jet.html.article.example.composables.DebugBottomBar
+import jet.html.article.example.composables.Results
 import jet.html.article.example.composables.SimpleTopaBar
+import jet.html.article.example.data.ExcludeRule
 
-
-/**
- * @author Miroslav Hýbler <br>
- * created on 30.01.2024
- */
 @Composable
-fun BenchmarkScreen(
+fun ArticleScreen(
     article: String,
-    viewModel: BenchmarkViewModel = hiltViewModel()
+    viewModel: ArticleViewModel,
+    navHostController: NavHostController,
 ) {
 
-    val data by viewModel.articleData.collectAsState()
-    val testResults by viewModel.testResults.collectAsState()
+    val data: HtmlArticleData by viewModel.articleData.collectAsState()
 
-    LaunchedEffect(key1 = Unit, block = {
-        viewModel.loadArticleFromResources(
-            article = article,
-            ignoreRules = ExcludeRule.globalRules
-        )
-    })
+    val testResults by viewModel.testResults.collectAsState()
 
     BackHandler(enabled = testResults != null) {
         viewModel.testResults.value = null
     }
 
+    LaunchedEffect(key1 = Unit, block = {
+        viewModel.loadArticleFromResources(
+            article = article,
+            excludeRules = ExcludeRule.globalRules
+        )
+    })
 
     Scaffold(
         topBar = {
-            SimpleTopaBar(text = "Benchmark: ${data.headData.title}")
+            SimpleTopaBar(text = data.headData.title ?: "---")
         },
         content = { paddingValues ->
             Box(modifier = Modifier.fillMaxSize()) {
@@ -88,7 +90,20 @@ fun BenchmarkScreen(
             }
         },
         bottomBar = {
-            BenchBottomBar(onTest = viewModel::runTest)
+            DebugBottomBar(
+                onTest = viewModel::runTest,
+                onAnalyzer = {
+                    navHostController.navigate(route = "analyzer?articlePath=${viewModel.articlePath}")
+                },
+            )
         }
     )
+}
+
+
+@Composable
+fun rememberIgnoreRules(vararg rules: Pair<String, String>): List<Pair<String, String>> {
+    return remember {
+        rules.toList()
+    }
 }

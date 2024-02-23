@@ -1,4 +1,4 @@
-package jet.html.article.example
+package jet.html.article.example.content
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import jet.html.article.example.composables.SimpleTopaBar
-import jet.html.article.example.main.JetHtmlArticleExampleTheme
+import jet.html.article.example.JetHtmlArticleExampleTheme
 import jet.html.article.example.composables.HomeCard
 import jet.html.article.example.composables.spacedCard
-import jet.html.article.example.main.OpenSource
+import jet.html.article.example.composables.OpenSource
 
 
 /**
@@ -70,15 +70,6 @@ fun HomeScreen(navHostController: NavHostController) {
                 description = "Problematic real articles used for the development to increase relaibility of the library",
                 onClick = { navHostController.navigate(route = "articles") },
                 modifier = Modifier.spacedCard()
-            )
-
-
-            HomeCard(
-                title = "Analyzer",
-                description = "Work In Progress, analyzer module for library",
-                onClick = {},
-                modifier = Modifier
-                    .spacedCard()
             )
 
             Spacer(

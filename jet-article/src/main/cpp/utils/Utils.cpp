@@ -223,10 +223,10 @@ namespace utils {
             int tagBodyLength = tei - i - 1;
             //tagbody within <>, i + 1 to remove '<'
             std::string_view tagBody = input.substr(i + 1, tagBodyLength);
-            std::string_view rawTagName = utils::getTagName(tagBody);
+            std::string rawTagName = utils::getTagName(tagBody);
             bool isClosingTag = rawTagName.find('/', 0) == 0;
             if (isClosingTag) {
-                std::string_view tagName = rawTagName.substr(1, rawTagName.length());
+                std::string tagName = rawTagName.substr(1, rawTagName.length());
                 bool isSearched = utils::fastCompare(tagName, searchedTag);
                 if (isSearched) {
                     if (tempWorkingInt > 0) {

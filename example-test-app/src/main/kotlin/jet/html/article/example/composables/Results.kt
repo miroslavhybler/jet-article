@@ -1,4 +1,4 @@
-package jet.html.article.example.benchmark
+package jet.html.article.example.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

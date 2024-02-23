@@ -3,7 +3,7 @@
 ///
 
 #include "BodyProcessor.h"
-#include "Utils.h"
+#include "../utils/Utils.h"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnusedParameter"
@@ -39,14 +39,16 @@ bool BodyProcessor::isValidBasedOnRule(
 ) {
     bool isUsingTag = !rule.getTag().empty();
     bool isUsingClazz = !rule.getClazz().empty();
+    bool isUsingIdMatch = !rule.getId().empty();
 
-
-    if (!isUsingTag && !isUsingClazz) {
+    if (!isUsingTag && !isUsingClazz && !isUsingIdMatch) {
         //Rule is empty, no tag and no clazz, this shouldn't occur because it doesn't make any sence.
+        //If it occurs, just return silently
         return true;
     }
 
 
+    //TODO Simplify code
     if (isUsingTag) {
         bool tagMatch = utils::fastCompare(tag, rule.getTag());
         if (isUsingClazz && tagMatch) {
@@ -57,6 +59,14 @@ bool BodyProcessor::isValidBasedOnRule(
                     return false;
                 }
             }
+
+            if (isUsingIdMatch) {
+                std::string tagId = utils::getTagAttribute(tagBody, "id");
+                if (tagId == rule.getId()) {
+                    return false;
+                }
+            }
+
             //No exclude rule based on tag and clazz not found, tag is considered valid
             return true;
         }
@@ -74,6 +84,15 @@ bool BodyProcessor::isValidBasedOnRule(
             return false;
         }
     }
+
+
+    if (isUsingIdMatch) {
+        std::string tagId = utils::getTagAttribute(tagBody, "id");
+        if (tagId == rule.getId()) {
+            return false;
+        }
+    }
+
 
     //No exclude option found, tag is considered valid
     return true;
