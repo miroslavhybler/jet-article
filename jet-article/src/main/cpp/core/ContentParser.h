@@ -127,7 +127,7 @@ public:
      * @return
      * @since 1.0.0
      */
-    std::vector<std::vector<std::string_view>> getTable();
+    const std::vector<std::vector<std::string_view>>& getTable();
 
 
     /**
@@ -162,22 +162,6 @@ public:
      * @since 1.0.0
      */
     bool isAbortingWithError();
-
-
-    /**
-     *
-     * @return Errror code from abortion.
-     * @since 1.0.0
-     */
-    ErrorCode getErrorCode();
-
-
-    /**
-     *
-     * @return
-     * @since 1.0.0
-     */
-    std::string getErrorMessage();
 
 
     /**
@@ -229,7 +213,12 @@ private:
 
 
 
-    void abortWithError(ErrorCode cause);
+    /**
+     *
+     * @param cause
+     * @param message
+     */
+    void abortWithError(ErrorCode cause, std::string message = "");
 };
 
 

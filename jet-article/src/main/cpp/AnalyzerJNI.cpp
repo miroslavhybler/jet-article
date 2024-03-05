@@ -109,6 +109,21 @@ Java_com_jet_article_AnalyzerNative_getCurrentTagEndIndex(
 }
 
 
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_jet_article_AnalyzerNative_hasPairTagContent(
+        JNIEnv *environment, jobject caller
+) {
+    return jni::analyzer->hasPairTagContent();
+}
+
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_jet_article_AnalyzerNative_getPairTagContent(
+        JNIEnv *environment, jobject caller
+) {
+    return environment->NewStringUTF(jni::analyzer->currentPairTagContent.c_str());
+}
+
 extern "C" JNIEXPORT jint JNICALL
 Java_com_jet_article_AnalyzerNative_getCurrentTagAttributesCount(
         JNIEnv *environment, jobject caller
@@ -135,5 +150,36 @@ Java_com_jet_article_AnalyzerNative_getCurrentAttributeValue(
     return environment->NewStringUTF(attributeValue.c_str());
 }
 
+extern "C" JNIEXPORT jboolean JNICALL
+Java_com_jet_article_AnalyzerNative_isAbortingWithError(
+        JNIEnv *environment, jobject caller
+) {
+    return jni::analyzer->isAbortingWithError();
+}
+
+
+extern "C" JNIEXPORT jint JNICALL
+Java_com_jet_article_AnalyzerNative_getErrorCode(
+        JNIEnv *environment, jobject caller
+) {
+    return jni::analyzer->getErrorCode();
+}
+
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_jet_article_AnalyzerNative_getErrorMessage(
+        JNIEnv *environment, jobject caller
+) {
+    std::string msg = jni::analyzer->getErrorMessage();
+    return environment->NewStringUTF(msg.c_str());
+}
+
+
+extern "C" JNIEXPORT void JNICALL
+Java_com_jet_article_AnalyzerNative_clearAllResources(
+        JNIEnv *environment, jobject caller
+) {
+    jni::analyzer->clearAllResources();
+}
 
 #pragma clang diagnostic pop

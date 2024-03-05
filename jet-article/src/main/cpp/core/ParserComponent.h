@@ -55,6 +55,26 @@ public:
 
 
     /**
+     *
+     * @return Errror code from abortion.
+     * @since 1.0.0
+     */
+    ErrorCode getErrorCode() {
+        return error;
+    }
+
+
+    /**
+     *
+     * @return
+     * @since 1.0.0
+     */
+    std::string getErrorMessage() {
+        return errorMessage;
+    }
+
+
+    /**
      * Checks if index is same as the input length.
      * @return True when parser is not done parsing yet.
      * @since 1.0.0
@@ -72,15 +92,18 @@ protected:
      * @param cause Error that causes process abortion. See error code enum.
      * @since 1.0.0
      */
-   virtual void abortWithError(ErrorCode cause) = 0;
+    virtual void abortWithError(
+            ErrorCode cause,
+            std::string message = ""
+    ) = 0;
 
 
 
-   /////////////////////////////////////////////////////////////////////////////////////////////////
-   /////
-   /////   Final Protected Functions
-   /////
-   /////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    /////
+    /////   Final Protected Functions
+    /////
+    /////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     void invalidateHasNextStep() {
@@ -97,10 +120,12 @@ protected:
      */
     bool moveIndexToNextTag() {
         if (!mHasNextStep) {
+            //TODO
             throw "mNextStep is false";
         }
 
         if (index.getIndex() >= length) {
+            //TODO
             throw "Throwing because index >= length";
         }
 
@@ -127,6 +152,51 @@ protected:
         return true;
     }
 
+
+    /**
+     *
+     * @param tag
+     * @param tei
+     * @return
+     * @since 1.0.0
+     */
+    bool isActualTagValidForNextProcessing(std::string &tag, int &tei) {
+        if (utils::fastCompare(tag, "br/")
+            || utils::fastCompare(tag, "br")
+            || utils::fastCompare(tag, "hr")
+            || utils::fastCompare(tag, "hr/")
+            || utils::fastCompare(tag, "input")
+            || utils::fastCompare(tag, "source")
+            || utils::fastCompare(tag, "meta")
+                ) {
+            index.moveIndex(tei + 1);
+            invalidateHasNextStep();
+            return false;
+        }
+
+        if (utils::fastCompare(tag, "noscript")
+            || utils::fastCompare(tag, "script")
+            || utils::fastCompare(tag, "svg")
+                ) {
+            index.moveIndex(tei + 1);
+            //Skipping tags that can't be processed by library
+            //Can't use findClosingTag because script can contain '<' inside of it and that breaks
+            //searching for closing tag
+            std::string closingTag = "</" + tag + ">";
+            int ctsi;
+            try {
+                ctsi = utils::indexOfOrThrow(input, closingTag, index.getIndex());
+            } catch (ErrorCode e) {
+                abortWithError(e);
+                return false;
+            }
+            index.moveIndex(ctsi + closingTag.length());
+            invalidateHasNextStep();
+            return false;
+        }
+
+        return true;
+    }
 };
 
 #endif //JET_ARTICLE_PARSERCOMPONENT_H

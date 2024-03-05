@@ -130,7 +130,6 @@ Java_com_jet_article_ParserNative_getErrorCode(
         JNIEnv *environment, jobject caller
 ) {
     ErrorCode code = jni::contentParser->getErrorCode();
-    utils::log("mirek", "code: " + std::to_string(code));
     return code;
 }
 

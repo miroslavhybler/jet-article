@@ -91,7 +91,7 @@ void ContentParser::doNextStep() {
     } else if (!wasHeadParsed && utils::fastCompare(tag, "head")) {
         try {
             //Closing tag start index
-            int ctsi = utils::findClosingTag(input, tag, index);
+            int ctsi = utils::findClosingTag(input, tag, index.getIndex());
             parseHeadData(ctsi);
             wasHeadParsed = false;
         } catch (ErrorCode e) {
@@ -131,7 +131,7 @@ void ContentParser::parseHeadData(int e) {
 
         if (utils::fastCompare(tag, "title")) {
             try {
-                int ctsi = utils::findClosingTag(input, tag, index, e);
+                int ctsi = utils::findClosingTag(input, tag, index.getIndex(), e);
                 std::string titleContent = input.substr(tei + 1, ctsi - tei - 1);
                 title = titleContent;
                 int i = index.getIndex() + ctsi + 7;
@@ -190,10 +190,20 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
             abortWithError(e);
             return;
         }
-        index.moveIndex(ctsi + tag.length() + 3);
+        index.moveIndex(ctsi + closingTag.length());
         invalidateHasNextStep();
         return;
     }
+
+
+    //TODO doensnt work for some reason
+    /*
+    if(!isActualTagValidForNextProcessing(currentTag, tei)) {
+        //Tag is some tag which this library can't support like script, noscript, meta, ...
+        //For full list visit isActualTagValidForNextProcessing function
+        return;
+    }
+    */
 
     //At this point index is pointing at the sequence starting with '<' which is ready to be
     //processed as tag
@@ -206,11 +216,18 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
     //closing tag start index
     int ctsi;
     try {
-        ctsi = utils::findClosingTag(input, tag, index);
+        ctsi = utils::findClosingTag(input, tag, index.getIndex());
         tempContentIndexStart = index.getIndex();
         tempContentIndexEnd = ctsi;
     } catch (ErrorCode e) {
-        abortWithError(e);
+        // abortWithError(e);
+
+        //TODO experimental, debug
+        //Html artycles has too much html syntax errors like unclosed pair tags or others,
+        //so library should keep parsing
+        //Just keep parsing, just keep parsing
+        index.moveIndex(tei + 1);
+
         return;
     }
 
@@ -332,7 +349,7 @@ int ContentParser::getTempListSize() {
 }
 
 
-std::vector<std::vector<std::string_view>> ContentParser::getTable() {
+const std::vector<std::vector<std::string_view>> &ContentParser::getTable() {
     return tableHolder;
 }
 
@@ -359,17 +376,7 @@ bool ContentParser::isAbortingWithError() {
 }
 
 
-ErrorCode ContentParser::getErrorCode() {
-    return error;
-}
-
-
-std::string ContentParser::getErrorMessage() {
-    return errorMessage;
-}
-
-
-void ContentParser::abortWithError(ErrorCode cause) {
+void ContentParser::abortWithError(ErrorCode cause, std::string message) {
     this->error = cause;
     isAbortingWithException = true;
     hasContentToProcess = false;
@@ -377,6 +384,7 @@ void ContentParser::abortWithError(ErrorCode cause) {
 
     errorMessage = "ABORTING PARSING WITH ERROR WITH CAUSE: " + std::to_string(cause) + "\n"
                    + index.toString() + "\n"
+                   + "Message: " + message + "\n"
                    + "body: " + currentTagBody;
 
     utils::log("PARSER", errorMessage, ANDROID_LOG_ERROR);

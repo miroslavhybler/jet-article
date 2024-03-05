@@ -25,7 +25,7 @@ void ContentAnalyzer::setInput(std::string content) {
 
 void ContentAnalyzer::setRange(int s, int e) {
 
-    if (s < 0 || e > length) {
+    if (s < 0 || e > length || s > e) {
         utils::log(
                 "ANALYZER",
                 "Unable to analyze becase of invalid range(s=" + std::to_string(s) + ", e=" +
@@ -41,12 +41,29 @@ void ContentAnalyzer::setRange(int s, int e) {
 
 
 void ContentAnalyzer::doNextStep() {
-    if (!moveIndexToNextTag()) {
+
+    currentTag = "";
+    currentTagBody = "";
+    currentTagId = "";
+    currentTagClass = "";
+    currentPairTagContent = "";
+    currentTagAttributes.clear();
+
+    if (mHasNextStep) {
+        if (!moveIndexToNextTag()) {
+            utils::log("ANALYZER", "Unable to move to next tag");
+            return;
+        }
         //No tag to process
         invalidateHasNextStep();
-        //TODO analyzer return some status to app, unable to move next
+        //TODO maybe analyzer return some status to app, unable to move next
+    }
+
+    if (!mHasNextStep) {
         return;
     }
+
+
     //Tag end index
     int tei;
     try {
@@ -63,9 +80,17 @@ void ContentAnalyzer::doNextStep() {
     currentTagBody = input.substr(index.getIndex() + 1, tagBodyLength);
     currentTag = utils::getTagName(currentTagBody);
 
-    tempContentIndexStart = index.getIndex();
-    tempContentIndexEnd = tei;
+    currentTagStartIndex = index.getIndex();
+    currentTagEndIndex = tei;
 
+    if (currentTag.find('/', 0) == 0) {
+        //Skipping closing tag
+        //its because after we parse out nested content, we don't know the "right" closing tag
+        //example <div><p>...</p></div> after parsing <p> we move behind </p>
+        index.moveIndex(tei + 1);
+        invalidateHasNextStep();
+        return;
+    }
 
     if (mHasBodyContext) {
         currentTagId = utils::getTagAttribute(currentTagBody, "id");
@@ -79,7 +104,50 @@ void ContentAnalyzer::doNextStep() {
         }
 
         invalidateHasNextStep();
-        //TODO pair tag
+
+        if (!isActualTagValidForNextProcessing(currentTag, tei)) {
+            //Tag is some tag which this library can't support like script, noscript, meta, ...
+            //For full list visit isActualTagValidForNextProcessing function
+            return;
+        }
+
+
+        bool isCurrentTagPair = utils::isTagPairTag(currentTagBody);
+        if (isCurrentTagPair) {
+            try {
+                int s = tei + 1;
+                int ctsi = utils::findClosingTagWithLogs(input, currentTag, tei);
+                currentPairTagContent = input.substr(tei + 1, ctsi - tei - 1);
+
+                int next;
+                try {
+                    next = utils::indexOfOrThrow(input, ">", ctsi);
+                    index.moveIndex(next + 1);
+                } catch (ErrorCode e) {
+                    abortWithError(e);
+                    return;
+                }
+
+            } catch (ErrorCode code) {
+                std::string message =
+                        "Problematic area within " + std::to_string(tei)
+                        + " .. " + std::to_string(length) + "\n"
+                        + "tei: " + input.substr(tei, 1) + "\n"
+                        + "Near substring:\n\n" +
+                        input.substr(tei - tagBodyLength, 40)
+                        + "\n";
+
+                abortWithError(code, message);
+                return;
+            }
+
+        } else {
+
+            index.moveIndex(tei + 1);
+        }
+
+        //TODO split supported and unsupported tags
+
         return;
     }
 
@@ -92,7 +160,7 @@ void ContentAnalyzer::doNextStep() {
     } else if (!wasHeadParsed && utils::fastCompare(currentTag, "head")) {
         try {
             //Closing tag start index
-            int ctsi = utils::findClosingTag(input, currentTag, index);
+         //   int ctsi = utils::findClosingTag(input, currentTag, index);
             // parseHeadData(ctsi);
             invalidateHasNextStep();
             wasHeadParsed = false;
@@ -124,15 +192,22 @@ int ContentAnalyzer::getCurrentAttributesSize() {
 
 //TODO
 int ContentAnalyzer::getCurrentTagStartIndex() {
-    return tempContentIndexStart;
+    return currentTagStartIndex;
 }
 
 int ContentAnalyzer::getCurrentTagEndIndex() {
-    return tempContentIndexEnd;
+    return currentTagEndIndex;
 }
 
+bool ContentAnalyzer::hasPairTagContent() {
+    return !currentPairTagContent.empty();
+}
 
-void ContentAnalyzer::abortWithError(ErrorCode cause) {
+std::string ContentAnalyzer::getCurrentPairTagContent() {
+    return currentPairTagContent;
+}
+
+void ContentAnalyzer::abortWithError(ErrorCode cause, std::string message) {
     this->error = cause;
     isAbortingWithException = true;
     hasContentToProcess = false;
@@ -140,6 +215,7 @@ void ContentAnalyzer::abortWithError(ErrorCode cause) {
 
     errorMessage = "ABORTING ANALIZING WITH ERROR WITH CAUSE: " + std::to_string(cause) + "\n"
                    + index.toString() + "\n"
+                   + "Message: " + message + "\n"
                    + "body: " + currentTagBody;
 
     utils::log("ANALYZER", errorMessage, ANDROID_LOG_ERROR);
@@ -157,6 +233,7 @@ void ContentAnalyzer::clearAllResources() {
     currentTag = "";
     currentTagBody = "";
     currentTagId = "";
+    currentPairTagContent = "";
     currentContentType = NO_CONTENT;
 
     hasContentToProcess = false;
@@ -170,8 +247,8 @@ void ContentAnalyzer::clearAllResources() {
     tableHolder.clear();
 
     length = 0;
-    tempContentIndexStart = -1;
-    tempContentIndexEnd = -1;
+    currentTagStartIndex = -1;
+    currentTagEndIndex = -1;
     temporaryOutIndex = 0;
 
     tempOutputVector.clear();

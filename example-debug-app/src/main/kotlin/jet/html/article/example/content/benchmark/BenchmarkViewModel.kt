@@ -35,7 +35,7 @@ class BenchmarkViewModel @Inject constructor(
 
     val testResults: MutableStateFlow<TestResults?> = MutableStateFlow(value = null)
 
-
+    var articlePath: String = ""
     private var article: String = ""
 
     fun loadArticleFromResources(article: String, ignoreRules: List<ExcludeRule>) {
@@ -44,8 +44,9 @@ class BenchmarkViewModel @Inject constructor(
             ignoreRules.forEach {
                 ProcessorNative.addRule(tag = it.tag, clazz = it.clazz, id = it.id)
             }
+            val articleContent = getArticle(fileName = article)
             mArticleData.value = ArticleParser.parse(
-                content = getArticle(fileName = article),
+                content = articleContent,
                 url = "https://www.example.com"
             )
         }
@@ -78,7 +79,8 @@ class BenchmarkViewModel @Inject constructor(
 
 
     private fun getArticle(fileName: String): String {
-        return String(assets.open("benchmark/${fileName}.html").readBytes())
+        articlePath = "benchmark/${fileName}.html"
+        return String(assets.open(articlePath).readBytes())
     }
 
 }

@@ -95,7 +95,7 @@ fun BenchmarkScreen(
             DebugBottomBar(
                 onTest = viewModel::runTest,
                 onAnalyzer = {
-                    navHostController.navigate(route = "analyzer?articlePath=$article")
+                    navHostController.navigate(route = "analyzer?articlePath=${viewModel.articlePath}")
                 }
             )
         }

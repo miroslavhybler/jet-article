@@ -44,9 +44,23 @@ class AnalyzerViewModel @Inject constructor(
         }
     }
 
+    fun moveToPrevious() {
+        viewModelScope.launch {
+            ArticleAnalyzer.movePrevious()
+        }
+    }
+
+
     fun moveInside() {
         viewModelScope.launch {
             ArticleAnalyzer.moveInside()
+        }
+    }
+
+
+    fun jumpToBody() {
+        viewModelScope.launch {
+            ArticleAnalyzer.jumpToBody()
         }
     }
 

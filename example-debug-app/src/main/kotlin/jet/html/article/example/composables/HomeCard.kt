@@ -33,7 +33,6 @@ fun HomeCard(
     description: String,
     onClick: () -> Unit
 ) {
-
     Column(
         modifier = modifier
             .border(

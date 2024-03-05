@@ -50,7 +50,7 @@ public sealed class TagAnalyze private constructor(
         override val name: String,
         @HtmlContentType
         override val contentType: Int,
-        val contentRange: IntRange,
+        val content: String,
     ) : TagAnalyze(
         tag = tag,
         tagAttributes = tagAttributes,

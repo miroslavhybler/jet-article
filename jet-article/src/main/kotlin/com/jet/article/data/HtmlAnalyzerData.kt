@@ -1,3 +1,5 @@
+@file:Suppress("RedundantVisibilityModifier")
+
 package com.jet.article.data
 
 
@@ -10,14 +12,19 @@ public sealed class HtmlAnalyzerData private constructor(
 ) {
 
 
+    public data object Empty : HtmlAnalyzerData(range = IntRange(start = 0, endInclusive = 0))
 
-
-    data object Empty : HtmlAnalyzerData(range = IntRange(start = 0, endInclusive = 0))
-
-   data class ContentTag constructor(
+    public data class ContentTag internal constructor(
         override val range: IntRange,
         val tag: TagAnalyze,
     ) : HtmlAnalyzerData(range = range) {
 
     }
+
+
+    public data class ParseError internal constructor(
+        override val range: IntRange,
+        val errorMessage: String,
+        @ErrorCode val cause: Int,
+    ) : HtmlAnalyzerData(range = range)
 }

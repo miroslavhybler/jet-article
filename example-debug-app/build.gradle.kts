@@ -101,18 +101,18 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     /** Compose */
-    val composeVersion = "1.5.4"
+    val composeVersion = "1.6.2"
     implementation("androidx.compose.ui:ui:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
     implementation("androidx.activity:activity-compose:1.8.2")
-    implementation("androidx.compose.material3:material3:1.1.2")
-    implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
-    implementation("androidx.navigation:navigation-compose:2.7.6")
+    implementation("androidx.compose.material3:material3:1.2.0")
+    implementation("androidx.compose.material3:material3-window-size-class:1.2.0")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.28.0")
 
     /** Hilt DI */
-    val hiltVersion = "2.48"
-    val hiltCompilerVersion = "1.1.0"
+    val hiltVersion = "2.49"
+    val hiltCompilerVersion = "1.2.0"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
     implementation("androidx.hilt:hilt-common:$hiltCompilerVersion")

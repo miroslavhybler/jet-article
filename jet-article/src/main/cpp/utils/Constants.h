@@ -8,6 +8,7 @@
 #ifndef JET_HTML_ARTICLE_CONSTANTS_H
 #define JET_HTML_ARTICLE_CONSTANTS_H
 
+#include <set>
 
 /**
  * Sipmifies the meaning of html tags.
@@ -33,6 +34,14 @@ enum ErrorCode {
 
     CONTENT_NOT_HTML = 100000
 };
+
+
+const std::set<std::string> unsupportedPairTags = {
+        "noscript",
+        "script",
+        "svg"
+};
+
 
 #endif //JET_HTML_ARTICLE_CONSTANTS_H
 

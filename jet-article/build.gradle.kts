@@ -21,7 +21,7 @@ android {
         consumerProguardFiles("consumer-rules.pro")
         externalNativeBuild {
             cmake {
-                cppFlags("")
+                cppFlags("-std=c++20")
             }
         }
     }
@@ -97,13 +97,6 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }
 
-
-//
-// For C++ docs run
-//doxygen doxyfile from cpp directory
-//
-
-
 tasks {
 
     dokkaHtml.configure {
@@ -136,7 +129,7 @@ tasks {
         }
     }
 
-    //TODO
+
     create(name = "generateCppDocs", type = Exec::class) {
         val outputDir = buildDir.resolve(relative = "docs/cpp")
         if (!outputDir.exists()) { outputDir.mkdirs() }

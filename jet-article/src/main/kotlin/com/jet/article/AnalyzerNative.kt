@@ -31,6 +31,24 @@ internal object AnalyzerNative {
     /**
      * @since 1.0.0
      */
+    external fun isAbortingWithError(): Boolean
+
+
+    /**
+     * @since 1.0.0
+     */
+    external fun getErrorCode(): Int
+
+
+    /**
+     * @since 1.0.0
+     */
+    external fun getErrorMessage(): String
+
+
+    /**
+     * @since 1.0.0
+     */
     external fun setRange(start: Int, end: Int)
 
 
@@ -81,6 +99,18 @@ internal object AnalyzerNative {
     /**
      * @since 1.0.0
      */
+    external fun hasPairTagContent(): Boolean
+
+
+    /**
+     * @since 1.0.0
+     */
+    external fun getPairTagContent(): String
+
+
+    /**
+     * @since 1.0.0
+     */
     external fun getCurrentTagAttributesCount(): Int
 
 
@@ -94,4 +124,10 @@ internal object AnalyzerNative {
      * @since 1.0.0
      */
     external fun getCurrentAttributeValue(name: String): String
+
+
+    /**
+     * @since 1.0.0
+     */
+    external fun clearAllResources(): Unit
 }

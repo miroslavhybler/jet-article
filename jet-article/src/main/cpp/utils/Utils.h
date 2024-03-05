@@ -17,7 +17,6 @@
  */
 namespace utils {
 
-
     /**
      * Tries to find index of substring within input
      * @param input Input for searching substring
@@ -100,31 +99,40 @@ namespace utils {
 
 
     /**
-     * Tries to find the right closing tag for tag. When tag contains same tags within like <p><p></p></p>
-     * it will folds every same inner tag into a stack and then popping it out. When the tag is found
-     * and stack for inner tags is empty, found tag is considered being right closing tag.
-     *
-     * Make sure to clip content or set index correctly. The content in which you are going to search
-     * has to be with clipped of the start tag. Otherwise the opening tag would be pushed into stack
-     * too and program fails.
-     * E.g:
-     * searching for <p> must be in clipped content ..... </p>
-     *
-     * Note: There is no validation of pair tags inside, you are responsible for searching the proper
-     * pair tag.
-     * @param input Input string in which closing tag will be searched
-     * @param tag Lowercase pair tag name you are searching for
-     * @param index actual index. Searching will be start from this index.
-     * @param e End index. Optional, if value is less than 0, input.length() will be used.
-     * @throw When closing tag was not found within content
-     * @return Index if start of the closing tag, index of '<' char
-     * @since 1.0.0
-     */
+    * Tries to find the right closing tag for tag. When tag contains same tags within like <p><p></p></p>
+    * it will folds every same inner tag into a stack and then popping it out. When the tag is found
+    * and stack for inner tags is empty, found tag is considered being right closing tag.
+    *
+    * Make sure to clip content or set index correctly. The content in which you are going to search
+    * has to be with clipped of the start tag. Otherwise the opening tag would be pushed into stack
+    * too and program fails.
+    * E.g:
+    * searching for <p> must be in clipped content ..... </p>
+    *
+    * Note: There is no validation of pair tags inside, you are responsible for searching the proper
+    * pair tag.
+    * @param input Input string in which closing tag will be searched
+    * @param tag Lowercase pair tag name you are searching for
+    * @param s Start index
+    * @param e End index. Optional, if value is less than 0, input.length() will be used.
+    * @throw When closing tag was not found within content
+    * @return Index if start of the closing tag, index of '<' char
+    * @since 1.0.0
+    */
     int findClosingTag(
             const std::string_view &input,
             const std::string &tag,
-            IndexWrapper &index,
-            const int &e = 0
+            int s,
+            const int e = 0
+    );
+
+
+
+    int findClosingTagWithLogs(
+            const std::string_view &input,
+            const std::string &tag,
+            int s,
+            const int e = 0
     );
 
 
@@ -145,9 +153,6 @@ namespace utils {
             const int &e,
             std::vector<std::string_view> &outputList
     );
-
-
-
 
 
     /**
@@ -224,6 +229,22 @@ namespace utils {
             const std::string_view &tagBody,
             std::vector<std::string_view> &outList
     );
+
+
+    /**
+     *
+     * @return
+     * @since 1.0.0
+     */
+    bool isTagSingleTag(std::string &tagBody);
+
+
+    /**
+     *
+     * @return
+     * @since 1.0.0
+     */
+    bool isTagPairTag(std::string &tagBody);
 }
 
 #endif //JET_HTML_ARTICLE_UTILS_H

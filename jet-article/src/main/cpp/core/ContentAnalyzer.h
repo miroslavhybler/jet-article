@@ -20,6 +20,7 @@ class ContentAnalyzer : public AbstractParserComponent {
 public:
     std::string currentTagName = "";
     std::string currentTagClass = "";
+    std::string currentPairTagContent = "";
 
 private:
     int actualInputStart = 0;
@@ -33,8 +34,8 @@ private:
     int length;
     bool hasContentToProcess;
     bool wasHeadParsed;
-    int tempContentIndexStart = -1;
-    int tempContentIndexEnd = -1;
+    int currentTagStartIndex = -1;
+    int currentTagEndIndex = -1;
     std::vector<std::string_view> tempOutputVector;
     std::vector<std::vector<std::string_view>> tableHolder;
     bool isAbortingWithException;
@@ -68,14 +69,17 @@ public:
 
     int getCurrentTagStartIndex();
 
-
     int getCurrentTagEndIndex();
 
+    std::string getCurrentPairTagContent();
+
+
+    bool hasPairTagContent();
 
     void clearAllResources();
 
 
-    void abortWithError(ErrorCode cause);
+    void abortWithError(ErrorCode cause, std::string message = "");
 };
 
 
