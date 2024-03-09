@@ -249,14 +249,20 @@ Java_com_jet_article_ParserNative_warmup(
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_jet_article_ProcessorNative_addRule(
-        JNIEnv *environment, jobject caller, jstring tag, jstring clazz, jstring id
+        JNIEnv *environment,
+        jobject caller,
+        jstring tag,
+        jstring clazz,
+        jstring id,
+        jstring keyword
 ) {
     jboolean outIsCopy;
     jni::processor->addRule(
             ExcludeRule(
                     environment->GetStringUTFChars(tag, &outIsCopy),
                     environment->GetStringUTFChars(clazz, &outIsCopy),
-                    environment->GetStringUTFChars(id, &outIsCopy)
+                    environment->GetStringUTFChars(id, &outIsCopy),
+                    environment->GetStringUTFChars(keyword, &outIsCopy)
 
             )
     );

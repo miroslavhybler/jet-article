@@ -14,7 +14,12 @@ public object ProcessorNative {
     /**
      * @since 1.0.0
      */
-    external fun addRule(tag: String, clazz: String, id: String): Unit
+    external fun addRule(
+        tag: String = "",
+        clazz: String = "",
+        id: String = "",
+        keyword: String = ""
+    ): Unit
 
 
     /**

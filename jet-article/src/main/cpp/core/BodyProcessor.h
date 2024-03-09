@@ -66,6 +66,65 @@ private:
             ExcludeRule &rule
     );
 
+
+    /**
+     *
+     * @param tag
+     * @param tagBody
+     * @param rule
+     * @param isUsingId
+     * @param isUsingClazz
+     * @param isUsingKeyword
+     * @return
+     * @since 1.0.0
+     */
+    bool isValidBasedOnRuleTagIncluded(
+            const std::string &tag,
+            const std::string &tagBody,
+            ExcludeRule &rule,
+            const bool &isUsingId,
+            const bool &isUsingClazz,
+            const bool &isUsingKeyword
+    );
+
+
+    /**
+     *
+     * @param tagBody
+     * @param rule
+     * @param isUsingId
+     * @param isUsingClazz
+     * @param isUsingKeyword
+     * @return
+     * @since 1.0.0
+     */
+    bool isValidBasedOnRuleTagNotIncluded(
+            const std::string &tagBody,
+            ExcludeRule &rule,
+            const bool &isUsingId,
+            const bool &isUsingClazz,
+            const bool &isUsingKeyword
+    );
+
+
+    bool isKeywordPresented(
+            const std::string_view &keyword,
+            const std::string &tagBody
+    );
+
+
+    bool isWordPresented(
+            const std::string_view &word,
+            const std::string_view &input,
+            const bool isContainsEnabled = false
+    );
+
+
+    bool isWordPresented(
+            const std::string_view &word,
+            const std::vector<std::string_view> &classes,
+            const bool isContainsEnabled = false
+    );
 };
 
 

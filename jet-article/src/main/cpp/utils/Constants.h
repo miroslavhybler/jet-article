@@ -36,11 +36,19 @@ enum ErrorCode {
 };
 
 
+const std::set<std::string> unsupportedPairTagsForTextBlock = {
+        "noscript",
+        "script",
+        "svg",
+        "div"
+};
+
 const std::set<std::string> unsupportedPairTags = {
         "noscript",
         "script",
-        "svg"
+        "svg",
 };
+
 
 
 #endif //JET_HTML_ARTICLE_CONSTANTS_H

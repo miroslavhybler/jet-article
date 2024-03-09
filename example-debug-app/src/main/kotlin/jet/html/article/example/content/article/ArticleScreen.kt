@@ -71,6 +71,7 @@ fun ArticleScreen(
                     }
                 )
 
+
                 AnimatedVisibility(
                     visible = testResults != null,
                     modifier = Modifier.align(alignment = Alignment.BottomCenter),

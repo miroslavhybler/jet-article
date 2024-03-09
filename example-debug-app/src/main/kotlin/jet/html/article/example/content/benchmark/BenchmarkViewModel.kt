@@ -42,7 +42,12 @@ class BenchmarkViewModel @Inject constructor(
         this.article = article
         viewModelScope.launch {
             ignoreRules.forEach {
-                ProcessorNative.addRule(tag = it.tag, clazz = it.clazz, id = it.id)
+                ProcessorNative.addRule(
+                    tag = it.tag,
+                    clazz = it.clazz,
+                    id = it.id,
+                    keyword = it.keyword
+                )
             }
             val articleContent = getArticle(fileName = article)
             mArticleData.value = ArticleParser.parse(

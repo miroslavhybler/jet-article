@@ -174,6 +174,7 @@ protected:
             return false;
         }
 
+
         if (utils::fastCompare(tag, "noscript")
             || utils::fastCompare(tag, "script")
             || utils::fastCompare(tag, "svg")
@@ -185,12 +186,20 @@ protected:
             std::string closingTag = "</" + tag + ">";
             int ctsi;
             try {
-                ctsi = utils::indexOfOrThrow(input, closingTag, index.getIndex());
+                //TODO </script> can be inside script
+                //   ctsi = utils::indexOfOrThrow(input, closingTag, index.getIndex());
+                ctsi = utils::findUnsupportedTagClosing(input, tag, index.getIndex());
             } catch (ErrorCode e) {
                 abortWithError(e);
                 return false;
             }
             index.moveIndex(ctsi + closingTag.length());
+
+            utils::log("mirek",
+                       "Index moved to: " + index.toString()
+                       + " ctsi: " + std::to_string(ctsi)
+            );
+
             invalidateHasNextStep();
             return false;
         }

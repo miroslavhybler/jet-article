@@ -15,26 +15,35 @@
 class ExcludeRule {
 
 private:
-    std::string mTag;
-    std::string mClazz;
-    std::string mId;
+    std::string_view mTag;
+    std::string_view mClazz;
+    std::string_view mId;
+    std::string_view mKeyword;
 
 public:
 
-    ExcludeRule(std::string tag);
+    ExcludeRule(std::string_view tag);
 
-    ExcludeRule(std::string tag, std::string clazz);
+    ExcludeRule(std::string_view tag, std::string_view clazz);
 
-    ExcludeRule(std::string tag, std::string clazz, std::string id);
+    ExcludeRule(std::string_view tag, std::string_view clazz, std::string_view id);
 
+    ExcludeRule(
+            std::string_view tag,
+                std::string_view clazz,
+                std::string_view id,
+                std::string_view keyword
+                );
 
     ~ExcludeRule();
 
-    const std::string getTag();
+    const std::string_view getTag();
 
-    const std::string getClazz();
+    const std::string_view getClazz();
 
-    const std::string getId();
+    const std::string_view getId();
+
+    const std::string_view getKeyword();
 
 };
 

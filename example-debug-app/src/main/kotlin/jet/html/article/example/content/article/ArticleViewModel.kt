@@ -43,7 +43,12 @@ class ArticleViewModel @Inject constructor(
         viewModelScope.launch {
 
             excludeRules.forEach {
-                ProcessorNative.addRule(tag = it.tag, clazz = it.clazz, id = it.id)
+                ProcessorNative.addRule(
+                    tag = it.tag,
+                    clazz = it.clazz,
+                    id = it.id,
+                    keyword = it.keyword
+                )
             }
             mArticleData.value = ArticleParser.parse(
                 content = getArticle(fileName = article),

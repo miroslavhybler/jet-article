@@ -70,7 +70,6 @@ object ArticleParser {
                 if (ParserNative.hasContent()) {
                     onElement(elements = elements, articleUrl = url)
                     ParserNative.resetCurrentContent()
-                    ProcessorNative.clearAllResources()
                 }
             }
 
@@ -149,15 +148,26 @@ object ArticleParser {
 
             HtmlContentType.TEXT -> {
                 val content = ParserNative.getContent()
-                val text =
-                    HtmlElement.TextBlock(text = content, id = ParserNative.getCurrentTagId())
+
+                if (content.isBlank()) {
+                    return
+                }
+
+                val text = HtmlElement.TextBlock(
+                    text = content,
+                    id = ParserNative.getCurrentTagId()
+                )
                 elements.add(element = text)
             }
 
             HtmlContentType.TITLE -> {
+                val content = ParserNative.getContent()
+                if (content.isBlank()) {
+                    return
+                }
                 elements.add(
                     element = HtmlElement.Title(
-                        text = ParserNative.getContent(),
+                        text = content,
                         titleTag = ParserNative.getCurrentTag(),
                         id = ParserNative.getCurrentTagId()
                     )
@@ -180,18 +190,26 @@ object ArticleParser {
             }
 
             HtmlContentType.QUOTE -> {
+                val content = ParserNative.getContent()
+                if (content.isBlank()) {
+                    return
+                }
                 elements.add(
                     element = HtmlElement.Quote(
-                        text = ParserNative.getContent(),
+                        text = content,
                         id = ParserNative.getCurrentTagId()
                     ),
                 )
             }
 
             HtmlContentType.CODE -> {
+                val content = ParserNative.getContent()
+                if (content.isBlank()) {
+                    return
+                }
                 elements.add(
                     element = HtmlElement.Code(
-                        content = ParserNative.getContent(),
+                        content = content,
                         id = ParserNative.getCurrentTagId()
                     )
                 )
@@ -203,6 +221,10 @@ object ArticleParser {
                 val columnCount = ParserNative.getTableColumnCount()
                 val rowsCount = ParserNative.getTableRowsCount()
 
+                if (rowsCount == 0 || columnCount == 0) {
+                    return
+                }
+
                 for (i in 0 until rowsCount) {
                     val columns = ArrayList<String>()
                     for (j in 0 until columnCount) {
@@ -211,6 +233,7 @@ object ArticleParser {
                     }
                     rows.add(columns)
                 }
+
 
                 elements.add(
                     element = HtmlElement.Table(

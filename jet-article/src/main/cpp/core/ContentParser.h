@@ -26,8 +26,6 @@ public:
     std::string lang = "";
 
 private:
-    bool mHasNextStep;
-    bool mWasHtmlTagFound;
     bool hasContentToProcess;
     bool wasHeadParsed;
     int tempContentIndexStart = -1;

@@ -119,7 +119,23 @@ namespace utils {
     * @return Index if start of the closing tag, index of '<' char
     * @since 1.0.0
     */
-    int findClosingTag(
+    const int findClosingTag(
+            const std::string_view &input,
+            const std::string &tag,
+            int s,
+            const int e = 0
+    );
+
+
+    const int findClosingTagWithLogs(
+            const std::string_view &input,
+            const std::string &tag,
+            int s,
+            const int e = 0
+    );
+
+
+    const int findUnsupportedTagClosing(
             const std::string_view &input,
             const std::string &tag,
             int s,
@@ -128,11 +144,11 @@ namespace utils {
 
 
 
-    int findClosingTagWithLogs(
-            const std::string_view &input,
-            const std::string &tag,
+    void clearUnsupportedTagsFromTextBlock(
+            std::string &input,
+            std::string &output,
             int s,
-            const int e = 0
+            int e
     );
 
 

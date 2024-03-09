@@ -45,8 +45,27 @@ void ContentParser::hasParsedContentToBeProcessed(bool hasContent) {
 
 
 std::string ContentParser::getTempContent() {
+    if (currentContentType == NO_CONTENT) {
+        return "";
+    }
+
     int n = tempContentIndexEnd - tempContentIndexStart;
-    return input.substr(tempContentIndexStart, n);
+
+    if (n == 0) {
+        return "";
+    }
+
+    if (currentContentType != TEXT) {
+        return input.substr(tempContentIndexStart, n);
+    }
+
+
+    std::string tempInput = input.substr(tempContentIndexStart, n);
+    utils::trim(input);
+    std::string output = "";
+    utils::clearUnsupportedTagsFromTextBlock(tempInput, output, 0, tempInput.length());
+    return output;
+
 }
 
 
@@ -86,7 +105,6 @@ void ContentParser::doNextStep() {
     index.moveIndex(tei + 1);
 
     if (utils::fastCompare(tag, "html")) {
-        mWasHtmlTagFound = true;
         lang = utils::getTagAttribute(currentTagBody, "lang");
     } else if (!wasHeadParsed && utils::fastCompare(tag, "head")) {
         try {
@@ -161,49 +179,14 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
         return;
     }
 
-    if (utils::fastCompare(tag, "br/")
-        || utils::fastCompare(tag, "br")
-        || utils::fastCompare(tag, "hr")
-        || utils::fastCompare(tag, "hr/")
-        || utils::fastCompare(tag, "input")
-        || utils::fastCompare(tag, "source")
-        || utils::fastCompare(tag, "meta")
-            ) {
-        index.moveIndex(tei + 1);
-        invalidateHasNextStep();
-        return;
-    }
-
-    if (utils::fastCompare(tag, "noscript")
-        || utils::fastCompare(tag, "script")
-        || utils::fastCompare(tag, "svg")
-            ) {
-        index.moveIndex(tei + 1);
-        //Skipping tags that can't be processed by library
-        //Can't use findClosingTag because script can contain '<' inside of it and that breaks
-        //searching for closing tag
-        std::string closingTag = "</" + tag + ">";
-        int ctsi;
-        try {
-            ctsi = utils::indexOfOrThrow(input, closingTag, index.getIndex());
-        } catch (ErrorCode e) {
-            abortWithError(e);
-            return;
-        }
-        index.moveIndex(ctsi + closingTag.length());
-        invalidateHasNextStep();
-        return;
-    }
-
-
-    //TODO doensnt work for some reason
-    /*
-    if(!isActualTagValidForNextProcessing(currentTag, tei)) {
+    if (!isActualTagValidForNextProcessing(tag, tei)) {
         //Tag is some tag which this library can't support like script, noscript, meta, ...
         //For full list visit isActualTagValidForNextProcessing function
+        tempContentIndexStart = -1;
+        tempContentIndexEnd = -1;
         return;
     }
-    */
+
 
     //At this point index is pointing at the sequence starting with '<' which is ready to be
     //processed as tag
@@ -220,14 +203,10 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
         tempContentIndexStart = index.getIndex();
         tempContentIndexEnd = ctsi;
     } catch (ErrorCode e) {
-        // abortWithError(e);
-
-        //TODO experimental, debug
         //Html artycles has too much html syntax errors like unclosed pair tags or others,
         //so library should keep parsing
         //Just keep parsing, just keep parsing
         index.moveIndex(tei + 1);
-
         return;
     }
 
@@ -405,7 +384,6 @@ void ContentParser::clearAllResources() {
 
     hasContentToProcess = false;
     mHasBodyContext = false;
-    mWasHtmlTagFound = false;
     wasHeadParsed = false;
     isAbortingWithException = false;
     error = NO_ERROR;
