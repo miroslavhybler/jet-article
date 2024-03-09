@@ -47,11 +47,13 @@ import com.jet.article.ui.elements.HtmlBasicList
 
 
 /**
- * @param modifier
- * @param data
+ * Default composable implementation for the library. To use custom layouts see [JetHtmlArticleContent].
+ * @param modifier Modifier to modify composable
+ * @param data Parsed html article data to be shown.
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
  * created on 25.08.2023
+ * @see JetHtmlArticleContent
  */
 @Composable
 @JetExperimental

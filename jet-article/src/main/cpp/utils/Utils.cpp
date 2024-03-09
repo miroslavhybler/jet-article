@@ -50,7 +50,7 @@ namespace utils {
     }
 
 
-    inline void trim(std::string &s) {
+    void trim(std::string &s) {
         ltrim(s);
         rtrim(s);
     }

@@ -10,6 +10,7 @@
 #include <vector>
 
 /**
+ * Additional component that helps filtering tags by setting list of custom rules.
  * @since 1.0.0
  */
 class BodyProcessor {
@@ -107,12 +108,28 @@ private:
     );
 
 
+    /**
+     *
+     * @param keyword
+     * @param tagBody
+     * @return True when [keyword] is presented within [tagBody]
+     * @since 1.0.0
+     */
     bool isKeywordPresented(
             const std::string_view &keyword,
             const std::string &tagBody
     );
 
 
+    /**
+     *
+     * @param word Word you want to compare or search within [input]
+     * @param input Text where you want to search [word]
+     * @param isContainsEnabled When enabled, true will be returned when [input] contains [word].
+     * When disabled, [input] has to be equeal to [word] to return true.
+     * @return True when [input] is or contains [word] based on [isContainsEnabled]
+     * @since 1.0.0
+     */
     bool isWordPresented(
             const std::string_view &word,
             const std::string_view &input,
@@ -120,6 +137,15 @@ private:
     );
 
 
+    /**
+     *
+     * @param word Word you want to search
+     * @param classes List of classes from html tag
+     * @param isContainsEnabled When enabled, true will be returned when some of the [classes] contains
+     * [word]. When disabled, one of the [classes] must be equal to [word].
+     * @return True when [word] is presented in [classes] list.
+     * @since 1.0.0
+     */
     bool isWordPresented(
             const std::string_view &word,
             const std::vector<std::string_view> &classes,

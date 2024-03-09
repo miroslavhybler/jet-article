@@ -99,14 +99,15 @@ public:
 
     /**
      *
-     * @return
+     * @return Temporary text content of the [input] determined by [tempContentIndexStart]
+     * and [tempContentIndexEnd]. Can be also empty.
      * @since 1.0.0
      */
     std::string getTempContent();
 
 
     /**
-     * Clear o
+     * Clears all used resources and releases the memory at the end of parsing process
      * @since 1.0.0
      */
     void clearAllResources();
@@ -148,7 +149,7 @@ public:
 
     /**
      *
-     * @return
+     * @return Title of the html article, similar to <title> tag in <head>
      * @since 1.0.0
      */
     std::string getTitle();
@@ -156,7 +157,8 @@ public:
 
     /**
      *
-     * @return
+     * @return True when process is aborting with error, meaning that provided [input] could not be
+     * parsed properly.
      * @since 1.0.0
      */
     bool isAbortingWithError();

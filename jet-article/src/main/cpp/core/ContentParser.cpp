@@ -61,7 +61,7 @@ std::string ContentParser::getTempContent() {
 
 
     std::string tempInput = input.substr(tempContentIndexStart, n);
-    utils::trim(input);
+    utils::trim(tempInput);
     std::string output = "";
     utils::clearUnsupportedTagsFromTextBlock(tempInput, output, 0, tempInput.length());
     return output;

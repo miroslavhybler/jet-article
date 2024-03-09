@@ -1,3 +1,5 @@
+@file:Suppress("RedundantVisibilityModifier")
+
 package com.jet.article
 
 import android.content.Context
@@ -18,13 +20,14 @@ import kotlin.coroutines.CoroutineContext
  * @author Miroslav Hýbler <br>
  * created on 03.01.2024
  */
-object ArticleParser {
+public object ArticleParser {
+
 
     /**
      * Version of the parsing library
      * @since 1.0.0
      */
-    const val version: String = "1.0.0"
+    public const val version: String = "1.0.0"
 
 
     /**
@@ -34,18 +37,13 @@ object ArticleParser {
         .plus(context = CoroutineName(name = "JetHtmlArticleParse"))
 
 
-    suspend fun warmup(context: Context) {
-        val file = context.resources.assets.open("warm-up.html")
-        ParserNative.warmup(content = String(file.readBytes()))
-    }
-
-
     /**
-     * @param content
+     * Parses the [content] and creates [HtmlArticleData]
+     * @param content Html code
      * @param url Original url of the article
      * @since 1.0.0
      */
-    suspend fun parse(
+    public suspend fun parse(
         content: String,
         url: String,
     ): HtmlArticleData {

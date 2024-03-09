@@ -12,7 +12,8 @@
 
 
 /**
- * Defines the utils namespace. Containing usefull util functions for working with tags.
+ * Defines the utils namespace. Containing usefull util functions for working with html tags and strings
+ * in general.
  * @since 1.0.0
  */
 namespace utils {
@@ -172,7 +173,7 @@ namespace utils {
 
 
     /**
-     * Trims s from the left side, removing white chars from the text.
+     * Trims [s] from the left side, removing white chars from the text.
      * @param s String you want to trim. Will be modified.
      * @since 1.0.0
      */
@@ -180,7 +181,7 @@ namespace utils {
 
 
     /**
-     * Trims s from the right side, removing white chars from the text.
+     * Trims [s] from the right side, removing white chars from the text.
      * @param s String you want to trim. Will be modified.
      * @since 1.0.0
      */
@@ -188,18 +189,18 @@ namespace utils {
 
 
     /**
-     * Trims s from both side, removing white chars from the text.
+     * Trims [s] from both side, removing white chars from the text.
      * @param s String you want to trim. Will be modified.
      * @since 1.0.0
      */
-    inline void trim(std::string &s);
+    void trim(std::string &s);
 
 
     /**
-     *
-     * @param input
-     * @param separator
-     * @param outList
+     * Splits [input] string by [separator] character and stores output into [outList]
+     * @param input Input text to you want split
+     * @param separator Characted which will be used to separate [input]
+     * @param outList Output list where result will be stored
      * @since 1.0.0
      */
     void split(
@@ -226,7 +227,7 @@ namespace utils {
 
 
     /**
-     *
+     * Extracts single tag attribute by [attributeName] from [tagBody].
      * @param tagBody Tag body where to search for attribute
      * @param attributeName Name of the attribute you want to get
      * @return Found attribute value, or empty string when not found. Trimmed.
@@ -236,9 +237,9 @@ namespace utils {
 
 
     /**
-     *
-     * @param tagBody
-     * @param outList
+     * Extracts all classes from [tagBody] from "class" attribute. Results will be stored in [outList].
+     * @param tagBody Tag body where to search for classes.
+     * @param outList Output list where results will be stored.
      * @since 1.0.0
      */
     void extractClasses(
@@ -248,16 +249,16 @@ namespace utils {
 
 
     /**
-     *
-     * @return
+     * @return True when tag is considered being single tag based on it's body
+     * @param tagBody Body of the tag
      * @since 1.0.0
      */
     bool isTagSingleTag(std::string &tagBody);
 
 
     /**
-     *
-     * @return
+     * @return True when tag is considered being pair tag based on it's body
+     * @param tagBody Body of the tag
      * @since 1.0.0
      */
     bool isTagPairTag(std::string &tagBody);
