@@ -178,6 +178,8 @@ protected:
         if (utils::fastCompare(tag, "noscript")
             || utils::fastCompare(tag, "script")
             || utils::fastCompare(tag, "svg")
+            || utils::fastCompare(tag, "button")
+            || utils::fastCompare(tag, "input")
                 ) {
             index.moveIndex(tei + 1);
             //Skipping tags that can't be processed by library

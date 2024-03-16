@@ -55,17 +55,15 @@ std::string ContentParser::getTempContent() {
         return "";
     }
 
-    if (currentContentType != TEXT) {
-        return input.substr(tempContentIndexStart, n);
+    if (currentContentType == TEXT || currentContentType == TITLE) {
+        std::string tempInput = input.substr(tempContentIndexStart, n);
+        utils::trim(tempInput);
+        std::string output = "";
+        utils::clearUnsupportedTagsFromTextBlock(tempInput, output, 0, tempInput.length());
+        return output;
     }
 
-
-    std::string tempInput = input.substr(tempContentIndexStart, n);
-    utils::trim(tempInput);
-    std::string output = "";
-    utils::clearUnsupportedTagsFromTextBlock(tempInput, output, 0, tempInput.length());
-    return output;
-
+    return input.substr(tempContentIndexStart, n);
 }
 
 
@@ -338,11 +336,13 @@ const std::vector<std::vector<std::string_view>> &ContentParser::getTable() {
 }
 
 
-std::string_view ContentParser::getTempListItem(int i) {
+std::string ContentParser::getTempListItem(int i) {
     auto iterator = tempOutputVector.begin();
     std::advance(iterator, i);
-    //TODO clear unsupported tags from list items
-    return *iterator;
+    std::string_view input = std::string_view(*iterator);
+    std::string output = "";
+    utils::clearUnsupportedTagsFromTextBlock(input, output, 0, iterator->length());
+    return output;
 }
 
 

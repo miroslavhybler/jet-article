@@ -58,11 +58,11 @@ fun BenchmarksScreen(
                 modifier = Modifier.spacedCard()
             )
             HomeCard(
-                title = "Performance",
-                description = "Large file for performance test",
+                title = "Text unsupported",
+                description = "Clearing unsupported tags from text blocks",
                 onClick = {
                     navHostController.navigateToBenchmark(
-                        name = "performance-test",
+                        name = "text-unsupported",
                     )
                 },
                 modifier = Modifier.spacedCard()

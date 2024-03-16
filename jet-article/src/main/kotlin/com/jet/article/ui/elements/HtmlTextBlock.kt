@@ -2,6 +2,7 @@
 
 package com.jet.article.ui.elements
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -15,6 +16,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
@@ -97,7 +99,7 @@ fun HtmlTextBlock(
                     .toInt()
             )
         },
-        modifier = modifier
+        modifier = modifier.padding(top = 8.dp)
         //    .alpha(alpha = alpha.value),
 
     )

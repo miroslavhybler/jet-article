@@ -135,7 +135,7 @@ public:
      * @return
      * @since 1.0.0
      */
-    std::string_view getTempListItem(int i);
+    std::string getTempListItem(int i);
 
 
     /**
@@ -217,6 +217,7 @@ private:
      *
      * @param cause
      * @param message
+     * @since 1.0.0
      */
     void abortWithError(ErrorCode cause, std::string message = "");
 };

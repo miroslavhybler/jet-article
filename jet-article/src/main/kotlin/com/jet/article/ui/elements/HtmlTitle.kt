@@ -1,10 +1,12 @@
 package com.jet.article.ui.elements
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.jet.article.data.HtmlElement
 import com.jet.article.ui.LocalColorScheme
 
@@ -18,7 +20,6 @@ fun HtmlTitle(
     modifier: Modifier = Modifier,
     title: HtmlElement.Title
 ) {
-
     val typography = MaterialTheme.typography
     val colorScheme = LocalColorScheme.current
 
@@ -32,7 +33,12 @@ fun HtmlTitle(
     HtmlTextBlock(
         text = title.text,
         style = textStyle,
-        modifier = modifier
+        modifier = modifier.padding(
+            top = when (title.titleTag) {
+                "h1", "h2" -> 24.dp
+                else -> 16.dp
+            }
+        )
     )
 }
 

@@ -479,6 +479,74 @@ namespace utils {
     }
 
 
+    void clearUnsupportedTagsFromTextBlock(
+            std::string_view &input,
+            std::string &output,
+            int s,
+            int e
+    ) {
+        int i = s;
+        int outI = i;
+        output.clear();
+
+        while (i < e) {
+            char ch = input[i];
+            if (ch != '<') {
+                output = output + ch;
+                i += 1;
+                continue;
+            }
+
+            if (!utils::canProcessIncomingTag(input, input.length(), i, outI)) {
+                //Unable to process
+                if (i == outI) {
+                    i += 1;
+                } else {
+                    i = outI;
+                }
+                continue;
+            }
+
+            //TagType closing index, index of next '>'
+            int tei = utils::indexOfOrThrow(input, ">", i);
+            // -1 to remove '<' at the end
+            int tagBodyLength = tei - i - 1;
+            //tagbody within <>, i + 1 to remove '<'
+            std::string_view tagBody = input.substr(i + 1, tagBodyLength);
+            std::string rawTagName = utils::getTagName(tagBody);
+
+            if (rawTagName == "img") {
+                i = tei + 1;
+                continue;
+            }
+
+            if (unsupportedPairTagsForTextBlock.contains(rawTagName)) {
+                //Unsuported tag found, probably script, has to be skipped
+                try {
+                    std::string closingTag = "</" + rawTagName + ">";
+                    int ctsi = utils::indexOfOrThrow(input, closingTag, i);
+                    i = ctsi + closingTag.length();
+                } catch (ErrorCode e) {
+                    break;
+                }
+                //Continue the cycle, skipping at the next index after unsupported pair tag
+                continue;
+            } else {
+                try {
+                    std::string closingTag = "</" + rawTagName + ">";
+                    int ctsi = utils::indexOfOrThrow(input, closingTag, i);
+                    output += std::string(input, i, (ctsi + closingTag.length()) - i);
+                    i = ctsi + closingTag.length();
+                } catch (ErrorCode e) {
+                    i = tei + 1;
+                    continue;
+                }
+            }
+
+        }
+    }
+
+
     void getTagAttributes(
             const std::string &tagBody,
             std::map<std::string, std::string> &outMap

@@ -88,7 +88,8 @@ extern "C" JNIEXPORT jstring JNICALL
 Java_com_jet_article_ParserNative_getContent(
         JNIEnv *environment, jobject caller
 ) {
-    return environment->NewStringUTF(jni::contentParser->getTempContent().c_str());
+    std::string content = jni::contentParser->getTempContent();
+    return environment->NewStringUTF(content.c_str());
 }
 
 
@@ -154,8 +155,8 @@ extern "C" JNIEXPORT jstring JNICALL
 Java_com_jet_article_ParserNative_getContentListItem(
         JNIEnv *environment, jobject caller, jint index
 ) {
-    std::string_view item = jni::contentParser->getTempListItem(index);
-    return environment->NewStringUTF(std::string(item).c_str());
+    std::string item = jni::contentParser->getTempListItem(index);
+    return environment->NewStringUTF(item.c_str());
 }
 
 

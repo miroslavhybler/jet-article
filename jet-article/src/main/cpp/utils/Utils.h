@@ -143,8 +143,32 @@ namespace utils {
     );
 
 
+    /**
+     *
+     * @param input
+     * @param output
+     * @param s
+     * @param e
+     * @since 1.0.0
+     */
     void clearUnsupportedTagsFromTextBlock(
             std::string &input,
+            std::string &output,
+            int s,
+            int e
+    );
+
+
+    /**
+     *
+     * @param input
+     * @param output
+     * @param s
+     * @param e
+     * @since 1.0.0
+     */
+    void clearUnsupportedTagsFromTextBlock(
+            std::string_view &input,
             std::string &output,
             int s,
             int e

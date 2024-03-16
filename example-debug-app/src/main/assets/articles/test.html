@@ -7,15 +7,38 @@
 
 <!-- Use body of this document to whatever you need to solve -->
 
+<script>
 
+    function getCookie(c_name){
+    var i,x,y,ARRcookies=document.cookie.split(";");
+    for(i=0;i<ARRcookies.length;i++)
+        if(x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("=")),y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1),(x=x.replace(/^\s+|\s+$/g,""))==c_name)
+        return decodeURIComponent(y)}
 
+    darkmode_cookie = getCookie("darkmode");
+    if (sssp.displaySeznamAds()){
+        sssp.config({source: "hp_config", fallbackToGAM: false});
+    }else{
+        sssp.config({source: "media", fallbackToGAM: false});
+    }
+    if (darkmode_cookie == "true"){
+        sssp.getAds({
+            zoneId: 167736,
+            id: "cnt-167736",
+            width: 111,
+            height: 111
+        })
+    }
+    else{
+        sssp.getAds({
+            zoneId: 123097,
+            id: "cnt-123097",
+            width: 111,
+            height: 111
+        })
+    }
 
-<div class="wysiwyg-content" id="mainArticleContent">
-
-    <p>Když česká armáda hledala nové bojové vozidlo pěchoty, jedním z účastníků soutěže se stal i ASCOD. A ačkoliv budou čeští vojáci nakonec <a href="https://armadnizpravodaj.cz/pozemni-technika/acr-vysledna-podoba-cv90/">používat</a> konkurenční švédská CV90, <strong>neúspěch vozidla ASCOD rozhodně neznamená, že by bylo špatné</strong>. O výběru konkrétní zbraně totiž rozhoduje řada parametrů, a to nejenom její schopnosti. ASCOD nebo některý z jeho derivátů působí hned v několika západních armádách, případně do nich bude brzy zařazen.				<div class="regular-ad ">
-    <script id="wpify-ads-position-3693">window.WpifyAds=window.WpifyAds||[];window.WpifyAds.push({"id":3693,"width":"","height":"","type":"","switch_interval":"","ads":[{"id":240989,"devices":["non-mobile"],"seznam":{"zone_id":"323749","width":"480","height":"300","is_popup":false},"adsense":{"client":"","slot":"","width":"","height":"","format":[],"fullwidth":false},"html":{"content":""},"show_to":"from_seznam","show_on":"immediately","before":"\t\t<div class=regular-ad-note>\n\t\t\t\tReklama\n\t\t<\/div>\n\t\t","after":""},{"id":115012,"devices":["mobile"],"seznam":{"zone_id":"243419","width":"480","height":"480","is_seznam_referer":true,"is_popup":false},"adsense":{"client":"","slot":"","width":"","height":"","format":[],"fullwidth":false},"html":{"content":""},"show_to":"from_seznam","show_on":"immediately","before":"\t\t<div class=regular-ad-note>\n\t\t\t\tReklama\n\t\t<\/div>\n\t\t","after":""},{"id":115006,"devices":["mobile","non-mobile"],"seznam":{"zone_id":"","width":"","height":"","is_seznam_referer":false,"is_popup":false},"adsense":{"client":"ca-pub-7528899691063852","slot":"8563862097","width":"","height":"","format":[],"fullwidth":true},"html":{"content":""},"show_to":"not_from_seznam","show_on":"page_load","before":"\t\t<div class=regular-ad-note>\n\t\t\t\tReklama\n\t\t<\/div>\n\t\t","after":""}],"raw":false,"script_id":"wpify-ads-position-3693"});</script>
-</div>		</p>
-</div>
+</script>
 
 
 </body>

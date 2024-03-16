@@ -61,6 +61,8 @@ const std::set<std::string> unsupportedPairTags = {
         "noscript",
         "script",
         "svg",
+        "button",
+        "input"
 };
 
 
