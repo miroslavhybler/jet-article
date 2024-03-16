@@ -53,10 +53,10 @@ fun ArticlesScreen(
                 modifier = Modifier.spacedCard()
             )
             HomeCard(
-                title = "Temporary test",
-                description = "Temporary content for debbuging problematic html codes",
+                title = "TEST 2",
+                description = "Temporary opening problematic content",
                 onClick = {
-                    navHostController.navigateToArticle(name = "test")
+                    navHostController.navigateToArticle(name = "zing")
                 },
                 modifier = Modifier.spacedCard()
             )

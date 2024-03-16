@@ -187,6 +187,27 @@ namespace utils {
     }
 
 
+    const int findUnsupportedTagClosing(
+            const std::string_view &input,
+            const std::string &tag,
+            int s
+    ) {
+        std::string closingTag = "</" + tag + ">";
+
+        try {
+            int ctsi = utils::indexOfOrThrow(input, closingTag, s);
+            return ctsi;
+        } catch (ErrorCode e) {
+
+        }
+        utils::log("UTILS",
+                   "Unable to find closing for: " + tag
+                   + " at index: " + std::to_string(s)
+        );
+        throw NO_CLOSING_TAG_FOUND;
+    }
+
+
     const int findClosingTag(
             const std::string_view &input,
             const std::string &searchedTag,
@@ -238,7 +259,7 @@ namespace utils {
                 }
             } else {
 
-                if (unsupportedPairTagsForTextBlock.contains(rawTagName)) {
+                if (unsupportedPairTags.contains(rawTagName)) {
                     //Unsuported tag found, probably script, has to be skipped
                     try {
                         std::string closingTag = "</" + rawTagName + ">";
@@ -335,13 +356,27 @@ namespace utils {
                 }
             } else {
 
-                if (unsupportedPairTagsForTextBlock.contains(rawTagName)) {
+                if (unsupportedPairTags.contains(rawTagName)) {
                     //Unsuported tag found, probably script, has to be skipped
                     utils::log("UTILS", "Skipping search becasuse of " + rawTagName);
                     try {
+                        int ctsiAlt = utils::findUnsupportedTagClosing(
+                                input,
+                                rawTagName,
+                                tei
+                        );
                         std::string closingTag = "</" + rawTagName + ">";
                         int ctsi = utils::indexOfOrThrow(input, closingTag, i);
-                        i = ctsi + closingTag.length();
+                        i = ctsiAlt + closingTag.length();
+                        utils::log("UTILS",
+                                   "CTSI: " + std::to_string(ctsi)
+                                   + " CTSI2: " + std::to_string(ctsiAlt)
+                        );
+
+                        if (ctsiAlt != ctsi) {
+                            throw "CTSI alt != CTSI";
+                        }
+
                         utils::log("UTILS", "Skipping to index: " + std::to_string(i));
                     } catch (ErrorCode e) {
                         utils::log("UTILS", "Skipping failed");
@@ -362,83 +397,6 @@ namespace utils {
                             + " count: " + std::to_string(tempWorkingInt)
                             + " sub " + std::string(input.substr(i, 25))
                     );
-                }
-            }
-
-            i = tei + 1;
-        }
-
-        utils::log("UTILS",
-                   "Unable to find closing for: " + tag
-                   + " at index: " + std::to_string(s)
-        );
-        throw NO_CLOSING_TAG_FOUND;
-    }
-
-
-    const int findUnsupportedTagClosing(
-            const std::string_view &input,
-            const std::string &tag,
-            int s,
-            const int e = 0
-    ) {
-        int i = s;
-        int outI = i;
-        //Clearing tempStack before another use
-        tempWorkingInt = 0;
-        int end = e > 0 ? e : input.length();
-        while (i < end) {
-            char ch = input[i];
-            if (ch != '<') {
-                i += 1;
-                continue;
-            }
-
-            //char is '<'
-            if (!utils::canProcessIncomingTag(input, input.length(), i, outI)) {
-                //Unable to process
-                if (i == outI) {
-                    i += 1;
-                } else {
-                    i = outI;
-                }
-                continue;
-            }
-
-            //TagType closing index, index of next '>'
-            int tei = utils::indexOfOrThrow(input, ">", i);
-            // -1 to remove '<' at the end
-            int tagBodyLength = tei - i - 1;
-            //tagbody within <>, i + 1 to remove '<'
-            std::string_view tagBody = input.substr(i + 1, tagBodyLength);
-            std::string rawTagName = utils::getTagName(tagBody);
-
-            bool hasSlash = rawTagName.find('/', 0) == 0;
-            bool hasBackSlash = rawTagName.find('\\', 0) == 0;
-
-            bool isClosingTag = hasSlash || hasBackSlash;
-            if (isClosingTag) {
-                int pos = 0;
-                if (hasBackSlash) {
-                    pos = 2;
-                } else {
-                    pos = 1;
-                }
-
-                std::string tagName = rawTagName.substr(pos, rawTagName.length());
-                bool isSearched = utils::fastCompare(tagName, tag);
-                if (isSearched) {
-                    if (tempWorkingInt > 0) {
-                        //Stack is not empty, means that we found closing of inner same tag
-                        tempWorkingInt -= 1;
-                    } else {
-                        return i;
-                    }
-                }
-            } else {
-                if (utils::fastCompare(tag, rawTagName)) {
-                    //Push because inside tag is another one, like p in p -> <p><p>...</p></p>
-                    tempWorkingInt += 1;
                 }
             }
 

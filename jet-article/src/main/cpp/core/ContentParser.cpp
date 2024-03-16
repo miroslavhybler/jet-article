@@ -70,6 +70,11 @@ std::string ContentParser::getTempContent() {
 
 
 void ContentParser::doNextStep() {
+
+    currentTag = "";
+    currentTagBody = "";
+    currentTagId = "";
+
     if (!moveIndexToNextTag()) {
         //No tag to process
         invalidateHasNextStep();
@@ -336,6 +341,7 @@ const std::vector<std::vector<std::string_view>> &ContentParser::getTable() {
 std::string_view ContentParser::getTempListItem(int i) {
     auto iterator = tempOutputVector.begin();
     std::advance(iterator, i);
+    //TODO clear unsupported tags from list items
     return *iterator;
 }
 
@@ -364,7 +370,8 @@ void ContentParser::abortWithError(ErrorCode cause, std::string message) {
     errorMessage = "ABORTING PARSING WITH ERROR WITH CAUSE: " + std::to_string(cause) + "\n"
                    + index.toString() + "\n"
                    + "Message: " + message + "\n"
-                   + "body: " + currentTagBody;
+                   + "body: " + currentTagBody + "\n"
+                   + "subtring to find problematic area: " + input.substr(index.getIndex(), 50);
 
     utils::log("PARSER", errorMessage, ANDROID_LOG_ERROR);
 

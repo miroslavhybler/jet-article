@@ -139,10 +139,8 @@ namespace utils {
     const int findUnsupportedTagClosing(
             const std::string_view &input,
             const std::string &tag,
-            int s,
-            const int e = 0
+            int s
     );
-
 
 
     void clearUnsupportedTagsFromTextBlock(
