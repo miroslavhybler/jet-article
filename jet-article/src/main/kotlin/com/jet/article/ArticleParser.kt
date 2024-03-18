@@ -121,7 +121,7 @@ public object ArticleParser {
                     return
                 }
                 if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
-                    val base = articleUrl.toDomainName().removeSuffix(suffix = "/")
+                    val base = articleUrl.toDomainName()?.removeSuffix(suffix = "/")
                     val end = imageUrl.removePrefix(prefix = "/")
                     imageUrl = "www.$base/$end"
                 }

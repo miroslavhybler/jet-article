@@ -39,11 +39,11 @@ public fun String.toHtml(): Spanned {
 
 
 @Throws(URISyntaxException::class)
-public fun String.toDomainName(): String {
+public fun String.toDomainName(): String? {
     val uri = URI(this)
-    val domain = uri.host
-    return if (domain.startsWith(prefix = "www.")) {
-        domain.substring(startIndex = 4,)
+    val domain: String = uri.host ?: return null
+    return if (domain.startsWith(prefix = "www.") && domain.length > 4) {
+        substring(startIndex = 4, endIndex = domain.length)
     } else domain
 }
 

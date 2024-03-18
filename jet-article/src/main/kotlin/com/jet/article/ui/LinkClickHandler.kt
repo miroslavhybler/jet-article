@@ -42,12 +42,17 @@ public class LinkClickHandler internal constructor(
         data: HtmlArticleData,
         scrollOffset: Int
     ) {
-        val anotations = clickedText.getStringAnnotations(start = clickOffset, end = clickOffset)
+        val anotations = clickedText.getStringAnnotations(
+            start = clickOffset,
+            end = clickOffset
+        )
         anotations.firstOrNull()?.let { annotation ->
-            val link = getLink(rawLink = annotation.item, articleUrl = articleUrl)
+            val link = getLink(
+                rawLink = annotation.item,
+                articleUrl = articleUrl
+            )
             onLink(
                 link = link,
-                articleUrl = articleUrl,
                 data = data,
                 scrollOffset = scrollOffset
             )
@@ -55,7 +60,11 @@ public class LinkClickHandler internal constructor(
     }
 
 
-    private fun onLink(link: Link, articleUrl: String, data: HtmlArticleData, scrollOffset: Int) {
+    private fun onLink(
+        link: Link,
+        data: HtmlArticleData,
+        scrollOffset: Int
+    ) {
         when (link) {
             is Link.UriLink -> {
                 callback.onUriLink(link = link, context = context)
@@ -81,13 +90,16 @@ public class LinkClickHandler internal constructor(
     }
 
 
-    private fun getLink(rawLink: String, articleUrl: String): Link {
+    private fun getLink(
+        rawLink: String,
+        articleUrl: String
+    ): Link {
         if (rawLink.startsWith(prefix = "#")) {
-            return Link.SectionLink(rawLink = rawLink)
+            return Link.SectionLink(rawLink = rawLink, fullLink = rawLink)
         }
 
         if (rawLink.startsWith(prefix = "mailto:") || rawLink.startsWith(prefix = "tel:")) {
-            return Link.UriLink(rawLink = rawLink)
+            return Link.UriLink(rawLink = rawLink, fullLink = rawLink)
         }
 
         val mDomain = try {
@@ -101,11 +113,14 @@ public class LinkClickHandler internal constructor(
             null
         }
 
-        val fullLink = validateLink(rawLink = rawLink, articleUrl = articleUrl)
+        val fullLink = validateLink(
+            rawLink = rawLink,
+            articleUrl = articleUrl
+        )
 
         if (
-            (mDomain != null && rawLink.startsWith(prefix = mDomain))
-            || linkDomain == null
+            (mDomain != null && linkDomain != null)
+            && mDomain == linkDomain
         ) {
             //Must be link within same domain
             return Link.SameDomainLink(rawLink = rawLink, fullLink = fullLink)
@@ -119,7 +134,7 @@ public class LinkClickHandler internal constructor(
     private fun validateLink(rawLink: String, articleUrl: String): String {
         var fullLink = rawLink
         if (!rawLink.startsWith(prefix = "http://") && !rawLink.startsWith(prefix = "https://")) {
-            val base = articleUrl.toDomainName().removeSuffix(suffix = "/")
+            val base = articleUrl.toDomainName()?.removeSuffix(suffix = "/")
             val end = rawLink.removePrefix(prefix = "/")
             fullLink = "www.$base/$end"
         }
@@ -128,13 +143,11 @@ public class LinkClickHandler internal constructor(
     }
 
 
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
     /////
     /////   LinkCallback Class
     /////
     ////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 
     public open class LinkCallback public constructor() {
@@ -169,7 +182,6 @@ public class LinkClickHandler internal constructor(
     /////   DefaultLinkCallback Class
     /////
     ////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 
     /**
@@ -246,7 +258,6 @@ public class LinkClickHandler internal constructor(
 }
 
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////
 /////
 /////   Link Class
@@ -254,35 +265,46 @@ public class LinkClickHandler internal constructor(
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
 /**
  *
  * @since 1.0.0
  */
 public sealed class Link private constructor(
-    open val rawLink: String
+    open val rawLink: String,
+    open val fullLink: String,
 ) {
 
     data class UriLink internal constructor(
-        override val rawLink: String
-    ) : Link(rawLink = rawLink)
+        override val rawLink: String,
+        override val fullLink: String,
+    ) : Link(rawLink = rawLink, fullLink = fullLink)
 
 
     data class SameDomainLink internal constructor(
         override val rawLink: String,
-        val fullLink: String,
-    ) : Link(rawLink = rawLink)
+        override val fullLink: String,
+    ) : Link(
+        rawLink = rawLink,
+        fullLink = fullLink
+    )
 
 
     data class OtherDomainLink internal constructor(
         override val rawLink: String,
-        val fullLink: String,
-    ) : Link(rawLink = rawLink)
+        override val fullLink: String,
+    ) : Link(
+        rawLink = rawLink,
+        fullLink = fullLink
+    )
 
 
     data class SectionLink internal constructor(
         override val rawLink: String,
-    ) : Link(rawLink = rawLink)
+        override val fullLink: String,
+    ) : Link(
+        rawLink = rawLink,
+        fullLink = fullLink
+    )
 }
 
 
@@ -291,7 +313,6 @@ public sealed class Link private constructor(
 /////   Compose Functions
 /////
 ////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 
 @Composable

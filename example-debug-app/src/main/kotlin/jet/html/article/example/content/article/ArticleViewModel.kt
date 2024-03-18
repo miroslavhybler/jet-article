@@ -52,7 +52,7 @@ class ArticleViewModel @Inject constructor(
             }
             mArticleData.value = ArticleParser.parse(
                 content = getArticle(fileName = article),
-                url = "https://www.example.com"
+                url = getUrlForArticle(fileName = article)
             )
         }
     }
@@ -87,4 +87,11 @@ class ArticleViewModel @Inject constructor(
         return String(assets.open(articlePath).readBytes())
     }
 
+
+    private fun getUrlForArticle(fileName: String): String {
+        return when (fileName) {
+            "ascod" -> "https://armadnizpravodaj.cz/pozemni-technika/ascod-acr/"
+            else -> ""
+        }
+    }
 }
