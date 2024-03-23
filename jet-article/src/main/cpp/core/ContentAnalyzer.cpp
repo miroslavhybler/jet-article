@@ -190,7 +190,6 @@ int ContentAnalyzer::getCurrentAttributesSize() {
 }
 
 
-//TODO
 int ContentAnalyzer::getCurrentTagStartIndex() {
     return currentTagStartIndex;
 }

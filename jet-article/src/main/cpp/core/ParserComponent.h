@@ -180,6 +180,7 @@ protected:
             || utils::fastCompare(tag, "svg")
             || utils::fastCompare(tag, "button")
             || utils::fastCompare(tag, "input")
+            || utils::fastCompare(tag, "form")
                 ) {
             index.moveIndex(tei + 1);
             //Skipping tags that can't be processed by library
