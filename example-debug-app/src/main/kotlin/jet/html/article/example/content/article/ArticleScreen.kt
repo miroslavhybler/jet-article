@@ -49,7 +49,6 @@ fun ArticleScreen(
     LaunchedEffect(key1 = Unit, block = {
         viewModel.loadArticleFromResources(
             article = article,
-            excludeRules = ExcludeRule.globalRules
         )
     })
 

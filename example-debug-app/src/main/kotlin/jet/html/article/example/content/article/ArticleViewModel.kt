@@ -39,17 +39,14 @@ class ArticleViewModel @Inject constructor(
     var articlePath: String = ""
         private set
 
-    fun loadArticleFromResources(article: String, excludeRules: List<ExcludeRule>) {
+    fun loadArticleFromResources(
+        article: String,
+    ) {
         viewModelScope.launch {
+            //TODO why 2 rules breaks functionality
+            ProcessorNative.addRule(keyword = "header")
+            ProcessorNative.addRule(keyword = "menu")
 
-            excludeRules.forEach {
-                ProcessorNative.addRule(
-                    tag = it.tag,
-                    clazz = it.clazz,
-                    id = it.id,
-                    keyword = it.keyword
-                )
-            }
             mArticleData.value = ArticleParser.parse(
                 content = getArticle(fileName = article),
                 url = getUrlForArticle(fileName = article)

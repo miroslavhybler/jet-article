@@ -316,6 +316,8 @@ void ContentParser::parseTableTag(const int &ctsi) {
     }
 }
 
+//TODO novinky.cz - test file - skips few diws
+//TODO debug menu-accesibilty
 void ContentParser::tryMoveToClosing() {
     std::string closing = "</" + currentTag + ">";
     int ctsi = utils::indexOf(input, closing, index.getIndex());

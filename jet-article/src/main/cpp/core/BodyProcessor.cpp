@@ -109,7 +109,8 @@ bool BodyProcessor::isValidBasedOnRuleTagIncluded(
 
 
 bool BodyProcessor::isValidBasedOnRuleTagNotIncluded(
-        const std::string &tagBody, ExcludeRule &rule,
+        const std::string &tagBody,
+        ExcludeRule &rule,
         const bool &isUsingId,
         const bool &isUsingClazz,
         const bool &isUsingKeyword

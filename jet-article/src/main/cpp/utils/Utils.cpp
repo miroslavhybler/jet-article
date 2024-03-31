@@ -65,7 +65,8 @@ namespace utils {
         int i = 0;
         int l = input.length();
 
-        if (input.find(separator, 0) == -1) {
+        if (input.find(separator, 0) == std::string_view::npos) {
+
             //Unable to split,
             outList.push_back(input);
             return;
@@ -76,11 +77,16 @@ namespace utils {
             if (ch == separator) {
                 std::string_view sub = input.substr(s, i - s);
                 outList.push_back(sub);
-                s = i;
+                s = i + 1;
                 i += 2;
             } else {
                 i += 1;
             }
+        }
+
+        if (s != i && i - s > 0) {
+            std::string_view sub = input.substr(s, i - s);
+            outList.push_back(sub);
         }
     }
 
@@ -663,13 +669,23 @@ namespace utils {
             const std::string_view &tagBody,
             std::vector<std::string_view> &outList
     ) {
+        bool isSinglemark = false;
         std::string separator = "class=\"";
         int s = utils::indexOf(tagBody, separator, 0);
+        if (s == -1) {
+            separator = "class=\'";
+            isSinglemark = true;
+            s = utils::indexOf(tagBody, separator, 0);
+        }
+
+
         if (s == -1) {
             //Tag has no classes
             return;
         }
-        int e = utils::indexOfOrThrow(tagBody, "\"", s + separator.length());
+
+        std::string endCh = isSinglemark ? "\'" : "\"";
+        int e = utils::indexOfOrThrow(tagBody, endCh, s + separator.length());
         std::string_view classes = tagBody.substr(
                 s + separator.length(),
                 e - (s + separator.length())

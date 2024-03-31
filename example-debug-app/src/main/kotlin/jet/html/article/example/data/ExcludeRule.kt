@@ -13,10 +13,10 @@ import kotlinx.parcelize.Parcelize
  */
 @Parcelize
 public data class ExcludeRule public constructor(
-    val tag: String,
+    val tag: String = "",
     val clazz: String = "",
     val id: String = "",
-    val keyword:String = "",
+    val keyword: String = "",
 ) : Parcelable {
 
 

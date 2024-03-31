@@ -38,10 +38,10 @@ class BenchmarkViewModel @Inject constructor(
     var articlePath: String = ""
     private var article: String = ""
 
-    fun loadArticleFromResources(article: String, ignoreRules: List<ExcludeRule>) {
+    fun loadArticleFromResources(article: String,) {
         this.article = article
         viewModelScope.launch {
-            ignoreRules.forEach {
+            ExcludeRule.globalRules.forEach {
                 ProcessorNative.addRule(
                     tag = it.tag,
                     clazz = it.clazz,

@@ -134,11 +134,11 @@ protected:
         while (ch != '<' && index.getIndex() < length) {
             //continuing next, no valid content to parse
             index.moveIndex(index.getIndex() + 1);
-            invalidateHasNextStep();
-            if (!mHasNextStep) {
-                return false;
-            }
             ch = input[index.getIndex()];
+        }
+        invalidateHasNextStep();
+        if (!mHasNextStep) {
+            return false;
         }
 
         //char is <

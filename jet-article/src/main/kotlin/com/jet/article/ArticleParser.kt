@@ -173,15 +173,17 @@ public object ArticleParser {
             }
 
             HtmlContentType.LIST -> {
+                val isOrdered = ParserNative.getCurrentTag() == "ol"
+                val itemsList = ArrayList<String>().apply {
+                    val listSize = ParserNative.getContentListSize()
+                    for (i in 0 until listSize) {
+                        add(ParserNative.getContentListItem(index = i))
+                    }
+                }
                 elements.add(
                     element = HtmlElement.BasicList(
-                        isOrdered = ParserNative.getCurrentTag() == "ol",
-                        items = ArrayList<String>().apply {
-                            val listSize = ParserNative.getContentListSize()
-                            for (i in 0 until listSize) {
-                                add(ParserNative.getContentListItem(index = i))
-                            }
-                        },
+                        isOrdered = isOrdered,
+                        items = itemsList,
                         id = ParserNative.getCurrentTagId()
                     )
                 )

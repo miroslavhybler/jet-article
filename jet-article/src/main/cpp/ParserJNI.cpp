@@ -63,7 +63,7 @@ Java_com_jet_article_ParserNative_doNextStep(
 
     std::string currentTag = jni::contentParser->currentTag;
 
-    if (jni::contentParser->hasBodyContext()) {
+    if (jni::contentParser->hasBodyContext() && !currentTag.empty()) {
         jni::isContentForVisualAvailable = jni::processor->isTagValidForNextProcessing(
                 currentTag,
                 jni::contentParser->currentTagBody

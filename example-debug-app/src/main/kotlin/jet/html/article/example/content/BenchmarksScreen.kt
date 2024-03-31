@@ -51,7 +51,19 @@ fun BenchmarksScreen(
                         name = "ignore-test",
                         excludeRules = listOf(
                             ExcludeRule(tag = "div", clazz = "menu"),
-                            ExcludeRule(tag = "div", clazz = "resources")
+                            ExcludeRule(tag = "div", clazz = "resources"),
+                            ExcludeRule(keyword = "header"),
+                            ExcludeRule(keyword = "footer"),
+                            ExcludeRule(keyword = "menu"),
+                            ExcludeRule(keyword = "lang"),
+                            ExcludeRule(keyword = "date"),
+                            ExcludeRule(keyword = "weather"),
+                            ExcludeRule(keyword = "search"),
+                            ExcludeRule(keyword = "bar"),
+                            ExcludeRule(keyword = "resources"),
+                            ExcludeRule(keyword = "social"),
+                            ExcludeRule(keyword = "weather"),
+                            ExcludeRule(keyword = "tags")
                         )
                     )
                 },
