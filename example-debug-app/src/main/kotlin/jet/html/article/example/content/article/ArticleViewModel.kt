@@ -43,9 +43,14 @@ class ArticleViewModel @Inject constructor(
         article: String,
     ) {
         viewModelScope.launch {
-            //TODO why 2 rules breaks functionality
-            ProcessorNative.addRule(keyword = "header")
-            ProcessorNative.addRule(keyword = "menu")
+            ExcludeRule.globalRules.forEach { excludeRule ->
+                ProcessorNative.addRule(
+                    keyword = excludeRule.keyword,
+                    tag = excludeRule.tag,
+                    id = excludeRule.id,
+                    clazz = excludeRule.clazz
+                )
+            }
 
             mArticleData.value = ArticleParser.parse(
                 content = getArticle(fileName = article),

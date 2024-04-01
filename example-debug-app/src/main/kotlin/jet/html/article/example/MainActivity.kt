@@ -214,6 +214,7 @@ fun NavHostController.navigateToArticle(
     name: String,
     excludeRules: List<ExcludeRule> = emptyList()
 ) {
+    ExcludeRule.globalRules = excludeRules
     navigate(route = articleRoute(name = name, excludeRules = excludeRules))
 }
 
@@ -221,5 +222,6 @@ fun NavHostController.navigateToBenchmark(
     name: String,
     excludeRules: List<ExcludeRule> = emptyList()
 ) {
+    ExcludeRule.globalRules = excludeRules
     navigate(route = benchmarkRoute(name = name, excludeRules = excludeRules))
 }

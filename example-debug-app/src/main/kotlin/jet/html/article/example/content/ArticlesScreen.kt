@@ -48,7 +48,12 @@ fun ArticlesScreen(
                 title = "Temporary test",
                 description = "Temporary content for debbuging problematic html codes",
                 onClick = {
-                    navHostController.navigateToArticle(name = "test")
+                    navHostController.navigateToArticle(
+                        name = "test",
+                        excludeRules = listOf(
+                            ExcludeRule(keyword = "menu"),
+                            )
+                    )
                 },
                 modifier = Modifier.spacedCard()
             )

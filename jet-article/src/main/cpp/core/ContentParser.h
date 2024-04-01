@@ -167,7 +167,7 @@ public:
     /**
      * @since 1.0.0
      */
-    void tryMoveToClosing();
+    void tryMoveToContainerClosing();
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

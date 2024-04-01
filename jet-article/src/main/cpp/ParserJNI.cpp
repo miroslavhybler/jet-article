@@ -70,7 +70,8 @@ Java_com_jet_article_ParserNative_doNextStep(
         );
 
         if (!jni::isContentForVisualAvailable) {
-            jni::contentParser->tryMoveToClosing();
+            //When content was filtered by processor, move index after the skipped content
+            jni::contentParser->tryMoveToContainerClosing();
         }
     }
 }

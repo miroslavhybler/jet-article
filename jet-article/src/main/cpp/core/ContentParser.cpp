@@ -316,9 +316,18 @@ void ContentParser::parseTableTag(const int &ctsi) {
     }
 }
 
-//TODO novinky.cz - test file - skips few diws
-//TODO debug menu-accesibilty
-void ContentParser::tryMoveToClosing() {
+
+void ContentParser::tryMoveToContainerClosing() {
+
+    if (currentContentType == TEXT
+        || currentContentType == TITLE
+        || currentContentType == QUOTE
+        || currentContentType == ADDRESS) {
+        //For not-container content there is no need to search for closing because index is already
+        //at it. E.g. div can contains divs but p should not contain other p.
+        return;
+    }
+
     std::string closing = "</" + currentTag + ">";
     int ctsi = utils::indexOf(input, closing, index.getIndex());
     if (ctsi == -1) {
