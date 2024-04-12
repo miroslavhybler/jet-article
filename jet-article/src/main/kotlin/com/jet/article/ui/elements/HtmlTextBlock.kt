@@ -26,9 +26,8 @@ import com.jet.article.ui.LocalColorScheme
 import com.jet.article.ui.LocalContentPadding
 import com.jet.article.ui.LocalHtmlArticleData
 import com.jet.article.ui.LocalLinkHandler
-import mir.oslav.jet.utils.dpToPx
-import mir.oslav.jet.utils.screenHeightPx
-
+import com.jet.utils.dpToPx
+import com.jet.utils.screenHeightPx
 
 /**
  * @author Miroslav Hýbler <br>

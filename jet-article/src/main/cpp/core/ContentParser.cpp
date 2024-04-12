@@ -319,6 +319,7 @@ void ContentParser::parseTableTag(const int &ctsi) {
 
 void ContentParser::tryMoveToContainerClosing() {
 
+    //TODO maybe use direct tag check
     if (currentContentType == TEXT
         || currentContentType == TITLE
         || currentContentType == QUOTE
