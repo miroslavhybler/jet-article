@@ -209,7 +209,6 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
         //Html artycles has too much html syntax errors like unclosed pair tags or others,
         //so library should keep parsing
         //Just keep parsing, just keep parsing
-        index.moveIndex(tei + 1);
         return;
     }
 
@@ -317,7 +316,7 @@ void ContentParser::parseTableTag(const int &ctsi) {
 }
 
 
-void ContentParser::tryMoveToContainerClosing() {
+bool ContentParser::tryMoveToContainerClosing() {
 
     //TODO maybe use direct tag check
     if (currentContentType == TEXT
@@ -326,15 +325,16 @@ void ContentParser::tryMoveToContainerClosing() {
         || currentContentType == ADDRESS) {
         //For not-container content there is no need to search for closing because index is already
         //at it. E.g. div can contains divs but p should not contain other p.
-        return;
+        return false;
     }
 
     std::string closing = "</" + currentTag + ">";
     int ctsi = utils::indexOf(input, closing, index.getIndex());
     if (ctsi == -1) {
-        return;
+        return false;
     }
     index.moveIndex(ctsi + closing.length() + 1);
+    return true;
 }
 
 

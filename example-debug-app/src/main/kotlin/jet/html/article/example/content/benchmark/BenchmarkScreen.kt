@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -26,6 +27,7 @@ import jet.html.article.example.composables.DebugBottomBar
 import jet.html.article.example.composables.Results
 import jet.html.article.example.data.ExcludeRule
 import jet.html.article.example.composables.SimpleTopaBar
+import jet.html.article.example.findsubstring.FindSubstringActivity
 
 
 /**
@@ -38,7 +40,7 @@ fun BenchmarkScreen(
     viewModel: BenchmarkViewModel,
     navHostController: NavHostController,
 ) {
-
+    val context = LocalContext.current
     val data by viewModel.articleData.collectAsState()
     val testResults by viewModel.testResults.collectAsState()
 
@@ -95,6 +97,12 @@ fun BenchmarkScreen(
                 onTest = viewModel::runTest,
                 onAnalyzer = {
                     navHostController.navigate(route = "analyzer?articlePath=${viewModel.articlePath}")
+                },
+                onSearchByIndex = {
+                    FindSubstringActivity.launch(
+                        context = context,
+                        fileName = viewModel.articlePath
+                    )
                 }
             )
         }

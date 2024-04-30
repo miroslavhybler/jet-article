@@ -71,7 +71,12 @@ Java_com_jet_article_ParserNative_doNextStep(
 
         if (!jni::isContentForVisualAvailable) {
             //When content was filtered by processor, move index after the skipped content
-            jni::contentParser->tryMoveToContainerClosing();
+
+            utils::log("JNI", "i before: " + std::to_string(jni::contentParser->getCurrentIndex()));
+            bool wasMoved = jni::contentParser->tryMoveToContainerClosing();
+            utils::log("JNI", "trying move to closing == " + std::to_string(wasMoved));
+            utils::log("JNI", "i after: " + std::to_string(jni::contentParser->getCurrentIndex()));
+
         }
     }
 }

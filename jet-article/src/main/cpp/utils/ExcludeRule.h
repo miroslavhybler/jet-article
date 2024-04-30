@@ -46,6 +46,7 @@ public:
 
     const std::string_view getKeyword();
 
+    const std::string toString();
 };
 
 

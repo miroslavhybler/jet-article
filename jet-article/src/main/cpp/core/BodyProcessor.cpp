@@ -24,6 +24,11 @@ bool BodyProcessor::isTagValidForNextProcessing(
     for (ExcludeRule rule: rules) {
         bool isValid = isValidBasedOnRule(tag, tagBody, rule);
         if (!isValid) {
+
+            utils::log("PROCESSOR",
+                       "Tag: " + tagBody + " kicked out because of rule: " + rule.toString()
+                       );
+
             return false;
         }
     }

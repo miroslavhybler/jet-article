@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.jet.article.data.HtmlArticleData
@@ -30,6 +31,7 @@ import jet.html.article.example.composables.DebugBottomBar
 import jet.html.article.example.composables.Results
 import jet.html.article.example.composables.SimpleTopaBar
 import jet.html.article.example.data.ExcludeRule
+import jet.html.article.example.findsubstring.FindSubstringActivity
 
 @Composable
 fun ArticleScreen(
@@ -37,6 +39,7 @@ fun ArticleScreen(
     viewModel: ArticleViewModel,
     navHostController: NavHostController,
 ) {
+    val context = LocalContext.current
 
     val data: HtmlArticleData by viewModel.articleData.collectAsState()
 
@@ -96,6 +99,12 @@ fun ArticleScreen(
                 onAnalyzer = {
                     navHostController.navigate(route = "analyzer?articlePath=${viewModel.articlePath}")
                 },
+                onSearchByIndex = {
+                    FindSubstringActivity.launch(
+                        context = context,
+                        fileName = viewModel.articlePath
+                    )
+                }
             )
         }
     )

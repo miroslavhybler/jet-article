@@ -67,17 +67,17 @@ dependencies {
     api("com.github.miroslavhybler:jet-lint:1.0.2")
     implementation("com.github.miroslavhybler:jet-utils:1.1.1")
 
-    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.core:core-ktx:1.13.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.startup:startup-runtime:1.1.1")
 
     /** Compose */
-    val composeVersion = "1.6.5"
+    val composeVersion = "1.6.6"
     implementation("androidx.compose.ui:ui:$composeVersion")
     debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
     implementation("androidx.compose.animation:animation-graphics:$composeVersion")
-    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("androidx.activity:activity-compose:1.9.0")
 
     val material3Version = "1.2.1"
     implementation("androidx.compose.material3:material3:$material3Version")

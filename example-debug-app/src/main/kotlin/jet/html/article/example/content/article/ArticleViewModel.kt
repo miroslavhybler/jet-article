@@ -51,6 +51,58 @@ class ArticleViewModel @Inject constructor(
                     clazz = excludeRule.clazz
                 )
             }
+            listOf(
+                "header",
+                "footer",
+                "lang",
+                "menu",
+                "dropdown",
+                "comment",
+                "sidebar",
+                "social",
+                "form",
+                "navigation",
+                "call_to_action",
+                "after",
+                "before",
+                "rating",
+                "tags",
+                "share",
+                "meta",
+                "thumb",
+                "likes",
+                "dislikes",
+                "controls",
+                "target",
+                "related",
+                "best",
+                "popular",
+                "filter",
+                "search",
+                "searchbox",
+                "edit",
+                "references",
+                "sticky",
+                "posts",
+                "submit",
+                "follow",
+                "accessibility",
+                "reading",
+                "category",
+                "more",
+                "send",
+                "modal",
+                "hidden",
+                "articles",
+                "tabs",
+                "links",
+                "clipboard",
+            ).forEach {
+                ProcessorNative.addRule(keyword = it)
+            }
+
+          //  ProcessorNative.addRule(tag = "header")
+            ProcessorNative.addRule(keyword = "header")
 
             mArticleData.value = ArticleParser.parse(
                 content = getArticle(fileName = article),

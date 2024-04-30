@@ -22,11 +22,12 @@ ExcludeRule::ExcludeRule(std::string_view tag, std::string_view clazz, std::stri
     this->mId = id;
 }
 
-ExcludeRule::ExcludeRule(std::string_view tag, std::string_view clazz, std::string_view id, std::string_view keyword) {
+ExcludeRule::ExcludeRule(std::string_view tag, std::string_view clazz, std::string_view id,
+                         std::string_view keyword) {
     this->mTag = tag;
     this->mClazz = clazz;
     this->mId = id;
-    this ->mKeyword = keyword;
+    this->mKeyword = keyword;
 }
 
 
@@ -51,4 +52,14 @@ const std::string_view ExcludeRule::getId() {
 
 const std::string_view ExcludeRule::getKeyword() {
     return mKeyword;
+}
+
+const std::string ExcludeRule::toString() {
+    std::string message = "ExcludeRule(";
+    message += "tag=" + std::string(mTag);
+    message += ", clazz=" + std::string(mClazz);
+    message += ", id=" + std::string(mId);
+    message += ", keyword=" + std::string(mKeyword);
+    message += ")";
+    return message;
 }

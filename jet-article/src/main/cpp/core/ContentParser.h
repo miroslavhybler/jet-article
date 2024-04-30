@@ -167,7 +167,16 @@ public:
     /**
      * @since 1.0.0
      */
-    void tryMoveToContainerClosing();
+    bool tryMoveToContainerClosing();
+
+
+    /**
+     *
+     * @return
+     */
+    int getCurrentIndex() {
+        return index.getIndex();
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
