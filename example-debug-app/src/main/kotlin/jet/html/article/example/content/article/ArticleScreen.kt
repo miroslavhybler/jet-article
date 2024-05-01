@@ -2,7 +2,6 @@
 
 package jet.html.article.example.content.article
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
@@ -30,8 +29,7 @@ import com.jet.article.ui.JetHtmlArticle
 import jet.html.article.example.composables.DebugBottomBar
 import jet.html.article.example.composables.Results
 import jet.html.article.example.composables.SimpleTopaBar
-import jet.html.article.example.data.ExcludeRule
-import jet.html.article.example.findsubstring.FindSubstringActivity
+import jet.html.article.example.highlightstring.HighlightStringActivity
 
 @Composable
 fun ArticleScreen(
@@ -100,7 +98,7 @@ fun ArticleScreen(
                     navHostController.navigate(route = "analyzer?articlePath=${viewModel.articlePath}")
                 },
                 onSearchByIndex = {
-                    FindSubstringActivity.launch(
+                    HighlightStringActivity.launch(
                         context = context,
                         fileName = viewModel.articlePath
                     )

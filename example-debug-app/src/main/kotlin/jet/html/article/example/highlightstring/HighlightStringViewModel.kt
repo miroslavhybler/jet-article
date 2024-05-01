@@ -1,11 +1,9 @@
-package jet.html.article.example.findsubstring
+package jet.html.article.example.highlightstring
 
 import android.content.Context
 import android.content.res.AssetManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jet.article.ArticleParser
-import com.jet.article.data.HtmlArticleData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +17,7 @@ import javax.inject.Inject
  * created on 30.04.2024
  */
 @HiltViewModel
-class FindSubstringViewModel @Inject constructor(
+class HighlightStringViewModel @Inject constructor(
     @ApplicationContext context: Context,
 ) : ViewModel() {
 
