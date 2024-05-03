@@ -148,7 +148,7 @@ void ContentParser::parseHeadData(int e) {
         //tagbody within <>, i + 1 to remove '<'
         std::string tagBody = input.substr(index.getIndex() + 1, tagBodyLength);
         std::string tag = utils::getTagName(tagBody);
-        index.moveIndex(index.getIndex() + tag.length() + 1);
+        index.moveIndex(tei + 1);
 
         if (utils::fastCompare(tag, "title")) {
             try {
@@ -172,6 +172,7 @@ void ContentParser::parseHeadData(int e) {
 }
 
 
+//TODO copyright? what do do with copyright
 void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
     if (tag.find('/', 0) == 0) {
         //Skipping closing tag
@@ -194,7 +195,8 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
     //At this point index is pointing at the sequence starting with '<' which is ready to be
     //processed as tag
     if (utils::fastCompare(tag, "img")) {
-        parseImageTag(tei + 1);
+        parseImageTag(tei);
+        index.moveIndex(tei + 1);
         return;
     }
 
@@ -263,18 +265,26 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
     currentTag = tag;
     if (hasContentToProcess) {
         //Moves  at next char after closing of pair tag
-        int next;
-        try {
-            next = utils::indexOfOrThrow(input, ">", ctsi);
-        } catch (ErrorCode e) {
-            abortWithError(e);
-            return;
-        }
-        index.moveIndex(next + 1);
+//        int next;
+//        try {
+//            std::string  closingTag = "/" + tag + ">";
+//            next = utils::indexOfOrThrow(input, ">", ctsi);
+//            //TODO check
+//
+//            char ch = input[next];
+//            if (ch != '>') {
+//                throw "Hello";
+//            }
+//
+//        } catch (ErrorCode e) {
+//            abortWithError(e);
+//            return;
+//        }
+        index.moveIndex(ctsi );
     } else {
         //Moves at next char after open tag
         //This ussualy means that we are inside container like "div" and need to go deeper for the content
-        index.moveIndex(tei + 1);
+        index.moveIndex(tei );
     }
 }
 
@@ -291,7 +301,6 @@ void ContentParser::parseImageTag(const int &tei) {
     int n = tempContentIndexEnd - tempContentIndexStart;
     std::string tagBody = input.substr(tempContentIndexStart, n);
     utils::getTagAttributes(tagBody, tempOutputMap);
-    index.moveIndex(tei + 1);
     invalidateHasNextStep();
 }
 
@@ -329,11 +338,11 @@ bool ContentParser::tryMoveToContainerClosing() {
     }
 
     std::string closing = "</" + currentTag + ">";
-    int ctsi = utils::indexOf(input, closing, index.getIndex());
+    int ctsi = utils::findClosingTag(input, currentTag, index.getIndex());
     if (ctsi == -1) {
         return false;
     }
-    index.moveIndex(ctsi + closing.length() + 1);
+    index.moveIndex(ctsi + closing.length());
     return true;
 }
 

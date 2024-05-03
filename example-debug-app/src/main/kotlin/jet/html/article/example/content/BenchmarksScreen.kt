@@ -63,7 +63,8 @@ fun BenchmarksScreen(
                             ExcludeRule(keyword = "resources"),
                             ExcludeRule(keyword = "social"),
                             ExcludeRule(keyword = "weather"),
-                            ExcludeRule(keyword = "tags")
+                            ExcludeRule(keyword = "tags"),
+                            ExcludeRule(keyword = "megamenu")
                         )
                     )
                 },

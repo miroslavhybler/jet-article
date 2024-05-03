@@ -19,6 +19,7 @@ bool BodyProcessor::isTagValidForNextProcessing(
         return true;
     }
 
+    tempClasses.clear();
     std::vector<ExcludeRule>::iterator iterator = rules.begin();
 
     for (ExcludeRule rule: rules) {
