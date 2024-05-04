@@ -35,8 +35,8 @@ fun HtmlTitle(
         style = textStyle,
         modifier = modifier.padding(
             top = when (title.titleTag) {
-                "h1", "h2" -> 24.dp
-                else -> 16.dp
+                "h1", "h2" -> 32.dp
+                else -> 24.dp
             }
         )
     )

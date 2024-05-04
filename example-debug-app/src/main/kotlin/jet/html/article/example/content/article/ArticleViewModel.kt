@@ -52,9 +52,6 @@ class ArticleViewModel @Inject constructor(
                 )
             }
 
-          //  ProcessorNative.addRule(tag = "header")
-            ProcessorNative.addRule(keyword = "header")
-
             mArticleData.value = ArticleParser.parse(
                 content = getArticle(fileName = article),
                 url = getUrlForArticle(fileName = article)

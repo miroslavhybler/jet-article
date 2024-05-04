@@ -133,6 +133,7 @@ public fun JetHtmlArticleContent(
         LocalColorScheme provides colors
     ) {
         Scaffold(
+            modifier = Modifier.fillMaxSize(),
             content = {
                 SelectionContainer {
                     LazyColumn(
