@@ -65,14 +65,14 @@ android {
 dependencies {
 
     api("com.github.miroslavhybler:jet-lint:1.0.2")
-    implementation("com.github.miroslavhybler:jet-utils:1.1.1")
+    implementation("com.github.miroslavhybler:jet-utils:1.1.2")
 
-    implementation("androidx.core:core-ktx:1.13.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
     implementation("androidx.startup:startup-runtime:1.1.1")
 
     /** Compose */
-    val composeVersion = "1.6.6"
+    val composeVersion = "1.6.7"
     implementation("androidx.compose.ui:ui:$composeVersion")
     debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
@@ -89,7 +89,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.0")
 
     implementation("io.coil-kt:coil-compose:2.4.0")
-    implementation("com.google.android.material:material:1.11.0")
+    implementation("com.google.android.material:material:1.12.0")
     implementation("net.danlew:android.joda:2.12.5")
 
     testImplementation("junit:junit:4.13.2")
