@@ -45,6 +45,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    kotlin {
+        jvmToolchain(jdkVersion = 8)
+    }
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -52,7 +55,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
     publishing {
         multipleVariants {
@@ -85,10 +88,10 @@ dependencies {
 
 
     /** Accompanist & Experimental */
-    implementation("com.google.accompanist:accompanist-permissions:0.29.1-alpha")
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.0")
 
-    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("net.danlew:android.joda:2.12.5")
 

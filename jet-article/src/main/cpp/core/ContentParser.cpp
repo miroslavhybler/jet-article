@@ -195,6 +195,7 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
     //At this point index is pointing at the sequence starting with '<' which is ready to be
     //processed as tag
     if (utils::fastCompare(tag, "img")) {
+        currentTag = tag;
         parseImageTag(tei);
         index.moveIndex(tei + 1);
         return;
@@ -280,11 +281,11 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
 //            abortWithError(e);
 //            return;
 //        }
-        index.moveIndex(ctsi );
+        index.moveIndex(ctsi);
     } else {
         //Moves at next char after open tag
         //This ussualy means that we are inside container like "div" and need to go deeper for the content
-        index.moveIndex(tei );
+        index.moveIndex(tei);
     }
 }
 
@@ -310,10 +311,8 @@ void ContentParser::parseTableTag(const int &ctsi) {
     utils::groupPairTagContents(
             input, "tr", index.getIndex(), ctsi, tempOutputVector
     );
-    for (int i = 0; i < tempOutputVector.size(); i++) {
+    for (auto row : tempOutputVector) {
         std::vector<std::string_view> columns;
-        std::string_view row = tempOutputVector[i];
-
         if (!wasHeaderRowParsed) {
             utils::groupPairTagContents(row, "th", 0, row.length(), columns);
             wasHeaderRowParsed = true;
@@ -331,7 +330,8 @@ bool ContentParser::tryMoveToContainerClosing() {
     if (currentContentType == TEXT
         || currentContentType == TITLE
         || currentContentType == QUOTE
-        || currentContentType == ADDRESS) {
+        || currentContentType == ADDRESS
+        || currentContentType == IMAGE) {
         //For not-container content there is no need to search for closing because index is already
         //at it. E.g. div can contains divs but p should not contain other p.
         return false;

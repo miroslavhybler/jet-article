@@ -44,14 +44,14 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlin {
-        jvmToolchain(jdkVersion = 11)
+        jvmToolchain(jdkVersion = 8)
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "1.8"
         freeCompilerArgs += listOf(
             //Suppressing Jet Warnings
             "-Xopt-in=mir.oslav.jet.annotations.JetExperimental",
@@ -72,7 +72,7 @@ android {
         buildConfig = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
     packaging {
         resources {

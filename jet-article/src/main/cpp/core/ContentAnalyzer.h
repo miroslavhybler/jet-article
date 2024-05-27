@@ -67,14 +67,14 @@ public:
     int getCurrentAttributesSize();
 
 
-    int getCurrentTagStartIndex();
+    int getCurrentTagStartIndex() const;
 
-    int getCurrentTagEndIndex();
+    int getCurrentTagEndIndex() const;
 
     std::string getCurrentPairTagContent();
 
 
-    bool hasPairTagContent();
+    bool hasPairTagContent() const;
 
     void clearAllResources();
 

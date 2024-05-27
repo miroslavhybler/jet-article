@@ -38,9 +38,10 @@ fun HtmlImage(
     data: HtmlElement.Image,
     showErrorPlaceholder: Boolean = false,
 ) {
+    val context = LocalContext.current
 
     val painter = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(context = LocalContext.current)
+        model = ImageRequest.Builder(context = context)
             .data(data = data.url)
             .size(size = Size.ORIGINAL)
             .build()

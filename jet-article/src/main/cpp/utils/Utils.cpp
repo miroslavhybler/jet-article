@@ -193,7 +193,7 @@ namespace utils {
     }
 
 
-    const int findUnsupportedTagClosing(
+    int findUnsupportedTagClosing(
             const std::string_view &input,
             const std::string &tag,
             int s
@@ -207,14 +207,14 @@ namespace utils {
 
         }
         utils::log("UTILS",
-                   "Unable to find closing for: " + tag
+                   "Unable to find closing for unsupported: " + tag
                    + " at index: " + std::to_string(s)
         );
         throw NO_CLOSING_TAG_FOUND;
     }
 
 
-    const int findClosingTag(
+    int findClosingTag(
             const std::string_view &input,
             const std::string &searchedTag,
             int s,

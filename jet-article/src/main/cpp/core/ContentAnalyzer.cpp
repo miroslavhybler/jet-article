@@ -190,15 +190,15 @@ int ContentAnalyzer::getCurrentAttributesSize() {
 }
 
 
-int ContentAnalyzer::getCurrentTagStartIndex() {
+int ContentAnalyzer::getCurrentTagStartIndex() const {
     return currentTagStartIndex;
 }
 
-int ContentAnalyzer::getCurrentTagEndIndex() {
+int ContentAnalyzer::getCurrentTagEndIndex() const {
     return currentTagEndIndex;
 }
 
-bool ContentAnalyzer::hasPairTagContent() {
+bool ContentAnalyzer::hasPairTagContent() const {
     return !currentPairTagContent.empty();
 }
 

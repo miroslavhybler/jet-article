@@ -129,10 +129,12 @@ public object ArticleParser {
                 val w = ParserNative.getContentMapItem(attributeName = "width").toIntOrNull()
                 val h = ParserNative.getContentMapItem(attributeName = "height").toIntOrNull()
                 val alt = ParserNative.getContentMapItem(attributeName = "alt")
+
                 val size = if (w != null && h != null)
                     IntSize(width = w, height = h)
                 else
                     IntSize.Zero
+
                 elements.add(
                     element = HtmlElement.Image(
                         url = imageUrl,
