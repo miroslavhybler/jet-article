@@ -19,6 +19,10 @@ ContentParser::~ContentParser() {
 
 }
 
+void ContentParser::setAreImagesEnabled(bool enabled) {
+    this->areImagesEnabled = enabled;
+}
+
 
 void ContentParser::setInput(std::string content) {
     clearAllResources();
@@ -291,6 +295,11 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
 
 
 void ContentParser::parseImageTag(const int &tei) {
+
+    if (!areImagesEnabled) {
+        return;
+    }
+
     currentContentType = IMAGE;
     hasContentToProcess = true;
     tempContentIndexStart = index.getIndex();

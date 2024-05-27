@@ -29,6 +29,17 @@ namespace jni {
 }
 
 extern "C" JNIEXPORT void JNICALL
+Java_com_jet_article_ParserNative_initialize(
+        JNIEnv *environment,
+        jobject caller,
+        jboolean areImagesEnabled
+) {
+    jboolean isCopy;
+    jni::contentParser->setAreImagesEnabled(areImagesEnabled);
+}
+
+
+extern "C" JNIEXPORT void JNICALL
 Java_com_jet_article_ParserNative_setInput(
         JNIEnv *environment,
         jobject caller,

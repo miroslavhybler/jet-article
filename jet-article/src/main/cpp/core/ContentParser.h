@@ -30,6 +30,7 @@ private:
     bool wasHeadParsed;
     int tempContentIndexStart = -1;
     int tempContentIndexEnd = -1;
+    bool areImagesEnabled = false;
     std::vector<std::string_view> tempOutputVector;
     std::vector<std::vector<std::string_view>> tableHolder;
     std::map<std::string, std::string> tempOutputMap;
@@ -62,6 +63,10 @@ public:
      * @since 1.0.0
      */
     void setInput(std::string input);
+
+
+
+    void setAreImagesEnabled(bool enabled);
 
 
     /**

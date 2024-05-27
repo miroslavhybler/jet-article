@@ -1,4 +1,4 @@
-@file:Suppress("RedundantVisibilityModifier")
+@file:Suppress("RedundantVisibilityModifier", "RedundantUnitReturnType")
 
 package com.jet.article
 
@@ -35,6 +35,14 @@ public object ArticleParser {
      */
     private val safeCoroutineContext: CoroutineContext = Dispatchers.Default
         .plus(context = CoroutineName(name = "JetHtmlArticleParse"))
+
+
+
+    public fun initialize(
+        areImagesEnabled: Boolean
+    ): Unit {
+        ParserNative.initialize(areImagesEnabled = areImagesEnabled)
+    }
 
 
     /**

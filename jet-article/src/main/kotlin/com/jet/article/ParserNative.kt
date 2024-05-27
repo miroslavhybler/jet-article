@@ -13,6 +13,9 @@ import com.jet.article.data.HtmlContentType
 internal object ParserNative {
 
 
+    external fun initialize(areImagesEnabled: Boolean): Unit
+
+
     /**
      * @since 1.0.0
      */
