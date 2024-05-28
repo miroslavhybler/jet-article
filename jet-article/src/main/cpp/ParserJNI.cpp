@@ -32,10 +32,12 @@ extern "C" JNIEXPORT void JNICALL
 Java_com_jet_article_ParserNative_initialize(
         JNIEnv *environment,
         jobject caller,
-        jboolean areImagesEnabled
+        jboolean areImagesEnabled,
+        jboolean isLoggingEnabled
 ) {
     jboolean isCopy;
     jni::contentParser->setAreImagesEnabled(areImagesEnabled);
+    utils::setIsLoggingEnabled(isLoggingEnabled);
 }
 
 

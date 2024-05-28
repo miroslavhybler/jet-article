@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.IntSize
  * created on 30.06.2023
  */
 //TODO solve ids
+//TODO have some element id for code usage
 @Keep
 sealed class HtmlElement private constructor(
     open val id: String?

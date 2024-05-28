@@ -37,11 +37,14 @@ public object ArticleParser {
         .plus(context = CoroutineName(name = "JetHtmlArticleParse"))
 
 
-
     public fun initialize(
-        areImagesEnabled: Boolean
+        areImagesEnabled: Boolean,
+        isLoggingEnabled: Boolean,
     ): Unit {
-        ParserNative.initialize(areImagesEnabled = areImagesEnabled)
+        ParserNative.initialize(
+            areImagesEnabled = areImagesEnabled,
+            isLoggingEnabled = isLoggingEnabled,
+        )
     }
 
 

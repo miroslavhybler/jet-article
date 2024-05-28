@@ -10,6 +10,7 @@
 #include <android/log.h>
 #include "IndexWrapper.h"
 #include "Constants.h"
+#include "Utils.h"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
@@ -21,17 +22,31 @@ namespace utils {
      */
     int tempWorkingInt;
 
+    /**
+     * True when logging is enabled, false otherwise
+     * @since 1.0.0
+     */
+    bool isLoggingEnabled = false;
 
     std::function<bool(unsigned char)> trimPred = [](unsigned char ch) -> bool {
         return !std::isspace(ch);
     };
 
 
+    void setIsLoggingEnabled(bool isEnabled) {
+        isLoggingEnabled = isEnabled;
+    }
+
+
     void log(
             const char *tag,
             const std::string &message,
-            android_LogPriority prio = ANDROID_LOG_DEBUG
+            android_LogPriority prio
     ) {
+        if (!isLoggingEnabled) {
+            return;
+        }
+
         __android_log_print(
                 prio,
                 tag,
@@ -193,7 +208,7 @@ namespace utils {
     }
 
 
-    int findUnsupportedTagClosing(
+    const int findUnsupportedTagClosing(
             const std::string_view &input,
             const std::string &tag,
             int s
@@ -214,7 +229,7 @@ namespace utils {
     }
 
 
-    int findClosingTag(
+    const int findClosingTag(
             const std::string_view &input,
             const std::string &searchedTag,
             int s,

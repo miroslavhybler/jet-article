@@ -2,6 +2,8 @@
 /// Created by Miroslav Hýbler on 03.01.2024
 ///
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wextern-initializer"
 #ifndef JET_HTML_ARTICLE_UTILS_H
 #define JET_HTML_ARTICLE_UTILS_H
 
@@ -17,6 +19,13 @@
  * @since 1.0.0
  */
 namespace utils {
+
+    /**
+     *
+     * @param isEnabled
+     * @since 1.0.0
+     */
+    void setIsLoggingEnabled(bool isEnabled);
 
     /**
      * Tries to find index of substring within input
@@ -287,3 +296,5 @@ namespace utils {
 }
 
 #endif //JET_HTML_ARTICLE_UTILS_H
+
+#pragma clang diagnostic pop
