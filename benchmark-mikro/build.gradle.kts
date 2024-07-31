@@ -42,9 +42,9 @@ android {
 }
 
 dependencies {
-    androidTestImplementation("androidx.test:runner:1.5.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test:runner:1.6.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.benchmark:benchmark-junit4:1.2.2")
+    androidTestImplementation("androidx.benchmark:benchmark-junit4:1.2.4")
     androidTestImplementation(project(":jet-article"))
 }

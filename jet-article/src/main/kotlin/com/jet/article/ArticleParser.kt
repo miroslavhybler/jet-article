@@ -37,6 +37,9 @@ public object ArticleParser {
         .plus(context = CoroutineName(name = "JetHtmlArticleParse"))
 
 
+    /**
+     * @since 1.0.0
+     */
     public fun initialize(
         areImagesEnabled: Boolean,
         isLoggingEnabled: Boolean,
