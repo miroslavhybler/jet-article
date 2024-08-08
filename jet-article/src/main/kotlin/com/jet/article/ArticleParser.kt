@@ -24,13 +24,6 @@ public object ArticleParser {
 
 
     /**
-     * Version of the parsing library
-     * @since 1.0.0
-     */
-    public const val version: String = "1.0.0"
-
-
-    /**
      * @since 1.0.0
      */
     private val safeCoroutineContext: CoroutineContext = Dispatchers.Default
@@ -38,6 +31,8 @@ public object ArticleParser {
 
 
     /**
+     * @param areImagesEnabled True when you want to enable images being included in output, false otherwise.
+     * @param isLoggingEnabled True if you want to enable logs from native libs, false otherwise
      * @since 1.0.0
      */
     public fun initialize(
@@ -67,10 +62,6 @@ public object ArticleParser {
 
             if (!ParserNative.hasNextStep()) {
                 return@parser HtmlArticleData(
-                    failure = HtmlArticleData.Failure(
-                        message = "Content is empty",
-                        code = ErrorCode.NO_ERROR
-                    ),
                     elements = elements,
                     headData = HtmlHeadData(title = ParserNative.getTitle()),
                     url = url
@@ -86,14 +77,9 @@ public object ArticleParser {
             }
 
             if (ParserNative.isAbortingWithError()) {
-                val tag = ParserNative.getCurrentTag()
                 val data = HtmlArticleData(
                     elements = elements,
                     headData = HtmlHeadData(title = ParserNative.getTitle()),
-                    failure = HtmlArticleData.Failure(
-                        message = "Error while processing $tag\nOriginal message:\n" + ParserNative.getErrorMessage(),
-                        code = ParserNative.getErrorCode(),
-                    ),
                     url = url,
                 )
                 ParserNative.clearAllResources()

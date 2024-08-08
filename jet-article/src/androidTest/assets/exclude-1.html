@@ -1,0 +1,102 @@
+<!------------------------------------------------------------------------------------------------->
+<!------------------------------------------------------------------------------------------------->
+<!--    This file was made for testing "exclude" functionality, do not modify this file until    -->
+<!--    it's absolutely necessary. Test for this file should exclude keywords and output         -->
+<!--    should not contain any of the class="excluded" tags.                                     -->
+<!--    Exlude rules:                                                                            -->
+<!--    - keyword cookies                                                                        -->
+<!--    - tag id menu                                                                            -->
+<!--    - tag footer                                                                             -->
+<!--    - class advertisment                                                                     -->
+<!--                                                                                             -->
+<!--                                                                                             -->
+<!--    Required Output:                                                                         -->
+<!--    - Not containing any text of value "excluded", these text must be excluded by the rules  -->
+<!--    - Size of text elements must much with occurance of "visible" text inside <p> tag        -->
+<!--                                                                                             -->
+<!--    See ExcludedRulesTest.kt for more details about test output                              -->
+<!------------------------------------------------------------------------------------------------->
+<!------------------------------------------------------------------------------------------------->
+
+<html lang="en">
+<head title="Exclude test">
+    <meta name="meta"/>
+    <title>Exclude test</title>
+</head>
+<body>
+
+<div id="container">
+
+    <div id="menu">
+        <p class="excluded">excluded</p><!-- Some Comment -->
+        <p class="excluded">excluded</p>
+        <div>
+            <p class="excluded">excluded</p>
+            <ul>
+                <li>excluded</li>
+                <li>excluded</li>
+                <li>excluded</li>
+            </ul>
+        </div>
+    </div>
+
+    <h1>visible</h1>
+    <p>visible</p>
+    <div>
+        <div class="visible container" id="content">
+            <p>visible</p>
+            <div>
+                <div>
+                    <p>visible</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="advertisment ad-big ad-garbage">
+            <div>
+                <h2>visible</h2>
+                <p class="excluded">excluded</p>
+                <div>
+                    <div class="advertisment container">
+                        <p class="excluded">excluded</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <p>visible</p>
+        <div><!-- Some Comment -->
+            <p>visible</p>
+            <div id="cookies-container">
+                <div id="cookies">
+                    <p class="excluded">excluded</p>
+                </div><!-- Some Comment -->
+                <p>Cookies Container text</p>
+            </div><!-- Some Comment -->
+            <div>
+                <p>visible</p>
+            </div>
+            <p>visible</p><!-- Some Comment -->
+        </div><!-- Some Comment -->
+        <p>visible</p>
+    </div><!-- Some Comment -->
+    <div class="advertisment">
+        <p class="excluded">excluded</p>
+        <div><!-- Some Comment --><!-- Some Comment -->
+            <p class="excluded">excluded</p>
+        </div>
+    </div><!-- Some Comment -->
+    <footer>
+        <div>
+            <p class="excluded">excluded</p>
+        </div><!-- Some Comment -->
+        <p class="excluded">excluded</p>
+    </footer>
+</div>
+</body><!-- Some Comment -->
+<!-- Some Comment --><!-- Some Comment -->
+<!-- Some Comment --><!-- Some Comment -->
+</html>

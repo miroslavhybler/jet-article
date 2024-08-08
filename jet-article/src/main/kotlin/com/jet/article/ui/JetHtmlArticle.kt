@@ -167,12 +167,6 @@ public fun JetHtmlArticleContent(
                                     Text(text = "EMPTY")
                                 }
                             }
-                            if (data.failure != null) {
-                                item {
-                                    HtmlInvalid(error = data.failure)
-                                }
-                            }
-
                             item(content = footer)
                         },
                         contentPadding = contentPadding

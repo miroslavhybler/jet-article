@@ -26,7 +26,11 @@ android {
             }
         }
     }
-
+    sourceSets {
+        getByName("androidTest") {
+            assets.srcDir("src/androidTest/assets")
+        }
+    }
     buildTypes {
         release {
             isMinifyEnabled = false

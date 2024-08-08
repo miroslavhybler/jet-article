@@ -13,7 +13,13 @@ import com.jet.article.data.HtmlContentType
 internal object ParserNative {
 
 
-    external fun initialize(areImagesEnabled: Boolean, isLoggingEnabled: Boolean): Unit
+    /**
+     * @since 1.0.0
+     */
+    external fun initialize(
+        areImagesEnabled: Boolean,
+        isLoggingEnabled: Boolean,
+    ): Unit
 
 
     /**

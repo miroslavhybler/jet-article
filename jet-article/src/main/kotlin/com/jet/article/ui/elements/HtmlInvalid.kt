@@ -19,7 +19,6 @@ import com.jet.article.data.HtmlArticleData
 @Composable
 public fun HtmlInvalid(
     modifier: Modifier = Modifier,
-    error: HtmlArticleData.Failure
 ) {
 
 
@@ -30,12 +29,12 @@ public fun HtmlInvalid(
             color = MaterialTheme.colorScheme.error
         )
         Text(
-            text = error.message,
+            text = "TODO",
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.labelSmall,
         )
         Text(
-            text = "Code: ${error.code}",
+            text = "TODO",
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.labelSmall,
         )

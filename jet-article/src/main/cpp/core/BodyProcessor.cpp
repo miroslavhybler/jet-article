@@ -25,10 +25,10 @@ bool BodyProcessor::isTagValidForNextProcessing(
     for (ExcludeRule rule: rules) {
         bool isValid = isValidBasedOnRule(tag, tagBody, rule);
         if (!isValid) {
-
-            utils::log("PROCESSOR",
-                       "Tag: " + tagBody + " kicked out because of rule: " + rule.toString()
-                       );
+            utils::log(
+                    "PROCESSOR",
+                    "Tag: " + tagBody + " kicked out because of rule: " + rule.toString()
+            );
 
             return false;
         }
@@ -56,7 +56,7 @@ bool BodyProcessor::isValidBasedOnRule(
 
     if (isUsingKeyword && !isUsingTag && !isUsingId && !isUsingClazz) {
         //Using keyword only, this is the worst performace option avaliable because keyword is being
-        //compared with all tag id and classe
+        //compared with all tag id and classes
         if (isKeywordPresented(rule.getKeyword(), tagBody)) {
             return false;
         }

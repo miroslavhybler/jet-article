@@ -11,11 +11,10 @@ package com.jet.article.data
  * @author Miroslav Hýbler <br>
  * created on 15.07.2023
  */
-public class HtmlArticleData internal constructor(
+public class HtmlArticleData public constructor(
     val url: String,
     val elements: List<HtmlElement> = emptyList(),
     val headData: HtmlHeadData = HtmlHeadData.empty,
-    val failure: Failure? = null
 ) {
 
     companion object {
@@ -34,14 +33,4 @@ public class HtmlArticleData internal constructor(
      */
     val isEmpty: Boolean
         get() = elements.isEmpty()
-                && failure == null
-
-
-    /**
-     * @since 1.0.0
-     */
-    public data class Failure internal constructor(
-        @ErrorCode val code: Int,
-        val message: String
-    )
 }
