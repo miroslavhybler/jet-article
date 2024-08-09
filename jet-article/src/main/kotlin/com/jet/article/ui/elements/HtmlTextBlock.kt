@@ -41,9 +41,9 @@ fun HtmlTextBlock(
 ) {
 
     HtmlTextBlock(
+        modifier = modifier,
         text = text.text,
-        modifier = modifier.padding(top = 12.dp),
-        style = style
+        style = style,
     )
 }
 

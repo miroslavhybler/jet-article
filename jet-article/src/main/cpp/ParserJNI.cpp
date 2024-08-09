@@ -276,7 +276,7 @@ Java_com_jet_article_ProcessorNative_addRule(
         jstring id,
         jstring keyword
 ) {
-    jboolean outIsCopy;
+    jboolean outIsCopy = false;
     jni::processor->addRule(
             ExcludeRule(
                     environment->GetStringUTFChars(tag, &outIsCopy),

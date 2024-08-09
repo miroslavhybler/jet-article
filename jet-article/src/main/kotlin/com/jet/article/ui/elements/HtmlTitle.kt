@@ -31,26 +31,21 @@ fun HtmlTitle(
     }
 
     HtmlTextBlock(
+        modifier=modifier,
         text = title.text,
         style = textStyle,
-        modifier = modifier.padding(
-            top = when (title.titleTag) {
-                "h1", "h2" -> 32.dp
-                else -> 24.dp
-            }
-        )
     )
 }
 
 
 @Composable
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 private fun HtmlTitlePreview() {
     HtmlTitle(
         title = HtmlElement.Title(
             text = "Jetpack Compose rules!",
             titleTag = "h1",
-            id = ""
+            id = "",
         )
     )
 }

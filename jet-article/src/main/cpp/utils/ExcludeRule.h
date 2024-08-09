@@ -38,15 +38,15 @@ public:
 
     ~ExcludeRule();
 
-    const std::string_view getTag();
+    std::string_view getTag();
 
-    const std::string_view getClazz();
+    std::string_view getClazz();
 
-    const std::string_view getId();
+    std::string_view getId();
 
-    const std::string_view getKeyword();
+    std::string_view getKeyword();
 
-    const std::string toString();
+    std::string toString();
 };
 
 

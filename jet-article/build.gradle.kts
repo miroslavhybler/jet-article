@@ -17,7 +17,7 @@ android {
 
     defaultConfig {
         minSdk = 21
-
+        targetSdk = 34
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         externalNativeBuild {
@@ -69,37 +69,30 @@ android {
 
 dependencies {
 
-    api("com.github.miroslavhybler:jet-lint:1.0.2")
-    implementation("com.github.miroslavhybler:jet-utils:1.1.2")
+    api(libs.github.jet.lint)
+    implementation(libs.github.jet.utils)
 
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
-    implementation("androidx.startup:startup-runtime:1.1.1")
+    implementation(libs.androidx.core.core.ktx)
+    implementation(libs.androidx.lifecycle.lifecycle.runtime.ktx)
+    implementation(libs.androidx.startup.startup.runtime)
 
     /** Compose */
-    val composeVersion = "1.6.8"
-    implementation("androidx.compose.ui:ui:$composeVersion")
-    debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
-    implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
-    implementation("androidx.compose.animation:animation-graphics:$composeVersion")
-    implementation("androidx.activity:activity-compose:1.9.1")
-
-    val material3Version = "1.2.1"
-    implementation("androidx.compose.material3:material3:$material3Version")
-    implementation("androidx.compose.material3:material3-window-size-class:$material3Version")
-
+    implementation(libs.androidx.animation.graphics)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.material3)
+    implementation(libs.material3.window.size)
+    debugImplementation(libs.androidx.ui.tooling.preview.android)
 
     /** Accompanist & Experimental */
-    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.0")
+    implementation(libs.accompanist.permissions)
+    implementation(libs.accompanist.systemuicontroller)
 
-    implementation("io.coil-kt:coil-compose:2.6.0")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation("net.danlew:android.joda:2.12.7")
+    implementation(libs.coil.compose)
+    implementation(libs.material)
+    implementation(libs.android.joda)
 
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }
 
 tasks {
@@ -121,7 +114,7 @@ tasks {
                         Visibility.PRIVATE,
                         Visibility.PROTECTED,
                         Visibility.INTERNAL,
-                        Visibility.PACKAGE
+                        Visibility.PACKAGE,
                     )
                 )
 

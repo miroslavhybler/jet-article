@@ -40,8 +40,7 @@ fun HomeCard(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.outline,
                 ),
-                shape = MaterialTheme.shapes.large
-
+                shape = MaterialTheme.shapes.large,
             )
             .background(
                 color = MaterialTheme.colorScheme.primaryContainer,
@@ -87,11 +86,11 @@ fun Modifier.spacedCard(): Modifier {
 
 
 @Composable
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 private fun MainCardPreview() {
     HomeCard(
         title = "Title of the card",
         description = "Description of the card, usually longer that the tilte (naturally). I should use lorem ipsum more ofther, cause i don't have idea what put into these descriptions",
-        onClick = {}
+        onClick = {},
     )
 }

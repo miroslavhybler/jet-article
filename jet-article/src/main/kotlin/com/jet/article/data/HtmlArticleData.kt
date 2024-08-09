@@ -6,7 +6,6 @@ package com.jet.article.data
 /**
  * @param elements
  * @param headData
- * @param failure
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
  * created on 15.07.2023

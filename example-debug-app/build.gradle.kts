@@ -94,38 +94,24 @@ android {
 dependencies {
 
     implementation(project(":jet-article"))
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
-    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation(libs.androidx.core.core.ktx)
+    implementation(libs.androidx.lifecycle.lifecycle.runtime.ktx)
+    implementation(libs.androidx.core.splashscreen)
 
     /** Compose */
-    val composeVersion = "1.6.8"
-    implementation("androidx.compose.ui:ui:$composeVersion")
-    implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
-    implementation("androidx.activity:activity-compose:1.9.1")
-    implementation("androidx.compose.material3:material3:1.2.1")
-    implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.0")
+    implementation(libs.androidx.ui.tooling.preview.android)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.material3)
+    implementation(libs.material3.window.size)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.accompanist.systemuicontroller)
 
     /** Hilt DI */
-    val hiltVersion = "2.51.1"
-    val hiltCompilerVersion = "1.2.0"
-    implementation("com.google.dagger:hilt-android:$hiltVersion")
-    ksp("com.google.dagger:hilt-android-compiler:$hiltVersion")
-    implementation("androidx.hilt:hilt-common:$hiltCompilerVersion")
-    ksp("androidx.hilt:hilt-compiler:$hiltCompilerVersion")
-    implementation("androidx.hilt:hilt-navigation-compose:$hiltCompilerVersion")
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.common)
+    ksp(libs.androidx.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
-
-    implementation("com.google.code.gson:gson:2.10.1")
-
-
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.06.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:$composeVersion")
+    implementation(libs.gson)
 }

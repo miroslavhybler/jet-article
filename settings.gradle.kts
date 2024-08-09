@@ -29,6 +29,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Jet Article"
 include(":jet-article")
-include(":benchmark-debug-app")
-include(":benchmark-mikro")
+//include(":benchmark-debug-app")
+//include(":benchmark-mikro")
 include(":example-debug-app")

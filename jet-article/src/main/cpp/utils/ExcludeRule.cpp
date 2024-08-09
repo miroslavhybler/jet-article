@@ -5,25 +5,38 @@
 #include "ExcludeRule.h"
 
 
-ExcludeRule::ExcludeRule(std::string_view tag) {
+ExcludeRule::ExcludeRule(
+        std::string_view tag
+) {
     this->mTag = tag;
 }
 
 
-ExcludeRule::ExcludeRule(std::string_view tag, std::string_view clazz) {
+ExcludeRule::ExcludeRule(
+        std::string_view tag,
+        std::string_view clazz
+) {
     this->mTag = tag;
     this->mClazz = clazz;
 }
 
 
-ExcludeRule::ExcludeRule(std::string_view tag, std::string_view clazz, std::string_view id) {
+ExcludeRule::ExcludeRule(
+        std::string_view tag,
+        std::string_view clazz,
+        std::string_view id
+) {
     this->mTag = tag;
     this->mClazz = clazz;
     this->mId = id;
 }
 
-ExcludeRule::ExcludeRule(std::string_view tag, std::string_view clazz, std::string_view id,
-                         std::string_view keyword) {
+ExcludeRule::ExcludeRule(
+        std::string_view tag,
+        std::string_view clazz,
+        std::string_view id,
+        std::string_view keyword
+) {
     this->mTag = tag;
     this->mClazz = clazz;
     this->mId = id;
@@ -35,26 +48,26 @@ ExcludeRule::~ExcludeRule() {
 
 }
 
-const std::string_view ExcludeRule::getTag() {
+std::string_view ExcludeRule::getTag() {
     return mTag;
 }
 
 
-const std::string_view ExcludeRule::getClazz() {
+std::string_view ExcludeRule::getClazz() {
     return mClazz;
 }
 
 
-const std::string_view ExcludeRule::getId() {
+std::string_view ExcludeRule::getId() {
     return mId;
 }
 
 
-const std::string_view ExcludeRule::getKeyword() {
+std::string_view ExcludeRule::getKeyword() {
     return mKeyword;
 }
 
-const std::string ExcludeRule::toString() {
+std::string ExcludeRule::toString() {
     std::string message = "ExcludeRule(";
     message += "tag=" + std::string(mTag);
     message += ", clazz=" + std::string(mClazz);

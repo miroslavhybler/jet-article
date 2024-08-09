@@ -14,3 +14,14 @@ Java_com_jet_article_UtilsNative_getTagAttributes(
 ) {
 
 }
+
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_jet_article_UtilsNative_clearUnsupportedTagsFromTextBlock(
+        JNIEnv *environment, jobject caller, jstring input
+) {
+    jboolean isCopy = false;
+    std::string inputStd = environment->GetStringUTFChars(input, &isCopy);
+    std::string output;
+    utils::clearUnsupportedTagsFromTextBlock(inputStd, output, 0, inputStd.length());
+    return environment->NewStringUTF(output.c_str());
+}

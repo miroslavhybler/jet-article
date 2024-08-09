@@ -6,8 +6,11 @@ package com.jet.article.ui
 import android.annotation.SuppressLint
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
@@ -32,24 +35,32 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import mir.oslav.jet.annotations.JetExperimental
+import com.jet.article.ArticleParser
+import com.jet.article.data.HtmlArticleData
+import com.jet.article.data.HtmlElement
 import com.jet.article.ui.elements.HtmlAddress
+import com.jet.article.ui.elements.HtmlBasicList
 import com.jet.article.ui.elements.HtmlCode
 import com.jet.article.ui.elements.HtmlImage
-import com.jet.article.ui.elements.HtmlInvalid
 import com.jet.article.ui.elements.HtmlQuoete
 import com.jet.article.ui.elements.HtmlTable
 import com.jet.article.ui.elements.HtmlTextBlock
 import com.jet.article.ui.elements.HtmlTitle
-import com.jet.article.data.HtmlArticleData
-import com.jet.article.data.HtmlElement
-import com.jet.article.ui.elements.HtmlBasicList
+import mir.oslav.jet.annotations.JetExperimental
 
 
 /**
  * Default composable implementation for the library. To use custom layouts see [JetHtmlArticleContent].
+ * It's basically [LazyColumn] with items being [HtmlElement].
  * @param modifier Modifier to modify composable
- * @param data Parsed html article data to be shown.
+ * @param data Parsed html article data to be shown. Mostly result of [ArticleParser.parse].
+ * @param listState [LazyListState] used to controll scroll.
+ * @param snackbarHostState SnackBar state used to show errors.
+ * @param contentPadding
+ * @param header
+ * @param footer
+ * @param linkClickCallback
+ * @param colors
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
  * created on 25.08.2023
@@ -108,7 +119,7 @@ public fun JetHtmlArticleContent(
     header: @Composable LazyItemScope. () -> Unit = {},
     footer: @Composable LazyItemScope.() -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(all = 0.dp),
-    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(space = 8.dp),
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     linkClickCallback: LinkClickHandler.LinkCallback = rememberDefaultLinkCallback(
         snackbarHostState = snackbarHostState,
         coroutineScope = rememberCoroutineScope(),
@@ -134,7 +145,7 @@ public fun JetHtmlArticleContent(
     ) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
-            content = {
+            content = { paddingValues ->
                 SelectionContainer {
                     LazyColumn(
                         modifier = modifier
@@ -143,7 +154,6 @@ public fun JetHtmlArticleContent(
                         verticalArrangement = verticalArrangement,
                         content = {
                             item(content = header)
-
                             itemsIndexed(
                                 items = data.elements,
                             ) { index, element ->
@@ -153,7 +163,18 @@ public fun JetHtmlArticleContent(
                                     is HtmlElement.Table -> table(element)
                                     is HtmlElement.Address -> address(element)
                                     is HtmlElement.TextBlock -> text(element)
-                                    is HtmlElement.Title -> title(element)
+                                    is HtmlElement.Title -> {
+                                        if (index != 0) {
+                                            Column(modifier = Modifier) {
+                                                Spacer(modifier = Modifier.height(height = 24.dp))
+                                                title(element)
+                                            }
+                                        } else {
+                                            title(element)
+
+                                        }
+                                    }
+
                                     is HtmlElement.Code -> code(element)
                                     is HtmlElement.BasicList -> basicList(element)
                                     else -> throw IllegalStateException(

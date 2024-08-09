@@ -32,7 +32,10 @@ class ParsingArticlesBenchmark {
             val context: Context = ApplicationProvider.getApplicationContext()
             val article = String(context.assets.open("mapbox.html").readBytes())
             coroutineScope.launch {
-                ArticleParser.parse(content = article, url = "https://www.example.com")
+                ArticleParser.parse(
+                    content = article,
+                    url = "https://www.example.com",
+                )
             }
         }
     }

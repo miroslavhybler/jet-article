@@ -83,7 +83,7 @@ private fun ItemRow(
 
 
 @Composable
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 fun OpenSourcePreview() {
     OpenSource()
 }

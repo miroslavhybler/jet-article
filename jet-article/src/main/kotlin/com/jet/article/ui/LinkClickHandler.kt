@@ -23,6 +23,9 @@ import java.net.URISyntaxException
 
 
 /**
+ * @param lazyListState
+ * @param context
+ * @param callback
  * @see LinkCallback
  * @see rememberLinkClickHandler
  * @since 1.0.0
@@ -35,6 +38,14 @@ public class LinkClickHandler internal constructor(
     private val callback: LinkCallback,
 ) {
 
+
+    /**
+     * @param clickedText Text on which user clicked
+     * @param clickOffset Index of first charracted in clicked annotation
+     * @param articleUrl Original full url of the article
+     * @param data Parsed data
+     * @param scrollOffset
+     */
     internal fun handleLink(
         clickedText: AnnotatedString,
         clickOffset: Int,
@@ -44,7 +55,7 @@ public class LinkClickHandler internal constructor(
     ) {
         val anotations = clickedText.getStringAnnotations(
             start = clickOffset,
-            end = clickOffset
+            end = clickOffset,
         )
         anotations.firstOrNull()?.let { annotation ->
             val link = getLink(
@@ -54,12 +65,15 @@ public class LinkClickHandler internal constructor(
             onLink(
                 link = link,
                 data = data,
-                scrollOffset = scrollOffset
+                scrollOffset = scrollOffset,
             )
         }
     }
 
 
+    /**
+     * @since 1.0.0
+     */
     private fun onLink(
         link: Link,
         data: HtmlArticleData,
@@ -67,7 +81,10 @@ public class LinkClickHandler internal constructor(
     ) {
         when (link) {
             is Link.UriLink -> {
-                callback.onUriLink(link = link, context = context)
+                callback.onUriLink(
+                    link = link,
+                    context = context,
+                )
             }
 
             is Link.SectionLink -> {
@@ -150,8 +167,14 @@ public class LinkClickHandler internal constructor(
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+    /**
+     * @since 1.0.0
+     */
     public open class LinkCallback public constructor() {
 
+        /**
+         * @since 1.0.0
+         */
         public open fun onSectionLink(
             link: Link.SectionLink,
             lazyListState: LazyListState,
@@ -160,16 +183,25 @@ public class LinkClickHandler internal constructor(
         ): Unit = Unit
 
 
+        /**
+         * @since 1.0.0
+         */
         public open fun onSameDomainLink(
             link: Link.SameDomainLink
         ): Unit = Unit
 
 
+        /**
+         * @since 1.0.0
+         */
         public open fun onOtherDomainLink(
             link: Link.OtherDomainLink,
         ): Unit = Unit
 
 
+        /**
+         * @since 1.0.0
+         */
         public open fun onUriLink(
             link: Link.UriLink,
             context: Context,
@@ -233,6 +265,7 @@ public class LinkClickHandler internal constructor(
                 }
             }
         }
+
 
         override fun onSameDomainLink(link: Link.SameDomainLink) {
             showNotSupportedSnackBar()
