@@ -81,7 +81,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.material3)
     implementation(libs.material3.window.size)
-    debugImplementation(libs.androidx.ui.tooling.preview.android)
+    implementation(libs.androidx.ui.tooling.preview.android)
 
     /** Accompanist & Experimental */
     implementation(libs.accompanist.permissions)
@@ -93,6 +93,7 @@ dependencies {
 
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.test.manifest)
+    debugImplementation(libs.ui.tooling)
 }
 
 tasks {

@@ -34,6 +34,10 @@ uiTestManifest = "1.6.8"
 uiToolingPreviewAndroid = "1.7.0-beta07"
 coreKtx = "1.6.1"
 uiToolingPreviewAndroidVersion = "1.7.0-beta02"
+agp = "8.5.2"
+androidxJunit = "1.2.1"
+espressoCoreVersion = "3.6.1"
+uiTooling = "1.6.8"
 [libraries]
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -72,7 +76,12 @@ ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 androidx-ui-tooling-preview-android = { group = "androidx.compose.ui", name = "ui-tooling-preview-android", version.ref = "uiToolingPreviewAndroid" }
 androidx-core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtx" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCoreVersion" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
 
 [plugins]
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+android-application = { id = "com.android.application", version.ref = "agp" }

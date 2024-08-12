@@ -19,9 +19,6 @@ abstract class BaseAndroidTest public constructor() {
     protected val assets: AssetManager
         get() = context.assets
 
-    val coroutineScope: CoroutineScope = CoroutineScope(context = Dispatchers.Main)
-
-
     /**
      * @param fileName File name in assets folder without extension
      */

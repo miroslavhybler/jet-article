@@ -5,8 +5,8 @@ SET(
         DEPENDENCIES
         ContentParser.h
         ContentParser.cpp
-        BodyProcessor.h
-        BodyProcessor.cpp
+        ContentFilter.h
+        ContentFilter.cpp
         ContentAnalyzer.h
         ContentAnalyzer.cpp
 )

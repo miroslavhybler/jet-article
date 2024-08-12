@@ -5,7 +5,7 @@
 
 #include <string>
 #include "ContentParser.h"
-#include "BodyProcessor.h"
+#include "ContentFilter.h"
 #include "../utils/Utils.h"
 #include "../utils/Constants.h"
 
@@ -15,9 +15,7 @@ ContentParser::ContentParser() {
 }
 
 
-ContentParser::~ContentParser() {
-
-}
+ContentParser::~ContentParser() = default;
 
 void ContentParser::setAreImagesEnabled(bool enabled) {
     this->areImagesEnabled = enabled;
@@ -71,6 +69,9 @@ std::string ContentParser::getTempContent() {
 }
 
 
+//TODO handle random text somehow?
+//TODO Maybe enable that ininitialization, to process text outside tags
+//TODO https://android-developers.googleblog.com/ has texts inside divs
 void ContentParser::doNextStep() {
 
     currentTag = "";

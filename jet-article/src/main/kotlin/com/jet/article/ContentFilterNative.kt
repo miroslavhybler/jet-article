@@ -8,7 +8,7 @@ package com.jet.article
  * created on 23.01.2024
  */
 @Deprecated(message = "Doens't make much sence")
-public object ProcessorNative {
+public object ContentFilterNative {
 
 
     /**
@@ -20,7 +20,7 @@ public object ProcessorNative {
      * specific keyword, like "cookies"
      * @since 1.0.0
      */
-    external fun addRule(
+    external fun addExcludeOption(
         tag: String = "",
         clazz: String = "",
         id: String = "",
@@ -29,7 +29,7 @@ public object ProcessorNative {
 
 
     /**
-     * Clears rules that were added by [addRule].
+     * Clears rules that were added by [addExcludeOption].
      * @since 1.0.0
      */
     external fun clearAllResources(): Unit

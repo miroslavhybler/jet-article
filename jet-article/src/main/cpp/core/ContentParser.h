@@ -26,8 +26,8 @@ public:
     std::string lang = "";
 
 private:
-    bool hasContentToProcess;
-    bool wasHeadParsed;
+    bool hasContentToProcess = false;
+    bool wasHeadParsed = false;
     int tempContentIndexStart = -1;
     int tempContentIndexEnd = -1;
     bool areImagesEnabled = false;
@@ -63,7 +63,6 @@ public:
      * @since 1.0.0
      */
     void setInput(std::string input);
-
 
 
     void setAreImagesEnabled(bool enabled);
@@ -131,7 +130,7 @@ public:
      * @return
      * @since 1.0.0
      */
-    const std::vector<std::vector<std::string_view>>& getTable();
+    const std::vector<std::vector<std::string_view>> &getTable();
 
 
     /**
@@ -224,7 +223,6 @@ private:
      * @since 1.0.0
      */
     void parseTableTag(const int &ctsi);
-
 
 
     /**

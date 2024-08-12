@@ -1,0 +1,97 @@
+<!------------------------------------------------------------------------------------------------->
+<!------------------------------------------------------------------------------------------------->
+<!--    This file was made for testing "exclude" functionality, do not modify this file until    -->
+<!--    it's absolutely necessary. Test for this file should exclude keywords and output         -->
+<!--    should not contain any of the class="excluded" tags.                                     -->                                                                                         -->
+<!--    Exlude rules                                                                             -->
+<!--    - tag div, clazz toRemove                                                                -->
+<!--    - tag div, id divToRemove, clazz toRemove2                                               -->
+<!--                                                                                             -->
+<!--                                                                                             -->
+<!--    Required Output:                                                                         -->
+<!--    - Not containing any text of value "excluded", these text must be excluded by the rules  -->
+<!--    - Size of text elements must much with occurance of "visible" text inside <p> tag        -->
+<!--                                                                                             -->
+<!--    See ExcludedRulesTest.kt for more details about test output                              -->
+<!------------------------------------------------------------------------------------------------->
+<!------------------------------------------------------------------------------------------------->
+
+<html lang="en">
+<head title="Exclude test">
+    <meta name="meta"/>
+    <title>Exclude test</title>
+</head>
+<body>
+
+<div id="container">
+
+    <div>
+        <div>
+            <p>visible</p>
+            <p>visible</p>
+            <div>
+                <p>visible</p>
+                <div>
+                    <p>visible</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- This element have to be removed for tag=div && clazz == toRemove -->
+        <div class="toRemove">
+            <p id="ex1" class="excluded">excluded</p>
+            <div>
+                <p id="ex2" class="excluded">excluded</p>
+            </div>
+        </div>
+
+        <div>
+            <p>visible</p>
+            <div>
+                <p>visible</p>
+                <div id="divToRemove">
+                    <p id="ex3" class="excluded">excluded</p>
+                </div>
+            </div>
+            <!-- This element have to be removed for tag=div && clazz == toRemove -->
+            <div class="toRemove">
+                <p id="ex4" class="excluded">excluded</p>
+            </div>
+        </div>
+    </div>
+    <div>
+        <!-- This element have to be removed for tag==div && id==divToRemove2 && clazz == toRemove2 -->
+        <div id="divToRemove2" class="toRemove2">
+            <p id="ex5" class="excluded">excluded</p>
+            <div>
+                <p id="ex6" class="excluded">excluded</p>
+            </div>
+        </div>
+        <p>visible</p>
+    </div>
+
+
+    <div>
+        <div>
+            <!-- This element have to be removed for id==divToRemove3 && clazz == toRemove3 -->
+            <div id="divToRemove3" class='toRemove3 hidden'>
+                <p class="excluded">excluded</p>
+            </div>
+            <div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- This div should be visible because only two conditions are matched out of 3-->
+    <div class="toRemove2">
+        <p>visible</p>
+        <div>
+            <p>visible</p>
+        </div>
+    </div>
+</div>
+</body><!-- Some Comment -->
+<!-- Some Comment --><!-- Some Comment -->
+<!-- Some Comment --><!-- Some Comment -->
+</html>

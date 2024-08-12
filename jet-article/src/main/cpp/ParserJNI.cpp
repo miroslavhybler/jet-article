@@ -10,7 +10,7 @@
 #include <string>
 #include <map>
 #include "core/ContentParser.h"
-#include "core/BodyProcessor.h"
+#include "core/ContentFilter.h"
 #include "core/ContentAnalyzer.h"
 #include "utils/Utils.h"
 #include "utils/Constants.h"
@@ -22,7 +22,7 @@
 
 namespace jni {
     ContentParser *contentParser = new ContentParser();
-    BodyProcessor *processor = new BodyProcessor();
+    ContentFilter *processor = new ContentFilter();
 
     bool isContentForVisualAvailable = false;
     TagType tag = NO_CONTENT;
@@ -268,7 +268,7 @@ Java_com_jet_article_ParserNative_warmup(
 
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_jet_article_ProcessorNative_addRule(
+Java_com_jet_article_ContentFilterNative_addExcludeOption(
         JNIEnv *environment,
         jobject caller,
         jstring tag,
@@ -289,7 +289,7 @@ Java_com_jet_article_ProcessorNative_addRule(
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_jet_article_ProcessorNative_clearAllResources(
+Java_com_jet_article_ContentFilterNative_clearAllResources(
         JNIEnv *environment, jobject caller
 ) {
     jni::processor->clearAllResources();

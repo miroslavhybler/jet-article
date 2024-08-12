@@ -724,5 +724,26 @@ namespace utils {
     bool isTagPairTag(std::string &tagBody) {
         return !isTagSingleTag(tagBody);
     }
+
+
+    std::string listToString(std::vector<std::string_view> list) {
+        std::string output = "";
+
+
+        for (const auto text: list) {
+            output += text;
+            output += ",";
+        }
+
+        return output;
+    }
+
+    std::string boolToString(bool value) {
+        if (value) {
+            return "true";
+        } else {
+            return "false";
+        }
+    }
 }
 #pragma clang diagnostic pop

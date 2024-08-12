@@ -2,14 +2,14 @@
 /// Created by Miroslav Hýbler  on 08.01.2024
 ///
 
-#include "BodyProcessor.h"
+#include "ContentFilter.h"
 #include "../utils/Utils.h"
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "UnusedParameter"
 
 
-bool BodyProcessor::isTagValidForNextProcessing(
+bool ContentFilter::isTagValidForNextProcessing(
         const std::string &tag,
         const std::string &tagBody
 ) {
@@ -20,24 +20,27 @@ bool BodyProcessor::isTagValidForNextProcessing(
     }
 
     tempClasses.clear();
-    std::vector<ExcludeRule>::iterator iterator = rules.begin();
 
     for (ExcludeRule rule: rules) {
+
+        utils::extractClasses(tagBody, tempClasses);
+
         bool isValid = isValidBasedOnRule(tag, tagBody, rule);
         if (!isValid) {
             utils::log(
-                    "PROCESSOR",
-                    "Tag: " + tagBody + " kicked out because of rule: " + rule.toString()
+                    "CONTENT-FILTER",
+                    "Tag: " + tagBody + " filtered out because of rule: " + rule.toString()
             );
 
             return false;
         }
     }
+    //Tag passed all the rules, it is valid
     return true;
 }
 
 
-bool BodyProcessor::isValidBasedOnRule(
+bool ContentFilter::isValidBasedOnRule(
         const std::string &tag,
         const std::string &tagBody,
         ExcludeRule &rule
@@ -77,7 +80,7 @@ bool BodyProcessor::isValidBasedOnRule(
 }
 
 
-bool BodyProcessor::isValidBasedOnRuleTagIncluded(
+bool ContentFilter::isValidBasedOnRuleTagIncluded(
         const std::string &tag,
         const std::string &tagBody,
         ExcludeRule &rule,
@@ -85,28 +88,42 @@ bool BodyProcessor::isValidBasedOnRuleTagIncluded(
         const bool &isUsingClazz,
         const bool &isUsingKeyword
 ) {
-    bool tagMatch = utils::fastCompare(tag, rule.getTag());
+    bool isTagMatch = utils::fastCompare(tag, rule.getTag());
 
-    if (tagMatch) {
+    if (isTagMatch) {
+        //Tag is matching, need to check its attributes
+
         if (isUsingId) {
             std::string tagId = utils::getTagAttribute(tagBody, "id");
             if (isWordPresented(rule.getId(), tagId)) {
+                //Tag and tag id are matching, tag is not valid
                 return false;
+            } else {
+                return true;
             }
         }
         if (isUsingClazz) {
             utils::extractClasses(tagBody, tempClasses);
-            if (isWordPresented(rule.getKeyword(), tempClasses)) {
+
+            bool isPresented = isWordPresented(rule.getClazz(), tempClasses);
+
+            if (isPresented) {
+                //Tag is matching and its class containing class from rule
+                //Tag is not valid
                 return false;
+            } else {
+                return true;
             }
         }
         if (isUsingKeyword) {
             if (isKeywordPresented(rule.getKeyword(), tagBody)) {
+                //Tag is matching and rule keyword is presented
+                //Tag is not valid
                 return false;
             }
         }
-        //Exclude rule not found, tag is same but other rules are applied
-        return true;
+        //Rule is using tag only, since isTagMatch is true tag is not valid
+        return false;
     } else {
         //Tag is not matching so no need to check other rules
         return true;
@@ -114,7 +131,7 @@ bool BodyProcessor::isValidBasedOnRuleTagIncluded(
 }
 
 
-bool BodyProcessor::isValidBasedOnRuleTagNotIncluded(
+bool ContentFilter::isValidBasedOnRuleTagNotIncluded(
         const std::string &tagBody,
         ExcludeRule &rule,
         const bool &isUsingId,
@@ -148,7 +165,7 @@ bool BodyProcessor::isValidBasedOnRuleTagNotIncluded(
 }
 
 
-bool BodyProcessor::isKeywordPresented(
+bool ContentFilter::isKeywordPresented(
         const std::string_view &keyword,
         const std::string &tagBody
 ) {
@@ -165,12 +182,28 @@ bool BodyProcessor::isKeywordPresented(
 }
 
 
-bool BodyProcessor::isWordPresented(
+bool ContentFilter::isWordPresented(
         const std::string_view &word,
         const std::string_view &input,
         const bool isContainsEnabled
 ) {
+
+    if (word.empty() || input.empty()) {
+        return false;
+    }
+
+    utils::log(
+            "CONTENT-FILTER",
+            "isWordPresented comparing -- " + std::string(word) + " == " +
+            std::string(input) + " " + utils::boolToString(isContainsEnabled)
+    );
+
     bool isWord = utils::fastCompare(word, input);
+
+    utils::log(
+            "CONTENT-FILTER",
+            "equals: " + utils::boolToString(isWord)
+    );
 
     if (isWord) {
         return true;
@@ -185,12 +218,21 @@ bool BodyProcessor::isWordPresented(
 }
 
 
-bool BodyProcessor::isWordPresented(
+bool ContentFilter::isWordPresented(
         const std::string_view &word,
         const std::vector<std::string_view> &classes,
         const bool isContainsEnabled
 ) {
-    for (std::string_view clazz: tempClasses) {
+
+    if (classes.empty() || word.empty()) {
+        return false;
+    }
+
+    for (std::string_view clazz: classes) {
+        utils::log(
+                "CONTENT-FILTER",
+                "isWordPresented in classes -- " + std::string(word) + " == " + std::string(clazz)
+        );
         if (isWordPresented(word, clazz, isContainsEnabled)) {
             //Active rule found based on tag and its clazz
             //Or keyword found withing class body
@@ -201,12 +243,12 @@ bool BodyProcessor::isWordPresented(
 }
 
 
-void BodyProcessor::addRule(ExcludeRule rule) {
+void ContentFilter::addRule(ExcludeRule rule) {
     rules.push_back(rule);
 }
 
 
-void BodyProcessor::clearAllResources() {
+void ContentFilter::clearAllResources() {
     rules.clear();
 }
 

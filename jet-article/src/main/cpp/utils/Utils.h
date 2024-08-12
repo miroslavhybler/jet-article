@@ -293,6 +293,24 @@ namespace utils {
      * @since 1.0.0
      */
     bool isTagPairTag(std::string &tagBody);
+
+
+    /**
+     *
+     * @param list
+     * @return
+     * @since 1.0.0
+     */
+    std::string listToString(std::vector<std::string_view> list);
+
+
+    /**
+     *
+     * @param value
+     * @return String representation of value.
+     * @since 1.0.0
+     */
+    std::string boolToString(bool value);
 }
 
 #endif //JET_HTML_ARTICLE_UTILS_H

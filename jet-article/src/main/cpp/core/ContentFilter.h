@@ -10,10 +10,11 @@
 #include <vector>
 
 /**
+ * TODO docs how is filtration working
  * Additional component that helps filtering tags by setting list of custom rules.
  * @since 1.0.0
  */
-class BodyProcessor {
+class ContentFilter {
 
 private:
     std::vector<ExcludeRule> rules;

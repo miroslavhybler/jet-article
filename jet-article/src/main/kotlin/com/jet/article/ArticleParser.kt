@@ -2,9 +2,7 @@
 
 package com.jet.article
 
-import android.content.Context
 import androidx.compose.ui.unit.IntSize
-import com.jet.article.data.ErrorCode
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -83,7 +81,7 @@ public object ArticleParser {
                     url = url,
                 )
                 ParserNative.clearAllResources()
-                ProcessorNative.clearAllResources()
+                ContentFilterNative.clearAllResources()
                 return@parser data
             }
 
@@ -93,7 +91,7 @@ public object ArticleParser {
                 url = url,
             )
             ParserNative.clearAllResources()
-            ProcessorNative.clearAllResources()
+            ContentFilterNative.clearAllResources()
             return@parser data
         }
     }

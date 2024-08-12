@@ -10,7 +10,7 @@
 
 
 /**
- * Exlude rule option for the [BodyProcessor] component. Used to exlude some parts of html code.
+ * Exlude rule option for the [ContentFilter] component. Used to exlude some parts of html code.
  * @since 1.0.0
  */
 class ExcludeRule {

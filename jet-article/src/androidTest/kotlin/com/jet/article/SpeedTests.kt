@@ -2,6 +2,7 @@ package com.jet.article
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -19,7 +20,7 @@ class SpeedTests : BaseAndroidTest() {
     fun androidDocsTest() {
         val text = loadAsset(fileName = "android-docs-theme")
 
-        coroutineScope.launch {
+        runBlocking {
             val start = System.currentTimeMillis()
             val data = ArticleParser.parse(content = text, url = "")
             val end = System.currentTimeMillis()

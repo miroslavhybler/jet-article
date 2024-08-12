@@ -32,7 +32,7 @@ private fun HtmlAddressPreview() {
                     "    Example.com<br>\n" +
                     "    Box 564, Disneyland<br>\n" +
                     "    USA\n",
-            id = ""
+            id = "",
         )
     )
 }
