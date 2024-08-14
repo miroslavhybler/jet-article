@@ -17,8 +17,9 @@ ContentParser::ContentParser() {
 
 ContentParser::~ContentParser() = default;
 
-void ContentParser::setAreImagesEnabled(bool enabled) {
-    this->areImagesEnabled = enabled;
+void ContentParser::initialize(bool areImagesEnabled, bool isSimpleTextFormatAllowed) {
+    this->areImagesEnabled = areImagesEnabled;
+    this->isSimpleTextFormatAllowed = isSimpleTextFormatAllowed;
 }
 
 
@@ -61,7 +62,13 @@ std::string ContentParser::getTempContent() {
         std::string tempInput = input.substr(tempContentIndexStart, n);
         utils::trim(tempInput);
         std::string output = "";
-        utils::clearUnsupportedTagsFromTextBlock(tempInput, output, 0, tempInput.length());
+
+        if (isSimpleTextFormatAllowed) {
+            utils::clearUnsupportedTagsFromTextBlock(tempInput, output, 0, tempInput.length());
+        } else {
+            utils::clearTagsFromText(tempInput, output);
+        }
+
         return output;
     }
 
@@ -69,7 +76,7 @@ std::string ContentParser::getTempContent() {
 }
 
 
-//TODO handle random text somehow?
+//TODO handle random text outside tags somehow?
 //TODO Maybe enable that ininitialization, to process text outside tags
 //TODO https://android-developers.googleblog.com/ has texts inside divs
 void ContentParser::doNextStep() {
@@ -77,6 +84,7 @@ void ContentParser::doNextStep() {
     currentTag = "";
     currentTagBody = "";
     currentTagId = "";
+    index.invalidate();
 
     if (!moveIndexToNextTag()) {
         //No tag to process
@@ -85,6 +93,18 @@ void ContentParser::doNextStep() {
     }
     //char is < and its probably start of valid tag
     //TagType end index, index of next '>'
+
+
+    if (!currentContentOutsideTag.empty() && hasBodyContext()) {
+        utils::trim(currentContentOutsideTag);
+        if (!currentContentOutsideTag.empty()) {
+            utils::log("PARSER", "Text outside tags: " + currentContentOutsideTag);
+            tempContentIndexStart = index.getIndexOnStart() + 1;
+            tempContentIndexEnd = index.getIndex() - 1;
+            currentContentType = TEXT;
+            return;
+        }
+    }
 
 
     //Tag end index
@@ -222,6 +242,7 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
 
     if (utils::fastCompare(tag, "p")
         || utils::fastCompare(tag, "span")
+        || utils::fastCompare(tag, "em")
             ) {
         currentContentType = TEXT;
         hasContentToProcess = true;
@@ -321,7 +342,7 @@ void ContentParser::parseTableTag(const int &ctsi) {
     utils::groupPairTagContents(
             input, "tr", index.getIndex(), ctsi, tempOutputVector
     );
-    for (auto row : tempOutputVector) {
+    for (auto row: tempOutputVector) {
         std::vector<std::string_view> columns;
         if (!wasHeaderRowParsed) {
             utils::groupPairTagContents(row, "th", 0, row.length(), columns);

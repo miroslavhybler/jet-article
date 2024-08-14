@@ -37,6 +37,9 @@ public annotation class HtmlContentType constructor() {
         internal const val CODE: Int = 8
 
 
+        /**
+         * @since 1.0.0
+         */
         fun toString(@HtmlContentType value: Int): String {
             return when (value) {
                 NO_CONTENT -> "No Content"

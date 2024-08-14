@@ -8,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 
 
 /**
- * @author Miroslav Hýbler (Peko Studio s.r.o)<br>
+ * @author Miroslav Hýbler <br>
  * created on 05.08.2024
  */
 abstract class BaseAndroidTest public constructor() {

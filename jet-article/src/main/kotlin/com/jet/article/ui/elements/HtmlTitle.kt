@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jet.article.data.HtmlElement
@@ -18,15 +19,15 @@ import com.jet.article.ui.LocalColorScheme
 @Composable
 fun HtmlTitle(
     modifier: Modifier = Modifier,
-    title: HtmlElement.Title
+    title: HtmlElement.Title,
+    color: Color = MaterialTheme.colorScheme.onBackground,
 ) {
     val typography = MaterialTheme.typography
-    val colorScheme = LocalColorScheme.current
 
     val textStyle = remember(key1 = title) {
         when (title.titleTag) {
-            "h1", "h2" -> typography.displaySmall.copy(color = colorScheme.textColor)
-            else -> typography.titleLarge.copy(color = colorScheme.textColor)
+            "h1", "h2" -> typography.displaySmall.copy(color =color )
+            else -> typography.titleLarge.copy(color = color)
         }
     }
 
@@ -39,13 +40,13 @@ fun HtmlTitle(
 
 
 @Composable
-//@Preview(showBackground = true)
+@Preview(showBackground = true)
 private fun HtmlTitlePreview() {
     HtmlTitle(
         title = HtmlElement.Title(
             text = "Jetpack Compose rules!",
             titleTag = "h1",
-            id = "",
+            id = "page-title",
         )
     )
 }

@@ -31,6 +31,7 @@ private:
     int tempContentIndexStart = -1;
     int tempContentIndexEnd = -1;
     bool areImagesEnabled = false;
+    bool isSimpleTextFormatAllowed = true;
     std::vector<std::string_view> tempOutputVector;
     std::vector<std::vector<std::string_view>> tableHolder;
     std::map<std::string, std::string> tempOutputMap;
@@ -65,7 +66,12 @@ public:
     void setInput(std::string input);
 
 
-    void setAreImagesEnabled(bool enabled);
+    /**
+     *
+     * @param enabled
+     * @since 1.0.0
+     */
+    void initialize(bool areImagesEmabled, bool isSimpleTextFormatAllowed);
 
 
     /**

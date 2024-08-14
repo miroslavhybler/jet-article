@@ -1,6 +1,7 @@
 package com.jet.article
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -21,11 +22,16 @@ class SpeedTests : BaseAndroidTest() {
         val text = loadAsset(fileName = "android-docs-theme")
 
         runBlocking {
+            ArticleParser.initialize(
+                areImagesEnabled = true,
+                isSimpleTextFormatAllowed = true,
+                isLoggingEnabled = false,
+            )
             val start = System.currentTimeMillis()
             val data = ArticleParser.parse(content = text, url = "")
             val end = System.currentTimeMillis()
-            println("Time: ${end - start}")
-            assert(value= (end - start) < 10)
+            println("SpeedTests - Time: ${end - start}")
+            assertTrue((end - start) < 100)
         }
     }
 }

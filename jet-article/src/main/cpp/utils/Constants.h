@@ -11,7 +11,7 @@
 #include <set>
 
 /**
- * Sipmifies the meaning of html tags.
+ * Sipmifies the meaning of html tags, e.g. <p> <span> are considered being TEXT
  * @since 1.0.0
  */
 enum TagType {
@@ -48,13 +48,14 @@ const std::set<std::string> unsupportedPairTagsForTextBlock = {
         "noscript",
         "script",
         "svg",
-        "div"
+        "div",
+        "img",
 };
 
 
 /**
  * List of pair tags that are not supported by this library in global. For instance it means that
- * jet-article library cannot process <script> tag in any possible way.
+ * jet-article library cannot process ```<script>``` tag in any possible way.
  * @since 1.0.0
  */
 const std::set<std::string> unsupportedPairTags = {

@@ -18,6 +18,7 @@ public:
     std::string currentTag = "";
     std::string currentTagBody = "";
     std::string currentTagId = "";
+    std::string currentContentOutsideTag = "";
     TagType currentContentType = NO_CONTENT;
 
 protected:
@@ -129,13 +130,20 @@ protected:
             throw "Throwing because index >= length";
         }
 
+        currentContentOutsideTag.clear();
         //actual index within input
         char ch = input[index.getIndex()];
+
+
         while (ch != '<' && index.getIndex() < length) {
             //continuing next, no valid content to parse
             index.moveIndex(index.getIndex() + 1);
+            if (ch != '>') {
+                currentContentOutsideTag += ch;
+            }
             ch = input[index.getIndex()];
         }
+
         invalidateHasNextStep();
         if (!mHasNextStep) {
             return false;

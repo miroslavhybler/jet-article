@@ -137,6 +137,14 @@ namespace utils {
     );
 
 
+    /**
+     *
+     * @param input
+     * @param tag
+     * @param s
+     * @param e
+     * @return
+     */
     const int findClosingTagWithLogs(
             const std::string_view &input,
             const std::string &tag,
@@ -145,6 +153,13 @@ namespace utils {
     );
 
 
+    /**
+     *
+     * @param input
+     * @param tag
+     * @param s
+     * @return
+     */
     const int findUnsupportedTagClosing(
             const std::string_view &input,
             const std::string &tag,
@@ -200,6 +215,18 @@ namespace utils {
             const int &s,
             const int &e,
             std::vector<std::string_view> &outputList
+    );
+
+
+    /**
+     *
+     * @param input
+     * @param output
+     * @since 1.0.0
+     */
+    void clearTagsFromText(
+            const std::string_view &input,
+            std::string &output
     );
 
 

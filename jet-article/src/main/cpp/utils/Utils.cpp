@@ -23,10 +23,12 @@ namespace utils {
     int tempWorkingInt;
 
     /**
-     * True when logging is enabled, false otherwise
+     * True when logging is enabled, false otherwise. Used for development and debugging only,
+     * doesn't make sence to use logging in final app.
      * @since 1.0.0
      */
     bool isLoggingEnabled = false;
+
 
     std::function<bool(unsigned char)> trimPred = [](unsigned char ch) -> bool {
         return !std::isspace(ch);
@@ -568,6 +570,29 @@ namespace utils {
     }
 
 
+    void clearTagsFromText(
+            const std::string_view &input,
+            std::string &output
+    ) {
+        if (input.empty()) {
+            return;
+        }
+
+        output.clear();
+        bool insideTag = false;
+        for (char c: input) {
+            if (c == '<') {
+                insideTag = true;
+            } else if (c == '>' && insideTag) {
+                insideTag = false;
+            } else if (!insideTag) {
+                output += c;
+            }
+        }
+
+    }
+
+
     void getTagAttributes(
             const std::string &tagBody,
             std::map<std::string, std::string> &outMap
@@ -587,6 +612,12 @@ namespace utils {
             //atribute value end
             int avi = indexOf(tagBody, "\"", aei + 1);
 
+            if (aei == -1 && avi == -1) {
+                //Since attribute value wasn't found withing "", it's probably in apostrofes ''
+            }
+            aei = indexOf(tagBody, "\'", asi);
+            avi = indexOf(tagBody, "\'", aei + 1);
+
             if (aei == -1) {
                 //attribute not found,
                 return;
@@ -604,7 +635,10 @@ namespace utils {
     }
 
 
-    std::string getTagAttribute(const std::string &tagBody, const std::string &attributeName) {
+    std::string getTagAttribute(
+            const std::string &tagBody,
+            const std::string &attributeName
+    ) {
         int i = 0;
         while (i < tagBody.length()) {
             int ni = indexOf(tagBody, " ", i);
@@ -620,8 +654,15 @@ namespace utils {
             //atribute value end
             int avi = indexOf(tagBody, "\"", aei + 1);
 
+            if (aei == -1 && avi == -1) {
+                //Since attribute value wasn't found withing "", it's probably in apostrofes ''
+            }
+            aei = indexOf(tagBody, "\'", asi);
+            avi = indexOf(tagBody, "\'", aei + 1);
+
+
             if (aei == -1) {
-                //attribute not found
+                //attribute not found nor within "" nor '', it's probably not valid
                 return "";
             }
             //Minus 1 to remove '=' from attribute name e.g. class="hello"

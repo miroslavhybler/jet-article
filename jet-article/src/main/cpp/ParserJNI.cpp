@@ -33,10 +33,10 @@ Java_com_jet_article_ParserNative_initialize(
         JNIEnv *environment,
         jobject caller,
         jboolean areImagesEnabled,
-        jboolean isLoggingEnabled
+        jboolean isLoggingEnabled,
+        jboolean isSimpleTextFormatAllowed
 ) {
-    jboolean isCopy;
-    jni::contentParser->setAreImagesEnabled(areImagesEnabled);
+    jni::contentParser->initialize(areImagesEnabled, isSimpleTextFormatAllowed);
     utils::setIsLoggingEnabled(isLoggingEnabled);
 }
 
@@ -91,6 +91,11 @@ Java_com_jet_article_ParserNative_doNextStep(
             utils::log("JNI", "i after: " + std::to_string(jni::contentParser->getCurrentIndex()));
 
         }
+    } else if (
+            jni::contentParser->hasBodyContext() &&
+            !jni::contentParser->currentContentOutsideTag.empty()) {
+
+        jni::isContentForVisualAvailable = true;
     }
 }
 

@@ -2,8 +2,17 @@ package com.jet.article
 
 
 /**
+ * Java Native Interface (JNI) for utils of parser library
  * @author Miroslav Hýbler <br>
  * created on 22.01.2024
+ * @since 1.0.0
  */
-object UtilsNative {
+internal object UtilsNative {
+
+
+    /**
+     * @since 1.0.0
+     */
+    external fun clearTagsFromText(input: String): String
+
 }

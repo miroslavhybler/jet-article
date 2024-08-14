@@ -107,10 +107,8 @@ dependencies {
     implementation(libs.accompanist.systemuicontroller)
 
     /** Hilt DI */
-    implementation(libs.hilt.android)
-    ksp(libs.hilt.android.compiler)
-    implementation(libs.androidx.hilt.common)
-    ksp(libs.androidx.hilt.compiler)
+    implementation(libs.google.dagger.hilt)
+    ksp(libs.google.dagger.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
     implementation(libs.gson)

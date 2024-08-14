@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -38,12 +39,14 @@ fun HtmlTextBlock(
     modifier: Modifier = Modifier,
     text: HtmlElement.TextBlock,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
-) {
+    color: Color = MaterialTheme.colorScheme.onBackground,
+    ) {
 
     HtmlTextBlock(
         modifier = modifier,
         text = text.text,
         style = style,
+        color = color,
     )
 }
 
@@ -53,6 +56,7 @@ fun HtmlTextBlock(
     modifier: Modifier = Modifier,
     text: String,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
+    color: Color = MaterialTheme.colorScheme.onBackground,
 ) {
     val linkClickHandler = LocalLinkHandler.current
     val articleUrl = LocalBaseArticleUrl.current
@@ -81,10 +85,11 @@ fun HtmlTextBlock(
 //        initialAlpha = 1f
 //    })
 
+    //TODO
     ClickableText(
         text = formattedText,
-        style = remember(key1 = style, key2 = colorScheme.textColor) {
-            style.copy(color = colorScheme.textColor)
+        style = remember(key1 = style, key2 = color) {
+            style.copy(color = color)
         },
         onClick = { offset ->
             linkClickHandler?.handleLink(

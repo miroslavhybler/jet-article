@@ -74,6 +74,7 @@ public fun JetHtmlArticle(
     listState: LazyListState = rememberLazyListState(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     contentPadding: PaddingValues = PaddingValues(all = 0.dp),
+    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     header: @Composable LazyItemScope.() -> Unit = {},
     footer: @Composable LazyItemScope.() -> Unit = {},
     linkClickCallback: LinkClickHandler.LinkCallback = rememberDefaultLinkCallback(
@@ -90,11 +91,12 @@ public fun JetHtmlArticle(
         data = data,
         listState = listState,
         contentPadding = contentPadding,
+        verticalArrangement=verticalArrangement,
         header = header,
         footer = footer,
         snackbarHostState = snackbarHostState,
         colors = colors,
-        linkClickCallback = linkClickCallback
+        linkClickCallback = linkClickCallback,
     )
 }
 
@@ -216,6 +218,8 @@ public fun JetHtmlArticleContent(
 public object JetHtmlArticleDefaults {
 
 
+
+
     /**
      * @since 1.0.0
      */
@@ -238,7 +242,6 @@ public object JetHtmlArticleDefaults {
     private fun getDefaultColors(
         colorScheme: ColorScheme
     ): JetHtmlArticleColors = JetHtmlArticleColors(
-        textColor = colorScheme.onBackground,
         linkColor = colorScheme.primary,
         quoteTextColor = colorScheme.onBackground,
         quoteBarColor = colorScheme.tertiary,
@@ -257,7 +260,6 @@ public object JetHtmlArticleDefaults {
  * @since 1.0.0
  */
 public class JetHtmlArticleColors public constructor(
-    val textColor: Color,
     val linkColor: Color,
     val quoteTextColor: Color,
     val quoteBarColor: Color,

@@ -15,6 +15,7 @@ class IndexWrapper {
 
 private:
     int index = 0;
+    int indexOnStart = 0;
 
 public:
     IndexWrapper();
@@ -37,6 +38,21 @@ public:
      * @since 1.0.0
      */
     const int getIndex();
+
+
+    /**
+     *
+     * @return
+     * @since 1.0.0
+     */
+    const int getIndexOnStart();
+
+
+
+    /**
+     * @since 1.0.0
+     */
+    void invalidate();
 
 
     /**

@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.sp
 
 
 /**
- * @author Miroslav Hýbler (Peko Studio s.r.o)<br>
+ * @author Miroslav Hýbler <br>
  * created on 01.05.2024
  */
 @Composable

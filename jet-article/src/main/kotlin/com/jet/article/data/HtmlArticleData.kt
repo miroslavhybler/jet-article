@@ -25,11 +25,17 @@ public class HtmlArticleData public constructor(
         val empty: HtmlArticleData = HtmlArticleData(url = "")
     }
 
-
     /**
      * True when html data are empty
      * @since 1.0.0
      */
     val isEmpty: Boolean
         get() = elements.isEmpty()
+
+
+    /**
+     * @since 1.0.0
+     */
+    val firstTitle: HtmlElement.Title?
+        get() = elements.firstOrNull { it is HtmlElement.Title } as? HtmlElement.Title
 }

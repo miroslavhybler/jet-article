@@ -20,7 +20,11 @@ import kotlin.coroutines.CoroutineContext
  * created on 20.02.2024
  * @since 1.0.0
  */
-@Deprecated(message = "Analyzer is buggy and probably will be removed")
+@Deprecated(
+    message = "Analyzer is buggy and probably will be removed, this was handy during library " +
+            "development but it doenst make much sence to have in library.",
+    level = DeprecationLevel.WARNING,
+)
 public object ArticleAnalyzer {
 
 

@@ -19,6 +19,7 @@ internal object ParserNative {
     external fun initialize(
         areImagesEnabled: Boolean,
         isLoggingEnabled: Boolean,
+        isSimpleTextFormatAllowed: Boolean,
     ): Unit
 
 

@@ -69,8 +69,8 @@ android {
 
 dependencies {
 
-    api(libs.github.jet.lint)
-    implementation(libs.github.jet.utils)
+    api(libs.jet.lint)
+    implementation(libs.jet.utils)
 
     implementation(libs.androidx.core.core.ktx)
     implementation(libs.androidx.lifecycle.lifecycle.runtime.ktx)

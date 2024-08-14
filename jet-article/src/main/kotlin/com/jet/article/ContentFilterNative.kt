@@ -7,9 +7,7 @@ package com.jet.article
  * @author Miroslav Hýbler <br>
  * created on 23.01.2024
  */
-@Deprecated(message = "Doens't make much sence")
-public object ContentFilterNative {
-
+internal object ContentFilterNative {
 
     /**
      * Adds rule for text processing. At least one parameters should be set.

@@ -27,6 +27,16 @@ const int IndexWrapper::getIndex() {
 }
 
 
+const int IndexWrapper::getIndexOnStart() {
+    return indexOnStart;
+}
+
+
+void IndexWrapper::invalidate() {
+    indexOnStart = index;
+}
+
+
 void IndexWrapper::reset() {
     this->index = 0;
 }

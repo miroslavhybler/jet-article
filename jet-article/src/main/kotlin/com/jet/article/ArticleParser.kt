@@ -31,15 +31,36 @@ public object ArticleParser {
     /**
      * @param areImagesEnabled True when you want to enable images being included in output, false otherwise.
      * @param isLoggingEnabled True if you want to enable logs from native libs, false otherwise
+     * @param isSimpleTextFormatAllowed True if you want to use simple html formatting like bold, italic, ...
+     * for the text. False otherwise.
      * @since 1.0.0
      */
     public fun initialize(
         areImagesEnabled: Boolean,
         isLoggingEnabled: Boolean,
+        isSimpleTextFormatAllowed: Boolean,
     ): Unit {
         ParserNative.initialize(
             areImagesEnabled = areImagesEnabled,
             isLoggingEnabled = isLoggingEnabled,
+            isSimpleTextFormatAllowed = isSimpleTextFormatAllowed,
+        )
+    }
+
+    /**
+     * @since 1.0.0
+     */
+    fun addExcludeOption(
+        tag: String = "",
+        clazz: String = "",
+        id: String = "",
+        keyword: String = "",
+    ): Unit {
+        ContentFilterNative.addExcludeOption(
+            tag = tag,
+            clazz = clazz,
+            id = id,
+            keyword = keyword,
         )
     }
 
@@ -106,6 +127,8 @@ public object ArticleParser {
     ) {
         val type = ParserNative.getContentType()
         if (type == HtmlContentType.NO_CONTENT) {
+            //Some weird error, this should never happen but teoretically it can since elements
+            //parts are stored separately on c++ side.
             return
         }
         when (type) {
@@ -245,5 +268,23 @@ public object ArticleParser {
 
             else -> {}
         }
+    }
+
+
+    /**
+     * Holds util functions which can be used independentely from [ArticleParser]
+     * @since 1.0.0
+     */
+    object Utils {
+
+        /**
+         * @param input
+         * @return
+         * @since 1.0.0
+         */
+        fun clearTagsFromText(input: String): String {
+            return UtilsNative.clearTagsFromText(input = input)
+        }
+
     }
 }

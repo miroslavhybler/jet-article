@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.jet.article.data.HtmlArticleData
 import com.jet.article.ArticleParser
-import com.jet.article.ContentFilterNative
 import jet.html.article.example.data.ExcludeRule
 import jet.html.article.example.data.TestResults
 import javax.inject.Inject
@@ -44,7 +43,7 @@ class ArticleViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             ExcludeRule.globalRules.forEach { excludeRule ->
-                ContentFilterNative.addExcludeOption(
+                ArticleParser.addExcludeOption(
                     keyword = excludeRule.keyword,
                     tag = excludeRule.tag,
                     id = excludeRule.id,

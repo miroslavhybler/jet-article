@@ -5,7 +5,6 @@ import android.content.res.AssetManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jet.article.ArticleParser
-import com.jet.article.ContentFilterNative
 import com.jet.article.data.HtmlArticleData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -42,7 +41,7 @@ class BenchmarkViewModel @Inject constructor(
         this.article = article
         viewModelScope.launch {
             ExcludeRule.globalRules.forEach {
-                ContentFilterNative.addExcludeOption(
+                ArticleParser.addExcludeOption(
                     tag = it.tag,
                     clazz = it.clazz,
                     id = it.id,

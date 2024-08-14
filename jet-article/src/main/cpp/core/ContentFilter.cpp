@@ -208,11 +208,9 @@ bool ContentFilter::isWordPresented(
     if (isWord) {
         return true;
     }
-
     if (isContainsEnabled) {
         return input.find(word) != std::string_view::npos;
     }
-
 
     return false;
 }
