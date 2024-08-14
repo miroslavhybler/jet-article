@@ -614,9 +614,9 @@ namespace utils {
 
             if (aei == -1 && avi == -1) {
                 //Since attribute value wasn't found withing "", it's probably in apostrofes ''
+                aei = indexOf(tagBody, "\'", asi);
+                avi = indexOf(tagBody, "\'", aei + 1);
             }
-            aei = indexOf(tagBody, "\'", asi);
-            avi = indexOf(tagBody, "\'", aei + 1);
 
             if (aei == -1) {
                 //attribute not found,
@@ -656,10 +656,9 @@ namespace utils {
 
             if (aei == -1 && avi == -1) {
                 //Since attribute value wasn't found withing "", it's probably in apostrofes ''
+                aei = indexOf(tagBody, "\'", asi);
+                avi = indexOf(tagBody, "\'", aei + 1);
             }
-            aei = indexOf(tagBody, "\'", asi);
-            avi = indexOf(tagBody, "\'", aei + 1);
-
 
             if (aei == -1) {
                 //attribute not found nor within "" nor '', it's probably not valid
