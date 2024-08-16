@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -81,6 +82,9 @@ private enum class SpanCopier {
             context: CopierContext
         ) {
             val urlSpan = span as URLSpan
+
+
+            //TODO replace with link Annotation
             destination.addStringAnnotation(
                 tag = name,
                 annotation = urlSpan.url,

@@ -42,6 +42,11 @@ void ContentAnalyzer::setRange(int s, int e) {
 
 void ContentAnalyzer::doNextStep() {
 
+    if (!mHasNextStep) {
+        return;
+    }
+
+    index.invalidate();
     currentTag = "";
     currentTagBody = "";
     currentTagId = "";
@@ -49,15 +54,15 @@ void ContentAnalyzer::doNextStep() {
     currentPairTagContent = "";
     currentTagAttributes.clear();
 
-    if (mHasNextStep) {
-        if (!moveIndexToNextTag()) {
-            utils::log("ANALYZER", "Unable to move to next tag");
-            return;
-        }
-        //No tag to process
-        invalidateHasNextStep();
-        //TODO maybe analyzer return some status to app, unable to move next
+
+    if (!moveIndexToNextTag()) {
+        utils::log("ANALYZER", "Unable to move to next tag");
+        return;
     }
+    //No tag to process
+    invalidateHasNextStep();
+    //TODO maybe analyzer return some status to app, unable to move next
+
 
     if (!mHasNextStep) {
         return;
@@ -79,7 +84,6 @@ void ContentAnalyzer::doNextStep() {
 
     currentTagBody = input.substr(index.getIndex() + 1, tagBodyLength);
     currentTag = utils::getTagName(currentTagBody);
-
     currentTagStartIndex = index.getIndex();
     currentTagEndIndex = tei;
 
@@ -87,11 +91,20 @@ void ContentAnalyzer::doNextStep() {
         //Skipping closing tag
         //its because after we parse out nested content, we don't know the "right" closing tag
         //example <div><p>...</p></div> after parsing <p> we move behind </p>
+
+        if (currentTag == "/body" || currentTag == "/html") {
+            //Analyzer is really buggy now and works diferently from parser
+            //this prevents form crash at moveIndexToNextTag()
+            mHasBodyContext = false;
+            index.moveIndex(length);
+            mHasNextStep = false;
+            return;
+        }
+
         index.moveIndex(tei + 1);
         invalidateHasNextStep();
         return;
     }
-
     if (mHasBodyContext) {
         currentTagId = utils::getTagAttribute(currentTagBody, "id");
         currentTagName = utils::getTagAttribute(currentTagBody, "name");
@@ -114,9 +127,10 @@ void ContentAnalyzer::doNextStep() {
 
         bool isCurrentTagPair = utils::isTagPairTag(currentTagBody);
         if (isCurrentTagPair) {
+            //TODO probably when comes to <div> it skipps to </div> instead goint intside
             try {
                 int s = tei + 1;
-                int ctsi = utils::findClosingTagWithLogs(input, currentTag, tei);
+                int ctsi = utils::findClosingTag(input, currentTag, tei);
                 currentPairTagContent = input.substr(tei + 1, ctsi - tei - 1);
 
                 int next;
@@ -142,7 +156,6 @@ void ContentAnalyzer::doNextStep() {
             }
 
         } else {
-
             index.moveIndex(tei + 1);
         }
 
@@ -160,7 +173,7 @@ void ContentAnalyzer::doNextStep() {
     } else if (!wasHeadParsed && utils::fastCompare(currentTag, "head")) {
         try {
             //Closing tag start index
-         //   int ctsi = utils::findClosingTag(input, currentTag, index);
+            //   int ctsi = utils::findClosingTag(input, currentTag, index);
             // parseHeadData(ctsi);
             invalidateHasNextStep();
             wasHeadParsed = false;
@@ -180,7 +193,9 @@ std::string ContentAnalyzer::getCurrentTagAttributeName(int index) {
 }
 
 
-std::string ContentAnalyzer::getCurrentTagAttributeValue(std::string attributeName) {
+std::string ContentAnalyzer::getCurrentTagAttributeValue(
+        std::string &attributeName
+) {
     return currentTagAttributes[attributeName];
 }
 

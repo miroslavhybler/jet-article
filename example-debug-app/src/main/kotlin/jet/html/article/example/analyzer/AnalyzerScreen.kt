@@ -33,7 +33,7 @@ import androidx.navigation.NavHostController
 import com.jet.article.ArticleAnalyzer
 import com.jet.article.data.HtmlAnalyzerData
 import com.jet.article.data.HtmlContentType
-import com.jet.article.data.TagAnalyze
+import com.jet.article.data.TagInfo
 
 
 /**
@@ -147,7 +147,7 @@ private fun AnalyzerDetailsInfo(
                 DataRow(label = "Id:", value = tag.id)
                 DataRow(label = "Class:", value = tag.clazz)
                 DataRow(label = "Range:", value = "${analyzerData.range}")
-                DataRow(label = "Pair:", value = "${analyzerData.tag is TagAnalyze.Pair}")
+                DataRow(label = "Pair:", value = "${analyzerData.tag is TagInfo.Pair}")
 
                 Spacer(modifier = Modifier.height(height = 12.dp))
                 Text(text = "Attributes", style = MaterialTheme.typography.titleSmall)
@@ -156,10 +156,10 @@ private fun AnalyzerDetailsInfo(
                     DataRow(label = t, value = u, labelWeight = 1f, valueWeight = 1f)
                 }
 
-                if (analyzerData.tag is TagAnalyze.Pair) {
+                if (analyzerData.tag is TagInfo.Pair) {
                     Text(text = "Pair tag content", style = MaterialTheme.typography.titleSmall)
                     Text(
-                        text = (analyzerData.tag as TagAnalyze.Pair).content,
+                        text = (analyzerData.tag as TagInfo.Pair).content,
                         style = MaterialTheme.typography.bodySmall
                     )
                 }

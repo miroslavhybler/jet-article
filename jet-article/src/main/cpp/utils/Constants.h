@@ -26,7 +26,6 @@ enum TagType {
     CODE = 8,
 };
 
-
 /**
  * @since 1.0.0
  */

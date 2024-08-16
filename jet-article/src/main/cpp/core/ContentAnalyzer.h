@@ -61,7 +61,9 @@ public:
 
     std::string getCurrentTagAttributeName(int index);
 
-    std::string getCurrentTagAttributeValue(std::string attributeName);
+    std::string getCurrentTagAttributeValue(
+            std::string &attributeName
+    );
 
 
     int getCurrentAttributesSize();

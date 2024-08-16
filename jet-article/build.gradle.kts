@@ -22,7 +22,10 @@ android {
         consumerProguardFiles("consumer-rules.pro")
         externalNativeBuild {
             cmake {
-                cppFlags("-std=c++20")
+                arguments(
+                    "-DANDROID_ARM_MODE=arm",
+                    "-DANDROID_STL=c++_shared"
+                )
             }
         }
     }
@@ -38,6 +41,16 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            externalNativeBuild {
+                cmake {
+                    arguments(
+                        "-DANDROID_ARM_MODE=arm",
+                        "-DANDROID_STL=c++_shared"
+                    )
+                }
+            }
         }
     }
     externalNativeBuild {
@@ -131,12 +144,14 @@ tasks {
 
     create(name = "generateCppDocs", type = Exec::class) {
         val outputDir = buildDir.resolve(relative = "docs/cpp")
-        if (!outputDir.exists()) { outputDir.mkdirs() }
+        if (!outputDir.exists()) {
+            outputDir.mkdirs()
+        }
         commandLine("doxygen")
     }
 
 
-    create(name ="generateFullDocs", type = Task::class) {
+    create(name = "generateFullDocs", type = Task::class) {
         dependsOn("dokkaHtml", "generateCppDocs")
     }
 }

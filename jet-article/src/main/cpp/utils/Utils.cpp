@@ -177,31 +177,58 @@ namespace utils {
             const int &s,
             int &outIndex
     ) {
+
+        if (s >= l) {
+            return false;
+        }
+
         int i = s;
         outIndex = i;
         if ((i + 3) < l) {
             int il = i + 3;
-            std::string_view sub = input.substr(i + 1, 3);
+            std::string_view sub;
+            try {
+                sub = input.substr(i + 1, 3);
+            } catch (std::out_of_range &e) {
+                return false;
+            }
+
             if (utils::fastCompare(sub, "!--")) {
-                int ei = utils::indexOfOrThrow(input, "-->", il);
+                int ei;
+                try {
+                    ei = utils::indexOfOrThrow(input, "-->", il);
+                } catch (ErrorCode e) {
+                    return false;
+                }
+
                 outIndex = ei + 3;
                 return false;
             }
         }
+        if (i + 12 < l) {
+            int il = i + 12;
+            std::string_view sub;
 
-        if ((i + 14) < l) {
-            int il = i + 14;
-            std::string_view sub = input.substr(i + 1, 14);
-            if (utils::fastCompare(sub, "!doctype html>")) {
+            try {
+                sub = input.substr(i + 1, 12);
+            } catch (std::out_of_range &e) {
+                return false;
+            }
+
+            if (utils::fastCompare(sub, "/![cdata[//>")) {
                 outIndex = il;
                 return false;
             }
         }
-
-        if (i + 12 < l) {
-            int il = i + 12;
-            std::string_view sub = input.substr(i + 1, 12);
-            if (utils::fastCompare(sub, "/![cdata[//>")) {
+        if ((i + 14) < l) {
+            int il = i + 14;
+            std::string_view sub;
+            try {
+                sub = input.substr(i + 1, 14);
+            } catch (std::out_of_range &e) {
+                return false;
+            }
+            if (utils::fastCompare(sub, "!doctype html>")) {
                 outIndex = il;
                 return false;
             }
@@ -766,8 +793,8 @@ namespace utils {
     }
 
 
-    std::string listToString(std::vector<std::string_view> list) {
-        std::string output = "";
+    std::string listToString(std::vector<std::string_view> &list) {
+        std::string output;
 
 
         for (const auto text: list) {

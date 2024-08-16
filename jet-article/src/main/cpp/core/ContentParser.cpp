@@ -17,7 +17,10 @@ ContentParser::ContentParser() {
 
 ContentParser::~ContentParser() = default;
 
-void ContentParser::initialize(bool areImagesEnabled, bool isSimpleTextFormatAllowed) {
+void ContentParser::initialize(
+        bool areImagesEnabled,
+        bool isSimpleTextFormatAllowed
+) {
     this->areImagesEnabled = areImagesEnabled;
     this->isSimpleTextFormatAllowed = isSimpleTextFormatAllowed;
 }
@@ -95,6 +98,7 @@ void ContentParser::doNextStep() {
     //TagType end index, index of next '>'
 
 
+    //Saves text that is outside regular text tags
     if (!currentContentOutsideTag.empty() && hasBodyContext()) {
         utils::trim(currentContentOutsideTag);
         if (!currentContentOutsideTag.empty()) {
@@ -234,8 +238,8 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
         tempContentIndexStart = index.getIndex();
         tempContentIndexEnd = ctsi;
     } catch (ErrorCode e) {
-        //Html artycles has too much html syntax errors like unclosed pair tags or others,
-        //so library should keep parsing
+        //Html articles has too much html syntax errors like unclosed pair tags or others,
+        //so library should keep parsing, browsers are also ignoring these errors
         //Just keep parsing, just keep parsing
         return;
     }
@@ -398,7 +402,7 @@ std::string ContentParser::getTempListItem(int i) {
 }
 
 
-std::string ContentParser::getTempMapItem(std::string attributeName) {
+std::string ContentParser::getTempMapItem(const std::string &attributeName) {
     return tempOutputMap[attributeName];
 }
 

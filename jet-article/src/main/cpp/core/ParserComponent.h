@@ -15,10 +15,10 @@ class AbstractParserComponent {
 
     //TODO make protected
 public:
-    std::string currentTag = "";
-    std::string currentTagBody = "";
-    std::string currentTagId = "";
-    std::string currentContentOutsideTag = "";
+    std::string currentTag;
+    std::string currentTagBody;
+    std::string currentTagId;
+    std::string currentContentOutsideTag;
     TagType currentContentType = NO_CONTENT;
 
 protected:
@@ -33,7 +33,7 @@ protected:
 
     bool isAbortingWithException;
     ErrorCode error;
-    std::string errorMessage = "";
+    std::string errorMessage;
 
     //TODO maybe private
     int temporaryOutIndex = 0;
@@ -80,7 +80,7 @@ public:
      * @return True when parser is not done parsing yet.
      * @since 1.0.0
      */
-    bool hasNextStep() {
+    [[nodiscard]] bool hasNextStep() const {
         return mHasNextStep;
     };
 
@@ -107,6 +107,9 @@ protected:
     /////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+    /**
+     * @since 1.0.0
+     */
     void invalidateHasNextStep() {
         mHasNextStep = index.getIndex() < length;
     }
@@ -119,38 +122,52 @@ protected:
      * and further processing is required. False otherwise.
      * @since 1.0.0
      */
-    bool moveIndexToNextTag() {
+    [[nodiscard]] bool moveIndexToNextTag() {
         if (!mHasNextStep) {
-            //TODO
-            throw "mNextStep is false";
+            //Compoent can't do next step.
+            return false;
         }
 
-        if (index.getIndex() >= length) {
-            //TODO
-            throw "Throwing because index >= length";
+        int i = index.getIndex();
+        if (i >= length || i < 0) {
+            //Index is at the and, unable to make next step.
+            invalidateHasNextStep();
+            return false;
         }
 
         currentContentOutsideTag.clear();
         //actual index within input
-        char ch = input[index.getIndex()];
-
-
-        while (ch != '<' && index.getIndex() < length) {
-            //continuing next, no valid content to parse
-            index.moveIndex(index.getIndex() + 1);
-            if (ch != '>') {
-                currentContentOutsideTag += ch;
-            }
-            ch = input[index.getIndex()];
-        }
-
-        invalidateHasNextStep();
-        if (!mHasNextStep) {
+        char ch;
+        try {
+            ch = input[i];
+        } catch (const std::out_of_range &e) {
+            utils::log("PARSER-COMPONENT", "out of range");
             return false;
         }
 
+        while (ch != '<' && i < length) {
+            if (ch != '>') {
+                currentContentOutsideTag += ch;
+            }
+            i += 1;
+            try {
+                ch = input[i];
+            } catch (const std::out_of_range &e) {
+                index.moveIndex(i);
+                return false;
+            }
+        }
+
+        if (i >= length) {
+            //Next tag was not found and i gets out of the length of the content
+            index.moveIndex(length);
+            mHasNextStep = false;
+            return false;
+        }
+
+        index.moveIndex(i);
         //char is <
-        if (!utils::canProcessIncomingTag(input, length, index.getIndex(), temporaryOutIndex)) {
+        if (!utils::canProcessIncomingTag(input, length, i, temporaryOutIndex)) {
             //Char < is staring some special sequence like comment <!--
             //Moving cursor to the next '<' char
             index.moveIndex(temporaryOutIndex + 1);
@@ -164,11 +181,14 @@ protected:
     /**
      *
      * @param tag
-     * @param tei
+     * @param tei Tag end index
      * @return
      * @since 1.0.0
      */
-    bool isActualTagValidForNextProcessing(std::string &tag, int &tei) {
+    bool isActualTagValidForNextProcessing(
+            const std::string &tag,
+            const int &tei
+    ) {
         if (utils::fastCompare(tag, "br/")
             || utils::fastCompare(tag, "br")
             || utils::fastCompare(tag, "hr")

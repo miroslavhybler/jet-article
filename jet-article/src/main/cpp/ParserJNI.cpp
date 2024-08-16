@@ -282,15 +282,14 @@ Java_com_jet_article_ContentFilterNative_addExcludeOption(
         jstring keyword
 ) {
     jboolean outIsCopy = false;
-    jni::processor->addRule(
-            ExcludeRule(
-                    environment->GetStringUTFChars(tag, &outIsCopy),
-                    environment->GetStringUTFChars(clazz, &outIsCopy),
-                    environment->GetStringUTFChars(id, &outIsCopy),
-                    environment->GetStringUTFChars(keyword, &outIsCopy)
+    ExcludeRule rule = ExcludeRule(
+            environment->GetStringUTFChars(tag, &outIsCopy),
+            environment->GetStringUTFChars(clazz, &outIsCopy),
+            environment->GetStringUTFChars(id, &outIsCopy),
+            environment->GetStringUTFChars(keyword, &outIsCopy)
 
-            )
     );
+    jni::processor->addRule(rule);
 }
 
 extern "C" JNIEXPORT void JNICALL

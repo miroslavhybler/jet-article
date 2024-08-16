@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.22.1)
 project("jet-article")
 
+set(CMAKE_CXX_STANDARD 20)
+
 SET(
         DEPENDENCIES
         ParserJNI.cpp

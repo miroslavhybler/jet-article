@@ -11,12 +11,12 @@ public sealed class HtmlAnalyzerData private constructor(
     open val range: IntRange
 ) {
 
-
     public data object Empty : HtmlAnalyzerData(range = IntRange(start = 0, endInclusive = 0))
+
 
     public data class ContentTag internal constructor(
         override val range: IntRange,
-        val tag: TagAnalyze,
+        val tag: TagInfo,
     ) : HtmlAnalyzerData(range = range) {
 
     }

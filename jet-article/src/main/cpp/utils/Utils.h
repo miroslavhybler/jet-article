@@ -43,7 +43,7 @@ namespace utils {
      * @param input Input for searching substring
      * @param sub Substring you want to search
      * @param i Start index
-     * @throws Exception when sub was not found within input from i
+     * @throws ErrorCode when sub was not found within input from i
      * @return index of first found substring
      * @since 1.0.0
      */
@@ -96,7 +96,8 @@ namespace utils {
      * able to parse.
      * @param input Input
      * @param l Length of input
-     * @param index IndexWrapper that will be used.
+     * @param s Start index of the sequence, char at this index has to be '<'
+     * @param outIndex TODO
      * @return True if next string to process is valid tag syntax
      * @since 1.0.0
      */
@@ -328,7 +329,7 @@ namespace utils {
      * @return
      * @since 1.0.0
      */
-    std::string listToString(std::vector<std::string_view> list);
+    std::string listToString(std::vector<std::string_view> &list);
 
 
     /**

@@ -4,7 +4,7 @@ package com.jet.article
 
 import android.util.Log
 import com.jet.article.data.HtmlAnalyzerData
-import com.jet.article.data.TagAnalyze
+import com.jet.article.data.TagInfo
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,8 +21,8 @@ import kotlin.coroutines.CoroutineContext
  * @since 1.0.0
  */
 @Deprecated(
-    message = "Analyzer is buggy and probably will be removed, this was handy during library " +
-            "development but it doenst make much sence to have in library.",
+    message = "Analyzer is buggy and probably will be removed or replaced by different component." +
+            "This was handy during library development but it doenst make much sence to have it.",
     level = DeprecationLevel.WARNING,
 )
 public object ArticleAnalyzer {
@@ -49,8 +49,8 @@ public object ArticleAnalyzer {
     /**
      * @since 1.0.0
      */
-    private val resultData: ArrayList<HtmlAnalyzerData> = ArrayList()
-
+    private val mResultData: ArrayList<HtmlAnalyzerData> = ArrayList()
+    val resultData: List<HtmlAnalyzerData> get() = mResultData
 
     /**
      * @since 1.0.0
@@ -65,16 +65,18 @@ public object ArticleAnalyzer {
         content: String
     ): Unit = withContext(context = safeCoroutineContext) {
         AnalyzerNative.setInput(input = content)
-        resultData.clear()
+        mResultData.clear()
         actualDataIndex = -1
     }
 
 
-    suspend fun moveNext(): Unit = withContext(context = safeCoroutineContext) {
+    suspend fun moveNext(): Boolean = withContext(
+        context = safeCoroutineContext
+    ) {
 
-        if (actualDataIndex < resultData.lastIndex) {
-            mAnalyzerFlow.value = resultData[++actualDataIndex]
-            return@withContext
+        if (actualDataIndex < mResultData.lastIndex) {
+            mAnalyzerFlow.value = mResultData[++actualDataIndex]
+            return@withContext true
         }
 
         val actualData = analyzerFlow.value
@@ -83,8 +85,10 @@ public object ArticleAnalyzer {
         if (!AnalyzerNative.hasNextStep()) {
             Log.w(
                 "ArticleAnalyzer",
-                "Attempt to moveNext() but NativeAnalyzer can't go next based on the range"
+                "Attempt to moveNext() but NativeAnalyzer can't go next, probably it's on the end of document"
             )
+
+            return@withContext false
         }
 
         AnalyzerNative.doNextStep()
@@ -101,12 +105,17 @@ public object ArticleAnalyzer {
                 errorMessage = errorMessage,
                 cause = errorCode
             )
-            resultData.add(element = newData)
+            mResultData.add(element = newData)
             //TODO index
             actualDataIndex += 1
             mAnalyzerFlow.value = newData
 
-            return@withContext
+            Log.e(
+                "ArticleAnalyzer",
+                "Aborting with error $newData"
+            )
+
+            return@withContext false
         }
 
         val tag = AnalyzerNative.getCurrentTag()
@@ -129,8 +138,8 @@ public object ArticleAnalyzer {
 
         val isPairTag = AnalyzerNative.hasPairTagContent()
 
-        val tagAnalyze = if (isPairTag) {
-            TagAnalyze.Pair(
+        val tagInfo = if (isPairTag) {
+            TagInfo.Pair(
                 tag = tag,
                 name = name,
                 id = id,
@@ -141,7 +150,7 @@ public object ArticleAnalyzer {
             )
 
         } else {
-            TagAnalyze.Single(
+            TagInfo.Single(
                 tag = tag,
                 name = name,
                 id = id,
@@ -151,15 +160,19 @@ public object ArticleAnalyzer {
             )
 
         }
+//        Log.d(
+//            "ArticleAnalyzer", "newInfo: $tagInfo"
+//        )
         val newData = HtmlAnalyzerData.ContentTag(
-            tag = tagAnalyze,
+            tag = tagInfo,
             range = IntRange(start = contentStart, endInclusive = contentEnd)
         )
 
-        resultData.add(element = newData)
+        mResultData.add(element = newData)
         //TODO index
         actualDataIndex += 1
         mAnalyzerFlow.value = newData
+        return@withContext true
     }
 
     suspend fun movePrevious(): Unit = withContext(context = safeCoroutineContext) {
@@ -171,13 +184,27 @@ public object ArticleAnalyzer {
             return@withContext
         }
 
-        val data = resultData[--actualDataIndex]
+        val data = mResultData[--actualDataIndex]
         mAnalyzerFlow.value = data
     }
 
 
-    suspend fun moveInside(): Unit = withContext(context = safeCoroutineContext) {
-        TODO()
+    //TODO move out somehow
+    //TODO parser component nepočítá s range
+    suspend fun moveInside(): Boolean = withContext(context = safeCoroutineContext) {
+        val data = analyzerFlow.value
+        if (data is HtmlAnalyzerData.ContentTag && data.tag.isPairTag) {
+            (data.tag as TagInfo.Pair).let {
+                AnalyzerNative.setRange(
+                    start = data.range.first,
+                    end = data.range.last,
+                )
+                return@withContext true
+            }
+        }
+
+
+        return@withContext false
     }
 
 
@@ -193,7 +220,7 @@ public object ArticleAnalyzer {
 
 
     fun clearAllResources() {
-        resultData.clear()
+        mResultData.clear()
         actualDataIndex = -1
         AnalyzerNative.clearAllResources()
     }

@@ -192,20 +192,7 @@ bool ContentFilter::isWordPresented(
         return false;
     }
 
-    utils::log(
-            "CONTENT-FILTER",
-            "isWordPresented comparing -- " + std::string(word) + " == " +
-            std::string(input) + " " + utils::boolToString(isContainsEnabled)
-    );
-
-    bool isWord = utils::fastCompare(word, input);
-
-    utils::log(
-            "CONTENT-FILTER",
-            "equals: " + utils::boolToString(isWord)
-    );
-
-    if (isWord) {
+    if ( utils::fastCompare(word, input)) {
         return true;
     }
     if (isContainsEnabled) {
@@ -227,10 +214,6 @@ bool ContentFilter::isWordPresented(
     }
 
     for (std::string_view clazz: classes) {
-        utils::log(
-                "CONTENT-FILTER",
-                "isWordPresented in classes -- " + std::string(word) + " == " + std::string(clazz)
-        );
         if (isWordPresented(word, clazz, isContainsEnabled)) {
             //Active rule found based on tag and its clazz
             //Or keyword found withing class body
@@ -241,7 +224,7 @@ bool ContentFilter::isWordPresented(
 }
 
 
-void ContentFilter::addRule(ExcludeRule rule) {
+void ContentFilter::addRule(ExcludeRule &rule) {
     rules.push_back(rule);
 }
 

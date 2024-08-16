@@ -5,6 +5,7 @@ package com.jet.article.ui.elements
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,9 +17,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.text.toSpannable
+import com.jet.article.ArticleParser
 import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
@@ -40,7 +43,7 @@ fun HtmlTextBlock(
     text: HtmlElement.TextBlock,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
     color: Color = MaterialTheme.colorScheme.onBackground,
-    ) {
+) {
 
     HtmlTextBlock(
         modifier = modifier,
@@ -69,10 +72,19 @@ fun HtmlTextBlock(
     val screenHeightPx = configuration.screenHeightPx.toInt()
     var size by remember { mutableStateOf(value = IntSize.Zero) }
 
-    val formattedText = remember(key1 = text) {
-        text.toHtml()
-            .toSpannable()
-            .toAnnotatedString(primaryColor = colorScheme.linkColor)
+    val formattedText = remember(
+        key1 = text,
+        key2 = ArticleParser.isSimpleTextFormatAllowed,
+    ) {
+        if (ArticleParser.isSimpleTextFormatAllowed) {
+            text.toHtml()
+                .toSpannable()
+                .toAnnotatedString(primaryColor = colorScheme.linkColor)
+        } else {
+            buildAnnotatedString {
+                append(text = text)
+            }
+        }
     }
 
 //    var initialAlpha by rememberSaveable { mutableFloatStateOf(value = 0f) }
@@ -84,25 +96,23 @@ fun HtmlTextBlock(
 //        }
 //        initialAlpha = 1f
 //    })
-
-    //TODO
-    ClickableText(
+    Text(
         text = formattedText,
         style = remember(key1 = style, key2 = color) {
             style.copy(color = color)
         },
-        onClick = { offset ->
-            linkClickHandler?.handleLink(
-                clickedText = formattedText,
-                clickOffset = offset,
-                articleUrl = articleUrl,
-                data = data,
-                scrollOffset = screenHeightPx
-                        - size.height
-                        - density.dpToPx(dp = contentPadding.calculateTopPadding())
-                    .toInt()
-            )
-        },
+//        onClick = { offset ->
+//            linkClickHandler?.handleLink(
+//                clickedText = formattedText,
+//                clickOffset = offset,
+//                articleUrl = articleUrl,
+//                data = data,
+//                scrollOffset = screenHeightPx
+//                        - size.height
+//                        - density.dpToPx(dp = contentPadding.calculateTopPadding())
+//                    .toInt()
+//            )
+//        },
         modifier = modifier
         //    .alpha(alpha = alpha.value),
 

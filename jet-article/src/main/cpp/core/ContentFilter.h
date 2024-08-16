@@ -42,7 +42,7 @@ public:
      * @param rule
      * @since 1.0.0
      */
-    void addRule(ExcludeRule rule);
+    void addRule(ExcludeRule &rule);
 
 
     /**

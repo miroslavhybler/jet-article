@@ -2,6 +2,9 @@
 
 package com.jet.article
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.IntSize
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
@@ -10,6 +13,7 @@ import com.jet.article.data.HtmlContentType
 import com.jet.article.data.HtmlArticleData
 import com.jet.article.data.HtmlElement
 import com.jet.article.data.HtmlHeadData
+import com.jet.article.data.TagInfo
 import kotlin.coroutines.CoroutineContext
 
 
@@ -28,6 +32,10 @@ public object ArticleParser {
         .plus(context = CoroutineName(name = "JetHtmlArticleParse"))
 
 
+    var isSimpleTextFormatAllowed: Boolean by mutableStateOf(value = true)
+        private set
+
+
     /**
      * @param areImagesEnabled True when you want to enable images being included in output, false otherwise.
      * @param isLoggingEnabled True if you want to enable logs from native libs, false otherwise
@@ -40,6 +48,7 @@ public object ArticleParser {
         isLoggingEnabled: Boolean,
         isSimpleTextFormatAllowed: Boolean,
     ): Unit {
+        this.isSimpleTextFormatAllowed = isSimpleTextFormatAllowed
         ParserNative.initialize(
             areImagesEnabled = areImagesEnabled,
             isLoggingEnabled = isLoggingEnabled,
@@ -285,6 +294,5 @@ public object ArticleParser {
         fun clearTagsFromText(input: String): String {
             return UtilsNative.clearTagsFromText(input = input)
         }
-
     }
 }

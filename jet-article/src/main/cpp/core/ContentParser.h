@@ -22,8 +22,8 @@ class ContentParser : public AbstractParserComponent {
 
 
 public:
-    std::string title = "";
-    std::string lang = "";
+    std::string title;
+    std::string lang;
 
 private:
     bool hasContentToProcess = false;
@@ -154,7 +154,7 @@ public:
      * @return
      * @since 1.0.0
      */
-    std::string getTempMapItem(std::string attributeName);
+    std::string getTempMapItem(const std::string &attributeName);
 
 
     /**
@@ -171,7 +171,7 @@ public:
      * parsed properly.
      * @since 1.0.0
      */
-    bool isAbortingWithError();
+    bool isAbortingWithError() override;
 
 
     /**

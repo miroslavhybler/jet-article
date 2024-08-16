@@ -7,7 +7,7 @@ package com.jet.article.data
  * @author Miroslav Hýbler <br>
  * created on 13.02.2024
  */
-public sealed class TagAnalyze private constructor(
+public sealed class TagInfo private constructor(
     open val tag: String,
     open val tagAttributes: Map<String, String> = emptyMap(),
     open val clazz: String,
@@ -28,7 +28,7 @@ public sealed class TagAnalyze private constructor(
         override val name: String,
         @HtmlContentType
         override val contentType: Int,
-    ) : TagAnalyze(
+    ) : TagInfo(
         tag = tag,
         tagAttributes = tagAttributes,
         clazz = clazz,
@@ -51,7 +51,7 @@ public sealed class TagAnalyze private constructor(
         @HtmlContentType
         override val contentType: Int,
         val content: String,
-    ) : TagAnalyze(
+    ) : TagInfo(
         tag = tag,
         tagAttributes = tagAttributes,
         clazz = clazz,
