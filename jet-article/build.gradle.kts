@@ -100,7 +100,7 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.accompanist.systemuicontroller)
 
-    implementation(libs.coil.compose)
+    api(libs.coil.compose)
     implementation(libs.material)
     implementation(libs.android.joda)
 

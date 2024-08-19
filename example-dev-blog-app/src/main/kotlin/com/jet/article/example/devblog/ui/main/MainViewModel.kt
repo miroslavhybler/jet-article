@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.jet.article.ArticleParser
 import com.jet.article.data.HtmlArticleData
-import com.jet.article.example.devblog.BaseViewModel
+import com.jet.article.example.devblog.ui.BaseViewModel
 import com.jet.article.example.devblog.parseWithInitialization
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,5 +36,10 @@ class MainViewModel @Inject constructor(
                 url = "https://android-developers.googleblog.com/2024/07/the-fourth-beta-of-android-15.html",
             )
         }
+    }
+
+
+    fun onBack() {
+        mHtmlData.value = HtmlArticleData.empty
     }
 }

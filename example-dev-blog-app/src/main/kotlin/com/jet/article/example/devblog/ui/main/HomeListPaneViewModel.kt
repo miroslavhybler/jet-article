@@ -9,7 +9,7 @@ import com.jet.article.ArticleParser
 import com.jet.article.data.HtmlAnalyzerData
 import com.jet.article.data.HtmlElement
 import com.jet.article.data.TagInfo
-import com.jet.article.example.devblog.BaseViewModel
+import com.jet.article.example.devblog.ui.BaseViewModel
 import com.jet.article.example.devblog.Constants
 import com.jet.article.example.devblog.parseWithInitialization
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -40,7 +40,7 @@ class HomeListPaneViewModel @Inject constructor(
      */
     val lazyListState: LazyListState = LazyListState()
 
-    fun loadIndex() {
+    fun loadIndexSite() {
         viewModelScope.launch {
             val htmlCode = loadFromUrl(url = Constants.indexUrl)
 
@@ -62,6 +62,7 @@ class HomeListPaneViewModel @Inject constructor(
             ) {
                 //Do nothing, wait until analyzer is done and then just take it's results
             }
+            Log.d("mirek", "after while")
 
             val analyzerData = ArticleAnalyzer.resultData
                 .filterIsInstance<HtmlAnalyzerData.ContentTag>()
@@ -85,6 +86,8 @@ class HomeListPaneViewModel @Inject constructor(
                     url = "TODO",
                 )
             }
+            Log.d("mirek", "links: ${links.size}")
+            Log.d("mirek", "finalData: ${finalData.size}")
             mData.value = finalData
         }
     }

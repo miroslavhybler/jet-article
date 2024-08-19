@@ -27,23 +27,19 @@ import com.jet.article.example.devblog.isCompat
 import com.jet.article.example.devblog.isExpanded
 import com.jet.article.example.devblog.isMedium
 
-private val Green40 = Color(color = 0xFF3DDC84)
-private val Green80 = Color(color = 0xFF12B041)
-private val Green90 = Color(color = 0xFF06882B)
+private val Green80: Color = Color(color = 0xFF13B041)
+private val Green90: Color = Color(color = 0xFF07882B)
+private val Green40: Color = Color(color = 0xFF3ddc84)
 
 val LightColorScheme: ColorScheme = lightColorScheme(
-    primary = Green40,
+    primary = Green80,
     onPrimary = Color.White,
     primaryContainer = Green90,
     onPrimaryContainer = Color.White,
-    secondary = Green80,
-    onSecondary = Color.White,
-    secondaryContainer = Green90,
-    onSecondaryContainer = Color.White,
-    tertiary = Green40,
-    onTertiary = Color.White,
-    tertiaryContainer = Green90,
-    onTertiaryContainer = Color.White,
+    secondary = Color(color = 0xFF08677f),
+    onSecondary = Color(color = 0xFFffffff),
+    secondaryContainer = Color(color = 0xFFb7eaff),
+    onSecondaryContainer = Color(color = 0xFF001f28),
     error = Color.Red,
     onError = Color.White,
     errorContainer = Color.Red,
@@ -61,15 +57,15 @@ val LightColorScheme: ColorScheme = lightColorScheme(
 val DarkColorScheme = darkColorScheme(
     primary = Green80,
     onPrimary = Color.Black,
-    primaryContainer = Green40,
+    primaryContainer = Green90,
     onPrimaryContainer = Color.Black,
-    secondary = Green80,
-    onSecondary = Color.Black,
-    secondaryContainer = Green40,
-    onSecondaryContainer = Color.Black,
+    secondary = Color(color = 0xFF88d1ec),
+    onSecondary = Color(color = 0xFF003544),
+    secondaryContainer = Color(color = 0xFF004d61),
+    onSecondaryContainer = Color(color = 0xFFb7eaff),
     tertiary = Green80,
     onTertiary = Color.Black,
-    tertiaryContainer = Green40,
+    tertiaryContainer = Green90,
     onTertiaryContainer = Color.Black,
     error = Color.Red,
     onError = Color.Black,
@@ -85,11 +81,11 @@ val DarkColorScheme = darkColorScheme(
 )
 
 @Composable
-fun JetArticleTheme(
+fun DevBlogAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
@@ -105,6 +101,12 @@ fun JetArticleTheme(
         colorScheme = colorScheme,
         content = content,
     )
+}
+
+object DevBlogAppTheme {
+
+    val colorAndroid: Color
+        get() = Green40
 }
 
 
@@ -177,5 +179,12 @@ fun rememberDimensions(): Dimensions {
  * Local provider for dimensions, should be applied in top level composable functions
  */
 val LocalDimensions: ProvidableCompositionLocal<Dimensions> = compositionLocalOf(
-    defaultFactory = Dimensions.Companion::default
-)
+    defaultFactory = Dimensions.Companion::default,
+    )
+
+
+
+data object Routes {
+    const val main: String ="main"
+    const val settings: String ="settings"
+}

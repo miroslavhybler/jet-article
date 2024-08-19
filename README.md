@@ -23,6 +23,7 @@ showing html content within application.
 Main goals are:
 * Better UX - Showing elements using Material3 design, support of DarkMode
 * Speed - since all scripts, cookies are exluded it could work much faster than webview
+* No annoying cookies bar
 
 [//]: # (This is still under development, no relases yet)
 [//]: # (### Import)

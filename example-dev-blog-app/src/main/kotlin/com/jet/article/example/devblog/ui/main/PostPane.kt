@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -40,6 +41,8 @@ fun PostPane(
 ) {
     val context = LocalContext.current
     val dimensions = LocalDimensions.current
+    val mainState = LocalMainScreenState.current
+
     val linkCallback = remember {
         object : LinkClickHandler.LinkCallback() {
             override fun onOtherDomainLink(link: Link.OtherDomainLink) {
@@ -91,13 +94,17 @@ fun PostPane(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onOpenContests
+            if (mainState.role == ListDetailPaneScaffoldRole.Detail
+                || mainState.role == ListDetailPaneScaffoldRole.Extra
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_content),
-                    contentDescription = "TODO",
-                )
+                FloatingActionButton(
+                    onClick = onOpenContests
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_content),
+                        contentDescription = "TODO",
+                    )
+                }
             }
         }
     )

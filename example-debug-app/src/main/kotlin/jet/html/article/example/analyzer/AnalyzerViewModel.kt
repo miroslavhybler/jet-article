@@ -63,5 +63,4 @@ class AnalyzerViewModel @Inject constructor(
             ArticleAnalyzer.jumpToBody()
         }
     }
-
 }

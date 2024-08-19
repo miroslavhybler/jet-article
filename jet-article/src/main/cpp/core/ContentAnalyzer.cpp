@@ -57,6 +57,8 @@ void ContentAnalyzer::doNextStep() {
 
     if (!moveIndexToNextTag()) {
         utils::log("ANALYZER", "Unable to move to next tag");
+        mHasNextStep = false;
+        index.moveIndex(length);
         return;
     }
     //No tag to process

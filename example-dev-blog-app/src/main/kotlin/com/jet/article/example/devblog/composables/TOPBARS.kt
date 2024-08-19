@@ -13,8 +13,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavHostController
 import com.jet.article.example.devblog.R
 import com.jet.article.example.devblog.horizontalPadding
+import com.jet.article.example.devblog.ui.Routes
 
 
 /**
@@ -56,11 +58,11 @@ fun TitleTopBar(
 }
 
 
-
 @Composable
 fun MainTopBar(
     modifier: Modifier = Modifier,
     text: String,
+    navHostController: NavHostController,
 ) {
     TopAppBar(
         modifier = Modifier
@@ -75,7 +77,17 @@ fun MainTopBar(
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
             )
-
+        },
+        actions = {
+            IconButton(
+                onClick = {
+                    navHostController.navigate(route = Routes.settings)
+                }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_settings),
+                    contentDescription = "TODO",
+                )
+            }
         }
     )
 

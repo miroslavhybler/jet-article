@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
 import com.jet.article.data.HtmlElement
@@ -46,6 +47,7 @@ fun HtmlImage(
     shape: Shape = MaterialTheme.shapes.medium,
     loading: @Composable BoxScope.() -> Unit = { HtmlImageDefaults.LoadingLayout(scope = this) },
     error: @Composable BoxScope.() -> Unit = { HtmlImageDefaults.ErrorLayout(scope = this) },
+    diskCachePolicy: CachePolicy = CachePolicy.ENABLED,
 ) {
     val context = LocalContext.current
 
@@ -53,12 +55,14 @@ fun HtmlImage(
         model = ImageRequest.Builder(context = context)
             .data(data = data.url)
             .size(size = Size.ORIGINAL)
+            .diskCachePolicy(diskCachePolicy)
+            .diskCacheKey(key = if (diskCachePolicy == CachePolicy.ENABLED) data.url else null)
             .build()
     )
     Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
+//            .fillMaxWidth()
+//            .wrapContentHeight()
             .then(other = modifier)
             .clip(shape = shape)
     ) {

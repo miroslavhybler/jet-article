@@ -9,6 +9,7 @@ import dagger.assisted.AssistedInject
 
 
 /**
+ * Load index site on the background and loads articles from it
  * @author Miroslav Hýbler <br>
  * created on 16.08.2024
  */
