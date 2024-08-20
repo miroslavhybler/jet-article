@@ -107,6 +107,7 @@ void ContentAnalyzer::doNextStep() {
         invalidateHasNextStep();
         return;
     }
+
     if (mHasBodyContext) {
         currentTagId = utils::getTagAttribute(currentTagBody, "id");
         currentTagName = utils::getTagAttribute(currentTagBody, "name");
@@ -143,7 +144,6 @@ void ContentAnalyzer::doNextStep() {
                     abortWithError(e);
                     return;
                 }
-
             } catch (ErrorCode code) {
                 std::string message =
                         "Problematic area within " + std::to_string(tei)

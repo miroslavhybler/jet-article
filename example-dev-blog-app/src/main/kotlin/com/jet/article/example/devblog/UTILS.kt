@@ -18,8 +18,10 @@ import androidx.window.core.layout.WindowHeightSizeClass
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.jet.article.ArticleParser
 import com.jet.article.data.HtmlArticleData
+import com.jet.article.data.HtmlElement
 import com.jet.article.example.devblog.data.ExcludeOption
 import com.jet.article.example.devblog.ui.LocalDimensions
+import com.jet.article.example.devblog.data.database.PostItem
 import com.jet.utils.pxToDp
 
 
@@ -122,4 +124,28 @@ suspend fun ArticleParser.parseWithInitialization(
     }
 
     return parse(content = content, url = url)
+}
+
+
+/**
+ *
+ */
+fun HtmlArticleData.getPostList(): List<PostItem> {
+    try {
+        val chunked = elements.chunked(size = 4)
+        val list = chunked.map { sublist ->
+            PostItem(
+                image = (sublist[0] as HtmlElement.Image).url,
+                title = (sublist[1] as HtmlElement.TextBlock).text,
+                time = (sublist[2] as HtmlElement.TextBlock).text,
+                description = (sublist[3] as HtmlElement.TextBlock).text,
+                url = "TODO",
+            )
+        }
+        return list
+    } catch (e: Exception) {
+        e.printStackTrace()
+        return emptyList()
+    }
+
 }

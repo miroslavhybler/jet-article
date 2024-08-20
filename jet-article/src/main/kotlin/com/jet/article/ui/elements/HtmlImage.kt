@@ -49,14 +49,41 @@ fun HtmlImage(
     error: @Composable BoxScope.() -> Unit = { HtmlImageDefaults.ErrorLayout(scope = this) },
     diskCachePolicy: CachePolicy = CachePolicy.ENABLED,
 ) {
+
+    HtmlImage(
+        modifier = modifier,
+        url = data.url,
+        defaultSize = data.defaultSize,
+        showErrorPlaceholder = showErrorPlaceholder,
+        contentScale = contentScale,
+        shape = shape,
+        loading = loading,
+        error = error,
+        diskCachePolicy = diskCachePolicy,
+    )
+}
+
+
+@Composable
+fun HtmlImage(
+    modifier: Modifier = Modifier,
+    url: String,
+    defaultSize: IntSize = IntSize.Zero,
+    showErrorPlaceholder: Boolean = false,
+    contentScale: ContentScale = ContentScale.FillWidth,
+    shape: Shape = MaterialTheme.shapes.medium,
+    loading: @Composable BoxScope.() -> Unit = { HtmlImageDefaults.LoadingLayout(scope = this) },
+    error: @Composable BoxScope.() -> Unit = { HtmlImageDefaults.ErrorLayout(scope = this) },
+    diskCachePolicy: CachePolicy = CachePolicy.ENABLED,
+) {
     val context = LocalContext.current
 
     val painter = rememberAsyncImagePainter(
         model = ImageRequest.Builder(context = context)
-            .data(data = data.url)
+            .data(data = url)
             .size(size = Size.ORIGINAL)
             .diskCachePolicy(diskCachePolicy)
-            .diskCacheKey(key = if (diskCachePolicy == CachePolicy.ENABLED) data.url else null)
+            .diskCacheKey(key = if (diskCachePolicy == CachePolicy.ENABLED) url else null)
             .build()
     )
     Box(
@@ -72,7 +99,7 @@ fun HtmlImage(
                     painter = painter,
                     contentDescription = null,
                     modifier = Modifier
-                        .htmlImage(size = data.defaultSize)
+                        .htmlImage(size = defaultSize)
                         .then(other = modifier),
                     contentScale = contentScale,
                 )

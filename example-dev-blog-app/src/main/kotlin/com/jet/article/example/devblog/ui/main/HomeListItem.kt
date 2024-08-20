@@ -21,20 +21,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.jet.article.example.devblog.data.database.PostItem
 import com.jet.article.example.devblog.isExpanded
 import com.jet.article.example.devblog.isMedium
 import com.jet.article.ui.elements.HtmlImage
 
 
 /**
- * @author Miroslav Hýbler (Peko Studio s.r.o)<br>
+ * @author Miroslav Hýbler <br>
  * created on 19.08.2024
  */
 @Composable
 fun HomeListItem(
     modifier: Modifier = Modifier,
     onOpenPost: (index: Int) -> Unit,
-    item: HomeListPaneViewModel.PostItem,
+    item: PostItem,
     index: Int,
 ) {
 
@@ -96,7 +97,7 @@ fun HomeListItem(
 private fun HomeListItemColumn(
     modifier: Modifier = Modifier,
     onOpenPost: (index: Int) -> Unit,
-    item: HomeListPaneViewModel.PostItem,
+    item: PostItem,
     index: Int,
     containerColor: Color,
     contentColor: Color,
@@ -118,7 +119,7 @@ private fun HomeListItemColumn(
     ) {
         HtmlImage(
             modifier = Modifier,
-            data = item.image
+            url = item.image,
         )
 
         Text(
@@ -147,7 +148,7 @@ private fun HomeListItemColumn(
 private fun HomeListItemRow(
     modifier: Modifier = Modifier,
     onOpenPost: (index: Int) -> Unit,
-    item: HomeListPaneViewModel.PostItem,
+    item: PostItem,
     index: Int,
     contentColor: Color,
     containerColor: Color,
@@ -170,7 +171,7 @@ private fun HomeListItemRow(
     ) {
         HtmlImage(
             modifier = Modifier.size(size = 48.dp),
-            data = item.image,
+            url = item.image,
             contentScale = ContentScale.Crop,
         )
 

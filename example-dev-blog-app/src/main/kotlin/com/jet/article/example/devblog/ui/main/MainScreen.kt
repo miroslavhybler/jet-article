@@ -33,9 +33,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.jet.article.data.HtmlArticleData
+import com.jet.utils.dpToPx
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -52,27 +55,36 @@ fun MainScreen(
 ) {
     val state = rememberMainScreenState()
     val htmlData by viewModel.htmlData.collectAsState()
-
+    val coroutineScope = rememberCoroutineScope()
     val navigator = rememberListDetailPaneScaffoldNavigator<Nothing>(
         scaffoldDirective = calculatePaneScaffoldDirective(currentWindowAdaptiveInfo()),
     )
 
-    BackHandler(enabled = state.role != ListDetailPaneScaffoldRole.List) {
+    BackHandler(
+        enabled = state.role != ListDetailPaneScaffoldRole.List
+    ) {
         state.onNavigateBack()
         navigator.navigateBack(backNavigationBehavior = BackNavigationBehavior.PopLatest)
         //   navigator.navigateTo(pane = state.role)
 
         if (state.role == ListDetailPaneScaffoldRole.List) {
             viewModel.onBack()
+            coroutineScope.launch {
+                delay(timeMillis = 200)
+                state.isEmptyPaneVisible = true
+            }
         }
     }
 
     MainScreenContent(
         state = state,
         htmlData = htmlData,
-        onLoad = viewModel::loadArticle,
+        onLoad = { url ->
+            viewModel.loadArticle(url = url)
+            state.isEmptyPaneVisible = false
+        },
         navigator = navigator,
-        navHostController=navHostController,
+        navHostController = navHostController,
     )
 }
 
@@ -86,10 +98,9 @@ fun MainScreenContent(
     navHostController: NavHostController,
 ) {
     val context = LocalContext.current
-
+    val density = LocalDensity.current
     val postListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-
 
     LaunchedEffect(state.role) {
         if (state.role == ListDetailPaneScaffoldRole.List) {
@@ -131,7 +142,7 @@ fun MainScreenContent(
                 detailPane = {
                     AnimatedPane {
                         when {
-                            htmlData.isEmpty -> {
+                            htmlData.isEmpty && state.isEmptyPaneVisible -> {
                                 PostEmptyPane()
                             }
 
@@ -161,8 +172,10 @@ fun MainScreenContent(
                                 navigator.navigateTo(pane = ListDetailPaneScaffoldRole.Detail)
                                 coroutineScope.launch {
                                     delay(timeMillis = 400)
-                                    //TODO offset
-                                    postListState.animateScrollToItem(index = index)
+                                    postListState.animateScrollToItem(
+                                        index = index,
+                                        scrollOffset = density.dpToPx(dp = 24.dp).toInt(),
+                                    )
                                 }
                             },
                         )
@@ -175,12 +188,14 @@ fun MainScreenContent(
 
 
 class MainScreenState constructor(
-    initialRole: ThreePaneScaffoldRole
+    initialRole: ThreePaneScaffoldRole,
+    initialIsEmptyPaneVisible: Boolean,
 ) {
 
     var role: ThreePaneScaffoldRole by mutableStateOf(value = initialRole)
 
     var seletedIndex: Int by mutableIntStateOf(value = -1)
+    var isEmptyPaneVisible by mutableStateOf(value = initialIsEmptyPaneVisible)
 
     fun onNavigateBack() {
         role = when (role) {
@@ -197,7 +212,7 @@ class MainScreenState constructor(
 
     object Saver : androidx.compose.runtime.saveable.Saver<MainScreenState, Bundle> {
 
-        val ThreePaneScaffoldRole.saveAbleName: String
+        private val ThreePaneScaffoldRole.saveAbleName: String
             get() {
                 return when (this) {
                     ListDetailPaneScaffoldRole.List -> "list"
@@ -219,12 +234,14 @@ class MainScreenState constructor(
         override fun SaverScope.save(value: MainScreenState): Bundle {
             return Bundle().apply {
                 putString("mss_role", value.role.saveAbleName)
+                putBoolean("mss_is_empty_pane_visible", value.isEmptyPaneVisible)
             }
         }
 
         override fun restore(value: Bundle): MainScreenState {
             return MainScreenState(
-                initialRole = fromSaveableName(name = value.getString("mss_role") ?: "")
+                initialRole = fromSaveableName(name = value.getString("mss_role") ?: ""),
+                initialIsEmptyPaneVisible = value.getBoolean("mss_is_empty_pane_visible")
             )
         }
     }
@@ -234,10 +251,12 @@ class MainScreenState constructor(
 @Composable
 fun rememberMainScreenState(
     initialRole: ThreePaneScaffoldRole = ListDetailPaneScaffoldRole.List,
+    initialIsEmptyPaneVisible: Boolean = true,
 ): MainScreenState {
     return rememberSaveable(saver = MainScreenState.Saver) {
         MainScreenState(
-            initialRole = initialRole
+            initialRole = initialRole,
+            initialIsEmptyPaneVisible = initialIsEmptyPaneVisible,
         )
     }
 }

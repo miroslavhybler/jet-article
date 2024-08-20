@@ -86,7 +86,8 @@ fun PostPane(
                     start = dimensions.topLinePadding,
                     top = dimensions.topLinePadding,
                     end = dimensions.sidePadding,
-                    bottom = dimensions.bottomLinePadding,
+                    //56.dp from FabPrimaryTokens.ContainerHeight
+                    bottom = dimensions.bottomLinePadding + 56.dp,
                 ),
                 data = data,
                 verticalArrangement = Arrangement.spacedBy(space = 24.dp),

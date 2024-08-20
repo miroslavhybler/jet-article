@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.jet.article.example.devblog.R
 import com.jet.article.example.devblog.composables.MainTopBar
+import com.jet.article.example.devblog.data.database.PostItem
 import com.jet.article.example.devblog.isExpanded
 import com.jet.article.example.devblog.isMedium
 import com.jet.article.example.devblog.ui.LocalDimensions
@@ -39,7 +40,7 @@ fun HomeListPane(
     navHostController: NavHostController,
 ) {
 
-    val data by viewModel.data.collectAsState()
+    val posts by viewModel.posts.collectAsState()
 
     LaunchedEffect(key1 = Unit) {
         viewModel.loadIndexSite()
@@ -48,7 +49,7 @@ fun HomeListPane(
 
     HomeListPaneContent(
         onOpenPost = onOpenPost,
-        data = data,
+        data = posts,
         lazyListState = viewModel.lazyListState,
         navHostController=navHostController,
     )
@@ -58,7 +59,7 @@ fun HomeListPane(
 @Composable
 private fun HomeListPaneContent(
     onOpenPost: (index: Int) -> Unit,
-    data: List<HomeListPaneViewModel.PostItem>,
+    data: List<PostItem>,
     lazyListState: LazyListState,
     navHostController: NavHostController,
 ) {

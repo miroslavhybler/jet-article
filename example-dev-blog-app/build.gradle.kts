@@ -38,6 +38,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -64,13 +65,18 @@ dependencies {
     implementation(libs.androidx.adaptive.navigation)
     implementation(libs.androidx.adaptive.navigation.suite)
 
+    /** Room Database */
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.datastore.core.android)
+    ksp(libs.androidx.room.compiler)
+
     /** KTOR */
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.serialization)
     implementation(libs.ktor.client.logging.jvm)
 
-
-    /** Hilt */
+    /** Hilt DI */
     implementation(libs.google.dagger.hilt)
     ksp(libs.google.dagger.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)

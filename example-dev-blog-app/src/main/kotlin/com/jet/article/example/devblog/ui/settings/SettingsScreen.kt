@@ -1,5 +1,6 @@
 package com.jet.article.example.devblog.ui.settings
 
+import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,9 +22,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.jet.article.example.devblog.R
@@ -58,6 +61,8 @@ private fun SettingsScreenContent(
     navHostController: NavHostController,
 ) {
     val dimensions = LocalDimensions.current
+    val context = LocalContext.current
+
     Scaffold(
         topBar = {
             TitleTopBar(
@@ -87,8 +92,15 @@ private fun SettingsScreenContent(
                         .horizontalPadding()
                         .wrapContentSize()
                         .clip(shape = CircleShape)
-                        .clickable(onClick = {})
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                        .clickable(
+                            onClick = {
+                                context.startActivity(
+                                    Intent(Intent.ACTION_VIEW)
+                                        .setData("https://github.com/miroslavhybler/jet-article".toUri())
+                                )
+                            }
+                        )
+                        .padding(horizontal = 24.dp, vertical = 10.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(space = 12.dp)
                 ) {
@@ -99,7 +111,10 @@ private fun SettingsScreenContent(
                         contentDescription = null,
                     )
 
-                    Text(text = "Available on Github")
+                    Text(
+                        modifier = Modifier,
+                        text = "Available on Github",
+                    )
                 }
             }
         }

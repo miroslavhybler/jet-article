@@ -6,6 +6,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -53,7 +55,11 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        composable(route = Routes.settings) {
+                        composable(
+                            route = Routes.settings,
+                            enterTransition = { fadeIn() },
+                            exitTransition = { fadeOut() },
+                        ) {
                             SettingsScreen(
                                 navHostController = navHostController,
                                 viewModel = hiltViewModel(),
