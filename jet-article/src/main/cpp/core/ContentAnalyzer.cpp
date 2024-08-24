@@ -22,24 +22,6 @@ void ContentAnalyzer::setInput(std::string content) {
     invalidateHasNextStep();
 }
 
-
-void ContentAnalyzer::setRange(int s, int e) {
-
-    if (s < 0 || e > length || s > e) {
-        utils::log(
-                "ANALYZER",
-                "Unable to analyze becase of invalid range(s=" + std::to_string(s) + ", e=" +
-                std::to_string(e) + ")"
-        );
-        return;
-    }
-
-    this->actualInputStart = s;
-    this->actualInputEnd = e;
-    this->index.moveIndex(s);
-}
-
-
 void ContentAnalyzer::doNextStep() {
 
     if (!mHasNextStep) {
@@ -56,16 +38,11 @@ void ContentAnalyzer::doNextStep() {
 
 
     if (!moveIndexToNextTag()) {
-        utils::log("ANALYZER", "Unable to move to next tag");
-        mHasNextStep = false;
-        index.moveIndex(length);
+        invalidateHasNextStep();
         return;
     }
     //No tag to process
     invalidateHasNextStep();
-    //TODO maybe analyzer return some status to app, unable to move next
-
-
     if (!mHasNextStep) {
         return;
     }
@@ -112,7 +89,15 @@ void ContentAnalyzer::doNextStep() {
         currentTagId = utils::getTagAttribute(currentTagBody, "id");
         currentTagName = utils::getTagAttribute(currentTagBody, "name");
         currentTagClass = utils::getTagAttribute(currentTagBody, "class");
+
         utils::getTagAttributes(currentTagBody, currentTagAttributes);
+        utils::log("ANALYZER",
+                   "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        utils::log("ANALYZER", "tag: " + currentTag);
+        utils::log("ANALYZER", "name: "  + currentTagName);
+        utils::log("ANALYZER", "classes: " + currentTagClass);
+        utils::log("ANALYZER", "body: " + currentTagBody);
+
 
         for (auto &pair: currentTagAttributes) {
             //Pushing keys (attribute names) to separate array so it can be get better from kotlin code
@@ -127,39 +112,39 @@ void ContentAnalyzer::doNextStep() {
             return;
         }
 
-
-        bool isCurrentTagPair = utils::isTagPairTag(currentTagBody);
-        if (isCurrentTagPair) {
-            //TODO probably when comes to <div> it skipps to </div> instead goint intside
-            try {
-                int s = tei + 1;
-                int ctsi = utils::findClosingTag(input, currentTag, tei);
-                currentPairTagContent = input.substr(tei + 1, ctsi - tei - 1);
-
-                int next;
-                try {
-                    next = utils::indexOfOrThrow(input, ">", ctsi);
-                    index.moveIndex(next + 1);
-                } catch (ErrorCode e) {
-                    abortWithError(e);
-                    return;
-                }
-            } catch (ErrorCode code) {
-                std::string message =
-                        "Problematic area within " + std::to_string(tei)
-                        + " .. " + std::to_string(length) + "\n"
-                        + "tei: " + input.substr(tei, 1) + "\n"
-                        + "Near substring:\n\n" +
-                        input.substr(tei - tagBodyLength, 40)
-                        + "\n";
-
-                abortWithError(code, message);
-                return;
-            }
-
-        } else {
-            index.moveIndex(tei + 1);
-        }
+        index.moveIndex(tei + 1);
+//        bool isCurrentTagPair = utils::isTagPairTag(currentTagBody);
+//        if (isCurrentTagPair) {
+//            //TODO probably when comes to <div> it skipps to </div> instead goint intside
+//            try {
+//                int s = tei + 1;
+//                int ctsi = utils::findClosingTag(input, currentTag, tei);
+//                currentPairTagContent = input.substr(tei + 1, ctsi - tei - 1);
+//
+//                int next;
+//                try {
+//                    next = utils::indexOfOrThrow(input, ">", ctsi);
+//                    index.moveIndex(next + 1);
+//                } catch (ErrorCode e) {
+//                    abortWithError(e);
+//                    return;
+//                }
+//            } catch (ErrorCode code) {
+//                std::string message =
+//                        "Problematic area within " + std::to_string(tei)
+//                        + " .. " + std::to_string(length) + "\n"
+//                        + "tei: " + input.substr(tei, 1) + "\n"
+//                        + "Near substring:\n\n" +
+//                        input.substr(tei - tagBodyLength, 40)
+//                        + "\n";
+//
+//                abortWithError(code, message);
+//                return;
+//            }
+//
+//        } else {
+//            index.moveIndex(tei + 1);
+//        }
 
         //TODO split supported and unsupported tags
 

@@ -16,6 +16,7 @@ import com.jet.article.ArticleParser
 import com.jet.article.data.HtmlArticleData
 import com.jet.article.data.HtmlElement
 import com.jet.article.example.devblog.composables.TitleTopBar
+import com.jet.article.example.devblog.data.AdjustedPostData
 import com.jet.article.example.devblog.horizontalPadding
 import com.jet.article.ui.elements.HtmlTextBlock
 
@@ -26,19 +27,19 @@ import com.jet.article.ui.elements.HtmlTextBlock
  */
 @Composable
 fun ContentsPane(
-    data: HtmlArticleData,
+    data: AdjustedPostData?,
     onSelected: (index: Int, element: HtmlElement.Title) -> Unit,
 ) {
 
     val list = remember(key1 = data) {
-        data.elements.mapIndexedNotNull { index, element ->
+        data?.postData?.elements?.mapIndexedNotNull { index, element ->
             if (element is HtmlElement.Title) {
                 TitleWithOriginalIndex(
                     title = element,
                     originalIndex = index,
                 )
             } else null
-        }
+        } ?: emptyList()
     }
 
 

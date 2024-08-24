@@ -27,6 +27,7 @@ import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
 import com.jet.article.ui.LocalColorScheme
+import com.jet.article.ui.LocalLinkHandler
 
 
 /**
@@ -42,7 +43,7 @@ fun HtmlQuoete(
 
     val colorScheme = LocalColorScheme.current
     val density = LocalDensity.current
-
+    val linkClickHandler = LocalLinkHandler.current
     var dividerHeight by remember { mutableStateOf(0.dp) }
 
     Row(
@@ -66,7 +67,10 @@ fun HtmlQuoete(
             text = remember {
                 data.text.toHtml()
                     .toSpannable()
-                    .toAnnotatedString(primaryColor = colorScheme.quoteTextColor)
+                    .toAnnotatedString(
+                        primaryColor = colorScheme.quoteTextColor,
+                        linkClickHandler = linkClickHandler,
+                    )
             },
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier

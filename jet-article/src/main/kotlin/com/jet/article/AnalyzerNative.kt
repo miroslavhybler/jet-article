@@ -49,12 +49,6 @@ internal object AnalyzerNative {
     /**
      * @since 1.0.0
      */
-    external fun setRange(start: Int, end: Int)
-
-
-    /**
-     * @since 1.0.0
-     */
     @HtmlContentType
     external fun getCurrentContentType(): Int
 

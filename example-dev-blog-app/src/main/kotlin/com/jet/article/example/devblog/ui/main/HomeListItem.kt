@@ -34,7 +34,7 @@ import com.jet.article.ui.elements.HtmlImage
 @Composable
 fun HomeListItem(
     modifier: Modifier = Modifier,
-    onOpenPost: (index: Int) -> Unit,
+    onOpenPost: (index: Int, item: PostItem) -> Unit,
     item: PostItem,
     index: Int,
 ) {
@@ -96,7 +96,7 @@ fun HomeListItem(
 @Composable
 private fun HomeListItemColumn(
     modifier: Modifier = Modifier,
-    onOpenPost: (index: Int) -> Unit,
+    onOpenPost: (index: Int, item: PostItem) -> Unit,
     item: PostItem,
     index: Int,
     containerColor: Color,
@@ -105,7 +105,7 @@ private fun HomeListItemColumn(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = { onOpenPost(index) })
+            .clickable(onClick = { onOpenPost(index, item) })
             .background(
                 color = containerColor,
                 shape = MaterialTheme.shapes.medium,
@@ -147,7 +147,7 @@ private fun HomeListItemColumn(
 @Composable
 private fun HomeListItemRow(
     modifier: Modifier = Modifier,
-    onOpenPost: (index: Int) -> Unit,
+    onOpenPost: (index: Int, item: PostItem) -> Unit,
     item: PostItem,
     index: Int,
     contentColor: Color,
@@ -157,7 +157,7 @@ private fun HomeListItemRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = { onOpenPost(index) })
+            .clickable(onClick = { onOpenPost(index, item) })
             .background(
                 color = containerColor,
                 shape = MaterialTheme.shapes.medium,

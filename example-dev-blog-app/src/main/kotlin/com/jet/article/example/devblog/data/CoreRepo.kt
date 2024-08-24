@@ -1,9 +1,11 @@
 package com.jet.article.example.devblog.data
 
 import android.content.Context
+import android.util.Log
 import com.jet.article.ArticleAnalyzer
 import com.jet.article.ArticleParser
-import com.jet.article.data.HtmlAnalyzerData
+import com.jet.article.data.HtmlArticleData
+import com.jet.article.data.HtmlElement
 import com.jet.article.data.TagInfo
 import com.jet.article.example.devblog.Constants
 import com.jet.article.example.devblog.data.database.PostItem
@@ -19,9 +21,11 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 import okio.IOException
 import java.io.File
 import javax.inject.Inject
@@ -63,47 +67,72 @@ class CoreRepo @Inject constructor(
 
     suspend fun loadPosts(
         isRefresh: Boolean = false,
-    ) {
+    ): Unit = withContext(context = Dispatchers.Default) {
         val htmlCode = loadHtmlFromUrl(
             url = Constants.indexUrl,
             isRefresh = isRefresh
-        ) ?: return
+        ) ?: return@withContext
 
         val data = ArticleParser.parseWithInitialization(
             content = htmlCode,
             url = Constants.indexUrl,
         )
 
-        ArticleAnalyzer.setInput(content = htmlCode)
-        val links: ArrayList<TagInfo.Pair> = ArrayList()
-        val allLinks: ArrayList<TagInfo.Pair> = ArrayList()
+
+        val links: ArrayList<TagInfo> = ArrayList()
 
         ArticleParser.initialize(
-            isLoggingEnabled = true,
+            isLoggingEnabled = false,
             areImagesEnabled = true,
             isSimpleTextFormatAllowed = true,
         )
-        while (ArticleAnalyzer.moveNext()) {
-            //Do nothing, wait until analyzer is done and then just take it's results
-        }
 
-        val analyzerData = ArticleAnalyzer.resultData
-            .filterIsInstance<HtmlAnalyzerData.ContentTag>()
-
-        analyzerData.forEach { item ->
-            val tag = item.tag
-            if (tag is TagInfo.Pair) {
-                if (tag.tag == "a") {
-                    allLinks.add(element = tag)
-                    if (tag.clazz == "featured__href") {
-                        links.add(element = tag)
-                    }
+        ArticleAnalyzer.jumpToBody()
+        ArticleAnalyzer.process(
+            content = htmlCode,
+            onTag = { tag ->
+                if (tag.tag == "a" && tag.clazz == "adb-card__href") {
+                    links.add(element = tag)
                 }
             }
+        )
+        val finalData = data.getPostList(links = links)
+        mPosts.value = finalData
+    }
+
+
+    suspend fun loadPostDetail(
+        url: String,
+        isRefresh: Boolean = false,
+    ): AdjustedPostData? = withContext(context = Dispatchers.IO) {
+        val htmlCode = loadHtmlFromUrl(
+            url = url,
+            isRefresh = isRefresh
+        ) ?: return@withContext null
+
+        val original = ArticleParser.parseWithInitialization(
+            content = htmlCode,
+            url = Constants.indexUrl,
+        )
+        val title = original.elements
+            .first { it is HtmlElement.Title } as HtmlElement.Title
+        val headerImage = original.elements
+            .first { it is HtmlElement.Image } as HtmlElement.Image
+        val date = original.elements
+            .first { it is HtmlElement.TextBlock } as HtmlElement.TextBlock
+
+        val newElements = ArrayList(original.elements).apply {
+            remove(headerImage)
+            remove(title)
+            remove(date)
         }
 
-        val finalData = data.getPostList()
-        mPosts.value = finalData
+        return@withContext AdjustedPostData(
+            postData = original.copy(elements = newElements),
+            headerImage = headerImage,
+            date = date,
+            title = title,
+        )
     }
 
 

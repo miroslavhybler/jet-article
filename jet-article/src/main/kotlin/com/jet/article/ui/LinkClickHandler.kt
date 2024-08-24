@@ -74,7 +74,7 @@ public class LinkClickHandler internal constructor(
     /**
      * @since 1.0.0
      */
-    private fun onLink(
+    internal fun onLink(
         link: Link,
         data: HtmlArticleData,
         scrollOffset: Int

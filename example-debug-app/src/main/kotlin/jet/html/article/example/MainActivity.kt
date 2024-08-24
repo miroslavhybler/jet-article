@@ -43,7 +43,6 @@ import jet.html.article.example.content.BenchmarksScreen
 import jet.html.article.example.data.ExcludeRule
 import jet.html.article.example.content.article.ArticleScreen
 import jet.html.article.example.content.HomeScreen
-import jet.html.article.example.analyzer.AnalyzerScreen
 import jet.html.article.example.content.benchmark.BenchmarkScreen
 
 /**
@@ -143,26 +142,6 @@ class MainActivity : ComponentActivity() {
                                 article = res,
                                 viewModel = hiltViewModel(),
                                 navHostController = navHostController
-                            )
-                        }
-
-                        composable(
-                            route = "analyzer?articlePath={articlePath}",
-                            arguments = listOf(
-                                navArgument(name = "articlePath") {
-                                    type = NavType.StringType
-                                    nullable = false
-                                },
-                            )
-                        ) {
-
-                            val articleFilePath = it.arguments?.getString("articlePath")
-                                ?: throw NullPointerException("articleFilePath is null")
-
-                            AnalyzerScreen(
-                                viewModel = hiltViewModel(),
-                                navHostController = navHostController,
-                                articleFilePath = articleFilePath
                             )
                         }
                     }

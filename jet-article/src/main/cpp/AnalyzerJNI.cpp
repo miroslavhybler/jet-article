@@ -37,14 +37,6 @@ Java_com_jet_article_AnalyzerNative_hasNextStep(
 
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_jet_article_AnalyzerNative_setRange(
-        JNIEnv *environment, jobject caller, jint s, jint e
-) {
-    jni::analyzer->setRange(s, e);
-}
-
-
-extern "C" JNIEXPORT void JNICALL
 Java_com_jet_article_AnalyzerNative_doNextStep(
         JNIEnv *environment, jobject caller
 ) {

@@ -20,7 +20,6 @@ import androidx.compose.material3.adaptive.navigation.ThreePaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
@@ -32,12 +31,11 @@ import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.jet.article.data.HtmlArticleData
+import com.jet.article.example.devblog.data.AdjustedPostData
 import com.jet.utils.dpToPx
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -54,7 +52,7 @@ fun MainScreen(
     navHostController: NavHostController,
 ) {
     val state = rememberMainScreenState()
-    val htmlData by viewModel.htmlData.collectAsState()
+    val htmlData by viewModel.postData.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val navigator = rememberListDetailPaneScaffoldNavigator<Nothing>(
         scaffoldDirective = calculatePaneScaffoldDirective(currentWindowAdaptiveInfo()),
@@ -78,11 +76,8 @@ fun MainScreen(
 
     MainScreenContent(
         state = state,
-        htmlData = htmlData,
-        onLoad = { url ->
-            viewModel.loadArticle(url = url)
-            state.isEmptyPaneVisible = false
-        },
+        postData = htmlData,
+        onLoad = viewModel::loadPost,
         navigator = navigator,
         navHostController = navHostController,
     )
@@ -92,24 +87,14 @@ fun MainScreen(
 @Composable
 fun MainScreenContent(
     state: MainScreenState,
-    htmlData: HtmlArticleData,
+    postData: AdjustedPostData?,
     onLoad: (url: String) -> Unit,
     navigator: ThreePaneScaffoldNavigator<Nothing>,
     navHostController: NavHostController,
 ) {
-    val context = LocalContext.current
     val density = LocalDensity.current
     val postListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(state.role) {
-        if (state.role == ListDetailPaneScaffoldRole.List) {
-            return@LaunchedEffect
-        }
-
-        onLoad("TODO")
-
-    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -120,8 +105,6 @@ fun MainScreenContent(
             LocalMainScreenState provides state,
         ) {
 
-            // PostEmptyPane()
-
             ListDetailPaneScaffold(
                 modifier = Modifier.fillMaxSize(),
                 directive = navigator.scaffoldDirective,
@@ -129,9 +112,9 @@ fun MainScreenContent(
                 listPane = {
                     AnimatedPane {
                         HomeListPane(
-                            onOpenPost = {
-                                state.seletedIndex = it
-                                state.role = ListDetailPaneScaffoldRole.Detail
+                            onOpenPost = { index, item ->
+                                state.openPost(url = item.url, index = index)
+                                onLoad(item.url)
                                 navigator.navigateTo(pane = ListDetailPaneScaffoldRole.Detail)
                             },
                             viewModel = hiltViewModel(),
@@ -142,24 +125,23 @@ fun MainScreenContent(
                 detailPane = {
                     AnimatedPane {
                         when {
-                            htmlData.isEmpty && state.isEmptyPaneVisible -> {
-                                PostEmptyPane()
-                            }
-
-                            else -> {
+                            postData != null -> {
                                 PostPane(
                                     onOpenContests = {
                                         if (state.role == ListDetailPaneScaffoldRole.Extra) {
                                             state.onNavigateBack()
                                             navigator.navigateTo(pane = state.role)
                                         } else {
-                                            state.role = ListDetailPaneScaffoldRole.Extra
+                                            state.openContest()
                                             navigator.navigateTo(pane = ListDetailPaneScaffoldRole.Extra)
                                         }
                                     },
-                                    data = htmlData,
+                                    data = postData,
                                     listState = postListState,
                                 )
+                            }
+                            state.isEmptyPaneVisible -> {
+                                PostEmptyPane()
                             }
                         }
                     }
@@ -167,7 +149,7 @@ fun MainScreenContent(
                 extraPane = {
                     AnimatedPane {
                         ContentsPane(
-                            data = htmlData,
+                            data = postData,
                             onSelected = { index, title ->
                                 navigator.navigateTo(pane = ListDetailPaneScaffoldRole.Detail)
                                 coroutineScope.launch {
@@ -187,15 +169,38 @@ fun MainScreenContent(
 }
 
 
+/**
+ * @param initialRole
+ * @param initialIsEmptyPaneVisible
+ * @param initialIndex
+ * @param initialUrl
+ */
 class MainScreenState constructor(
     initialRole: ThreePaneScaffoldRole,
     initialIsEmptyPaneVisible: Boolean,
+    initialIndex: Int,
+    initialUrl: String,
 ) {
 
     var role: ThreePaneScaffoldRole by mutableStateOf(value = initialRole)
+        private set
+    var seletedIndex: Int by mutableIntStateOf(value = initialIndex)
+        private set
+    var actualUrl: String by mutableStateOf(value = initialUrl)
+        private set
+    var isEmptyPaneVisible: Boolean by mutableStateOf(value = initialIsEmptyPaneVisible)
 
-    var seletedIndex: Int by mutableIntStateOf(value = -1)
-    var isEmptyPaneVisible by mutableStateOf(value = initialIsEmptyPaneVisible)
+    fun openPost(url: String, index: Int) {
+        this.isEmptyPaneVisible = false
+        this.actualUrl = url
+        this.seletedIndex = index
+        this.role = ListDetailPaneScaffoldRole.Detail
+    }
+
+
+    fun openContest() {
+        this.role = ListDetailPaneScaffoldRole.Extra
+    }
 
     fun onNavigateBack() {
         role = when (role) {
@@ -207,6 +212,7 @@ class MainScreenState constructor(
 
         if (role == ListDetailPaneScaffoldRole.List) {
             seletedIndex = -1
+            actualUrl = ""
         }
     }
 
@@ -235,13 +241,17 @@ class MainScreenState constructor(
             return Bundle().apply {
                 putString("mss_role", value.role.saveAbleName)
                 putBoolean("mss_is_empty_pane_visible", value.isEmptyPaneVisible)
+                putString("mss_url", value.actualUrl)
+                putInt("mss_index", value.seletedIndex)
             }
         }
 
         override fun restore(value: Bundle): MainScreenState {
             return MainScreenState(
                 initialRole = fromSaveableName(name = value.getString("mss_role") ?: ""),
-                initialIsEmptyPaneVisible = value.getBoolean("mss_is_empty_pane_visible")
+                initialIsEmptyPaneVisible = value.getBoolean("mss_is_empty_pane_visible"),
+                initialIndex = value.getInt("mss_index", -1),
+                initialUrl = value.getString("mss_url", ""),
             )
         }
     }
@@ -252,11 +262,15 @@ class MainScreenState constructor(
 fun rememberMainScreenState(
     initialRole: ThreePaneScaffoldRole = ListDetailPaneScaffoldRole.List,
     initialIsEmptyPaneVisible: Boolean = true,
+    initialIndex: Int = -1,
+    initialUrl: String = "",
 ): MainScreenState {
     return rememberSaveable(saver = MainScreenState.Saver) {
         MainScreenState(
             initialRole = initialRole,
             initialIsEmptyPaneVisible = initialIsEmptyPaneVisible,
+            initialIndex = initialIndex,
+            initialUrl = initialUrl,
         )
     }
 }

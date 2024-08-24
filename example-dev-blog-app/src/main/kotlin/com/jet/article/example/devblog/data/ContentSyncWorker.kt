@@ -11,17 +11,17 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.jet.article.ArticleAnalyzer
 import com.jet.article.ArticleParser
+import com.jet.article.data.TagInfo
 import com.jet.article.example.devblog.Constants
 import com.jet.article.example.devblog.data.database.DatabaseRepo
 import com.jet.article.example.devblog.getPostList
 import com.jet.article.example.devblog.parseWithInitialization
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import io.ktor.client.request.get
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.readText
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 
 /**
@@ -33,39 +33,37 @@ import java.util.concurrent.TimeUnit
 class ContentSyncWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParameters: WorkerParameters,
-    private val databaseRepo: DatabaseRepo,
-    private val coreRepo: CoreRepo,
+    private var databaseRepo: DatabaseRepo,
+    private var coreRepo: CoreRepo,
 ) : CoroutineWorker(
     appContext = context,
     params = workerParameters,
 ) {
 
 
+
     companion object {
         fun register(context: Context) {
-            val request = getRequest()
-            val workManager = WorkManager.getInstance(context)
-
-            workManager.enqueueUniquePeriodicWork(
-                "update-post-list",
-                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-                request
-            )
-
+//            val request = getRequest()
+//            val workManager = WorkManager.getInstance(context)
+//
+//            workManager.enqueueUniquePeriodicWork(
+//                "update-post-list",
+//                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+//                request,
+//            )
         }
 
         private fun getRequest(): PeriodicWorkRequest {
-            val constraints = Constraints.Builder()
-                .setRequiredNetworkType(networkType = NetworkType.CONNECTED)
-                .build()
-
-            val builder = PeriodicWorkRequestBuilder<ContentSyncWorker>(
+            return PeriodicWorkRequestBuilder<ContentSyncWorker>(
                 repeatInterval = 7,
                 repeatIntervalTimeUnit = TimeUnit.DAYS,
             )
-
-            return builder
-                .setConstraints(constraints = constraints)
+                .setConstraints(
+                    constraints = Constraints.Builder()
+                        .setRequiredNetworkType(networkType = NetworkType.CONNECTED)
+                        .build()
+                )
                 .setInputData(Data.Builder().putBoolean("", true).build())
                 .build()
         }
@@ -80,8 +78,22 @@ class ContentSyncWorker @AssistedInject constructor(
             content = htmlCode,
             url = Constants.indexUrl,
         )
-        val finalData = data.getPostList()
+        val links: ArrayList<TagInfo> = ArrayList()
 
+        ArticleParser.initialize(
+            isLoggingEnabled = false,
+            areImagesEnabled = true,
+            isSimpleTextFormatAllowed = true,
+        )
+        ArticleAnalyzer.process(
+            content = htmlCode,
+            onTag = { tag ->
+                if (tag.tag == "a" && tag.clazz == "featured__href") {
+                    links.add(element = tag)
+                }
+            }
+        )
+        val finalData = data.getPostList(links = links)
 
         if (finalData.isEmpty()) {
             return Result.failure()

@@ -10,7 +10,7 @@ package com.jet.article.data
  * @author Miroslav Hýbler <br>
  * created on 15.07.2023
  */
-public class HtmlArticleData public constructor(
+public data class HtmlArticleData public constructor(
     val url: String,
     val elements: List<HtmlElement> = emptyList(),
     val headData: HtmlHeadData = HtmlHeadData.empty,

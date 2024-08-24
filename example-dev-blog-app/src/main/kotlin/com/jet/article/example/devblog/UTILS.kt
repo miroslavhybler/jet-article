@@ -6,7 +6,14 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.safeGestures
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -19,6 +26,7 @@ import androidx.window.core.layout.WindowWidthSizeClass
 import com.jet.article.ArticleParser
 import com.jet.article.data.HtmlArticleData
 import com.jet.article.data.HtmlElement
+import com.jet.article.data.TagInfo
 import com.jet.article.example.devblog.data.ExcludeOption
 import com.jet.article.example.devblog.ui.LocalDimensions
 import com.jet.article.example.devblog.data.database.PostItem
@@ -111,7 +119,7 @@ suspend fun ArticleParser.parseWithInitialization(
 ): HtmlArticleData {
     initialize(
         areImagesEnabled = true,
-        isLoggingEnabled = true,
+        isLoggingEnabled = false,
         isSimpleTextFormatAllowed = true,
     )
     ExcludeOption.devBlogExcludeRules.forEach { option ->
@@ -130,16 +138,29 @@ suspend fun ArticleParser.parseWithInitialization(
 /**
  *
  */
-fun HtmlArticleData.getPostList(): List<PostItem> {
+//TODO add support for featured item
+fun HtmlArticleData.getPostList(
+    links: List<TagInfo>,
+): List<PostItem> {
     try {
-        val chunked = elements.chunked(size = 4)
-        val list = chunked.map { sublist ->
+        val newList = ArrayList<HtmlElement>()
+        newList.addAll(elements = elements)
+
+        //Removing "featured" item
+        newList.removeAt(0)
+        newList.removeAt(0)
+        newList.removeAt(0)
+        newList.removeAt(0)
+
+        val chunked = newList.chunked(size = 4)
+        val list = chunked.mapIndexed { index, sublist ->
             PostItem(
                 image = (sublist[0] as HtmlElement.Image).url,
                 title = (sublist[1] as HtmlElement.TextBlock).text,
                 time = (sublist[2] as HtmlElement.TextBlock).text,
                 description = (sublist[3] as HtmlElement.TextBlock).text,
-                url = "TODO",
+                url = links[index].tagAttributes["href"]
+                    ?: throw NullPointerException("Unable to extract href from ${links[index]}"),
             )
         }
         return list
@@ -148,4 +169,66 @@ fun HtmlArticleData.getPostList(): List<PostItem> {
         return emptyList()
     }
 
+}
+
+
+
+
+@Composable
+fun rememberCurrentOffset(state: LazyListState): State<Int> {
+    val position = remember { derivedStateOf { state.firstVisibleItemIndex } }
+    val itemOffset = remember { derivedStateOf { state.firstVisibleItemScrollOffset } }
+    val lastPosition = rememberPrevious(position.value)
+    val lastItemOffset = rememberPrevious(itemOffset.value)
+    val currentOffset = remember { mutableStateOf(0) }
+
+    LaunchedEffect(position.value, itemOffset.value) {
+        if (lastPosition == null || position.value == 0) {
+            currentOffset.value = itemOffset.value
+        } else if (lastPosition == position.value) {
+            currentOffset.value += (itemOffset.value - (lastItemOffset ?: 0))
+        } else if (lastPosition > position.value) {
+            currentOffset.value -= (lastItemOffset ?: 0)
+        } else { // lastPosition.value < position.value
+            currentOffset.value += itemOffset.value
+        }
+    }
+
+    return currentOffset
+}
+
+@Composable
+fun <T> rememberPrevious(
+    current: T,
+    shouldUpdate: (prev: T?, curr: T) -> Boolean = { a: T?, b: T -> a != b },
+): T? {
+    val ref = rememberRef<T>()
+
+    // launched after render, so the current render will have the old value anyway
+    SideEffect {
+        if (shouldUpdate(ref.value, current)) {
+            ref.value = current
+        }
+    }
+
+    return ref.value
+}
+
+
+/**
+ * Returns a dummy MutableState that does not cause render when setting it
+ */
+@Composable
+fun <T> rememberRef(): MutableState<T?> {
+    // for some reason it always recreated the value with vararg keys,
+    // leaving out the keys as a parameter for remember for now
+    return remember() {
+        object: MutableState<T?> {
+            override var value: T? = null
+
+            override fun component1(): T? = value
+
+            override fun component2(): (T?) -> Unit = { value = it }
+        }
+    }
 }

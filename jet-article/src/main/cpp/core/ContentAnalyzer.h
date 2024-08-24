@@ -18,9 +18,9 @@
 class ContentAnalyzer : public AbstractParserComponent {
 
 public:
-    std::string currentTagName = "";
-    std::string currentTagClass = "";
-    std::string currentPairTagContent = "";
+    std::string currentTagName;
+    std::string currentTagClass;
+    std::string currentPairTagContent;
 
 private:
     int actualInputStart = 0;
@@ -52,9 +52,6 @@ public:
 
 
     void setInput(std::string input);
-
-
-    void setRange(int s, int e);
 
 
     void doNextStep();

@@ -2,6 +2,7 @@
 
 package com.jet.article
 
+import androidx.annotation.CheckResult
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -80,6 +81,7 @@ public object ArticleParser {
      * @param url Original url of the article
      * @since 1.0.0
      */
+    @CheckResult
     public suspend fun parse(
         content: String,
         url: String,

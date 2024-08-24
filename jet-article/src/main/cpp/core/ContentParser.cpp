@@ -64,7 +64,7 @@ std::string ContentParser::getTempContent() {
     if (currentContentType == TEXT || currentContentType == TITLE) {
         std::string tempInput = input.substr(tempContentIndexStart, n);
         utils::trim(tempInput);
-        std::string output = "";
+        std::string output;
 
         if (isSimpleTextFormatAllowed) {
             utils::clearUnsupportedTagsFromTextBlock(tempInput, output, 0, tempInput.length());
@@ -79,7 +79,6 @@ std::string ContentParser::getTempContent() {
 }
 
 
-//TODO handle random text outside tags somehow?
 //TODO Maybe enable that ininitialization, to process text outside tags
 //TODO https://android-developers.googleblog.com/ has texts inside divs
 void ContentParser::doNextStep() {
@@ -126,6 +125,11 @@ void ContentParser::doNextStep() {
     currentTagBody = input.substr(index.getIndex() + 1, tagBodyLength);
     currentTagId = utils::getTagAttribute(currentTagBody, "id");
     std::string tag = utils::getTagName(currentTagBody);
+
+    if (currentTagBody == "/body") {
+        mHasBodyContext = false;
+    }
+
 
     //Move index to the next char after tag
     if (mHasBodyContext) {
@@ -201,7 +205,6 @@ void ContentParser::parseHeadData(int e) {
 }
 
 
-//TODO copyright? what do do with copyright
 void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
     if (tag.find('/', 0) == 0) {
         //Skipping closing tag

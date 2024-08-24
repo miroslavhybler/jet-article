@@ -42,6 +42,7 @@ import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
 import com.jet.article.ui.LocalColorScheme
+import com.jet.article.ui.LocalLinkHandler
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
@@ -149,6 +150,7 @@ private fun TableCell(
 ) {
 
     val colorScheme = LocalColorScheme.current
+    val linkClickHandler = LocalLinkHandler.current
     Box(
         modifier = modifier
             .sizeIn(minWidth = 128.dp, minHeight = 32.dp)
@@ -157,7 +159,10 @@ private fun TableCell(
             text = remember(value) {
                 value.toHtml()
                     .toSpannable()
-                    .toAnnotatedString(primaryColor = colorScheme.linkColor)
+                    .toAnnotatedString(
+                        primaryColor = colorScheme.linkColor,
+                        linkClickHandler = linkClickHandler,
+                    )
             },
             modifier = Modifier
                 .align(alignment = Alignment.Center)

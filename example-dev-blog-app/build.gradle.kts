@@ -8,16 +8,21 @@ plugins {
 
 android {
     namespace = "com.jet.article.example.devblog"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.jet.article.example.devblog"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["room.schemaLocation"] = "${projectDir.path}/room-schemas"
+            }
+        }
     }
 
     buildTypes {
@@ -58,6 +63,7 @@ dependencies {
     implementation(libs.androidx.adaptive.android)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.palette.ktx)
 
     /** Adaptive UI */
     implementation(libs.androidx.adaptive)
@@ -79,6 +85,7 @@ dependencies {
     /** Hilt DI */
     implementation(libs.google.dagger.hilt)
     ksp(libs.google.dagger.hilt.compiler)
+    ksp (libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.hilt.work)
 }

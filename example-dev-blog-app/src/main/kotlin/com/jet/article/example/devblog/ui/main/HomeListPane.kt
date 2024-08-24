@@ -35,7 +35,7 @@ import com.jet.utils.plus
  */
 @Composable
 fun HomeListPane(
-    onOpenPost: (index: Int) -> Unit,
+    onOpenPost: (index: Int, item: PostItem) -> Unit,
     viewModel: HomeListPaneViewModel,
     navHostController: NavHostController,
 ) {
@@ -58,7 +58,7 @@ fun HomeListPane(
 
 @Composable
 private fun HomeListPaneContent(
-    onOpenPost: (index: Int) -> Unit,
+    onOpenPost: (index: Int, item: PostItem) -> Unit,
     data: List<PostItem>,
     lazyListState: LazyListState,
     navHostController: NavHostController,

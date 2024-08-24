@@ -63,7 +63,7 @@ public:
      * @param input
      * @since 1.0.0
      */
-    void setInput(std::string input);
+    void setInput(std::string input) override;
 
 
     /**
@@ -79,7 +79,7 @@ public:
      * to the next character and when '<' char is found, tries to process if it's tag or not.
      * @since 1.0.0
      */
-    void doNextStep();
+    void doNextStep() override;
 
 
     /**
@@ -96,7 +96,7 @@ public:
      * @return
      * @since 1.0.0
      */
-    bool hasBodyContext();
+    [[nodiscard]] bool hasBodyContext();
 
 
     /**
@@ -113,14 +113,14 @@ public:
      * and [tempContentIndexEnd]. Can be also empty.
      * @since 1.0.0
      */
-    std::string getTempContent();
+    [[nodiscard]] std::string getTempContent();
 
 
     /**
      * Clears all used resources and releases the memory at the end of parsing process
      * @since 1.0.0
      */
-    void clearAllResources();
+    void clearAllResources() override;
 
 
     /**
@@ -128,7 +128,7 @@ public:
      * @return
      * @since 1.0.0
      */
-    int getTempListSize();
+    [[nodiscard]] int getTempListSize();
 
 
     /**
@@ -237,7 +237,7 @@ private:
      * @param message
      * @since 1.0.0
      */
-    void abortWithError(ErrorCode cause, std::string message = "");
+    void abortWithError(ErrorCode cause, std::string message = "") override;
 };
 
 

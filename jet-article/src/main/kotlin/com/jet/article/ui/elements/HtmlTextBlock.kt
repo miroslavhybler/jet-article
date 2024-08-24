@@ -79,7 +79,10 @@ fun HtmlTextBlock(
         if (ArticleParser.isSimpleTextFormatAllowed) {
             text.toHtml()
                 .toSpannable()
-                .toAnnotatedString(primaryColor = colorScheme.linkColor)
+                .toAnnotatedString(
+                    primaryColor = colorScheme.linkColor,
+                    linkClickHandler = linkClickHandler,
+                )
         } else {
             buildAnnotatedString {
                 append(text = text)

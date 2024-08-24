@@ -16,6 +16,7 @@ import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
 import com.jet.article.ui.LocalColorScheme
+import com.jet.article.ui.LocalLinkHandler
 
 
 /**
@@ -28,6 +29,7 @@ fun HtmlCode(
     code: HtmlElement.Code
 ) {
     val colorScheme = LocalColorScheme.current
+    val linkClickHandler = LocalLinkHandler.current
 
     Box(
         modifier = Modifier
@@ -47,7 +49,10 @@ fun HtmlCode(
             text = remember(key1 = code) {
                 code.content.toHtml()
                     .toSpannable()
-                    .toAnnotatedString(primaryColor = colorScheme.linkColor)
+                    .toAnnotatedString(
+                        primaryColor = colorScheme.linkColor,
+                        linkClickHandler = linkClickHandler
+                    )
             },
             modifier = modifier
                 .fillMaxWidth()

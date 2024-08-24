@@ -27,7 +27,10 @@ protected:
     bool mHasNextStep;
     int length;
 
-
+    /**
+     * True when parser is currently within <body> tag
+     * @since 1.0.0
+     */
     bool mHasBodyContext;
 
 
@@ -132,6 +135,7 @@ protected:
         if (i >= length || i < 0) {
             //Index is at the and, unable to make next step.
             invalidateHasNextStep();
+            utils::log("PARSER-COMPONENT", "out of range, i >= length || i < 0");
             return false;
         }
 
@@ -146,7 +150,9 @@ protected:
         }
 
         while (ch != '<' && i < length) {
-            if (ch != '>') {
+            if (ch != '>' && mHasBodyContext) {
+                //TODO this is including comments content between tags,
+                //TODO its because comments are outside body
                 currentContentOutsideTag += ch;
             }
             i += 1;
@@ -154,6 +160,7 @@ protected:
                 ch = input[i];
             } catch (const std::out_of_range &e) {
                 index.moveIndex(i);
+                utils::log("PARSER-COMPONENT", "out of range in while");
                 return false;
             }
         }
@@ -172,6 +179,11 @@ protected:
             //Moving cursor to the next '<' char
             index.moveIndex(temporaryOutIndex + 1);
             invalidateHasNextStep();
+            utils::log("PARSER-COMPONENT",
+                       "cant process incoming tag, index: " +
+                       std::to_string(index.getIndex()) +
+                       " length: " +
+                       std::to_string(length));
             return false;
         }
         return true;

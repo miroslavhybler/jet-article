@@ -34,10 +34,10 @@ class ExcludedRulesTest : BaseAndroidTest() {
         )
 
         runBlocking {
-            ContentFilterNative.addExcludeOption(keyword = "cookies")
-            ContentFilterNative.addExcludeOption(id = "menu")
-            ContentFilterNative.addExcludeOption(tag = "footer")
-            ContentFilterNative.addExcludeOption(clazz = "advertisment")
+            ArticleParser.addExcludeOption(keyword = "cookies")
+            ArticleParser.addExcludeOption(id = "menu")
+            ArticleParser.addExcludeOption(tag = "footer")
+            ArticleParser.addExcludeOption(clazz = "advertisment")
 
             val data = ArticleParser.parse(content = text, url = "")
 
@@ -75,20 +75,20 @@ class ExcludedRulesTest : BaseAndroidTest() {
     fun multipleElementsRuleTest() {
         val text = loadAsset(fileName = "exclude-2")
 
-        ContentFilterNative.addExcludeOption(
+        ArticleParser.addExcludeOption(
             tag = "div",
             clazz = "toRemove",
         )
-        ContentFilterNative.addExcludeOption(
+        ArticleParser.addExcludeOption(
             tag = "div",
             id = "divToRemove"
         )
-        ContentFilterNative.addExcludeOption(
+        ArticleParser.addExcludeOption(
             tag = "div",
             id = "divToRemove2",
             clazz = "toRemove2",
         )
-        ContentFilterNative.addExcludeOption(
+        ArticleParser.addExcludeOption(
             id = "divToRemove3",
             clazz = "toRemove3",
         )

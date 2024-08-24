@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -32,6 +33,7 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -75,6 +77,7 @@ public fun JetHtmlArticle(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     contentPadding: PaddingValues = PaddingValues(all = 0.dp),
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     header: @Composable LazyItemScope.() -> Unit = {},
     footer: @Composable LazyItemScope.() -> Unit = {},
     linkClickCallback: LinkClickHandler.LinkCallback = rememberDefaultLinkCallback(
@@ -84,19 +87,22 @@ public fun JetHtmlArticle(
     colors: JetHtmlArticleColors = if (isSystemInDarkTheme())
         JetHtmlArticleDefaults.darkColorScheme
     else
-        JetHtmlArticleDefaults.lightColorScheme
+        JetHtmlArticleDefaults.lightColorScheme,
+    containerColor: Color = MaterialTheme.colorScheme.background,
 ) {
     JetHtmlArticleContent(
         modifier = modifier,
         data = data,
         listState = listState,
         contentPadding = contentPadding,
-        verticalArrangement=verticalArrangement,
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
         header = header,
         footer = footer,
         snackbarHostState = snackbarHostState,
         colors = colors,
         linkClickCallback = linkClickCallback,
+        containerColor = containerColor,
     )
 }
 
@@ -122,6 +128,7 @@ public fun JetHtmlArticleContent(
     footer: @Composable LazyItemScope.() -> Unit = {},
     contentPadding: PaddingValues = PaddingValues(all = 0.dp),
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     linkClickCallback: LinkClickHandler.LinkCallback = rememberDefaultLinkCallback(
         snackbarHostState = snackbarHostState,
         coroutineScope = rememberCoroutineScope(),
@@ -129,8 +136,10 @@ public fun JetHtmlArticleContent(
     colors: JetHtmlArticleColors = if (isSystemInDarkTheme())
         JetHtmlArticleDefaults.darkColorScheme
     else
-        JetHtmlArticleDefaults.lightColorScheme
-) {
+        JetHtmlArticleDefaults.lightColorScheme,
+    containerColor: Color = MaterialTheme.colorScheme.background,
+
+    ) {
 
     val linkHandler = rememberLinkClickHandler(
         lazyListState = listState,
@@ -145,15 +154,19 @@ public fun JetHtmlArticleContent(
         LocalContentPadding provides contentPadding,
         LocalColorScheme provides colors
     ) {
+        //TODO remove scaffold and use box or something instead
         Scaffold(
             modifier = Modifier.fillMaxSize(),
+            containerColor = containerColor,
             content = { paddingValues ->
+                //TODO enable/disable selection
                 SelectionContainer {
                     LazyColumn(
                         modifier = modifier
                             .fillMaxSize(),
                         state = listState,
                         verticalArrangement = verticalArrangement,
+                        horizontalAlignment = horizontalAlignment,
                         content = {
                             item(content = header)
                             itemsIndexed(
@@ -194,16 +207,14 @@ public fun JetHtmlArticleContent(
                         },
                         contentPadding = contentPadding
                     )
-
                 }
             },
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState) {
                     Snackbar(
                         snackbarData = it,
-                        modifier = Modifier.padding(
-                            bottom = contentPadding.calculateBottomPadding()
-                        )
+                        modifier = Modifier
+                            .padding(bottom = contentPadding.calculateBottomPadding())
                     )
                 }
             }
@@ -216,8 +227,6 @@ public fun JetHtmlArticleContent(
  * @since 1.0.0
  */
 public object JetHtmlArticleDefaults {
-
-
 
 
     /**
@@ -274,8 +283,8 @@ public class JetHtmlArticleColors public constructor(
 /**
  * @since 1.0.0
  */
-internal val LocalLinkHandler: ProvidableCompositionLocal<LinkClickHandler?> = compositionLocalOf(
-    defaultFactory = { null }
+internal val LocalLinkHandler: ProvidableCompositionLocal<LinkClickHandler> = compositionLocalOf(
+    defaultFactory = { error("LinkClickHandler not provided!") }
 )
 
 
