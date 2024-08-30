@@ -1,5 +1,6 @@
 package com.jet.article.ui.elements
 
+import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,22 +15,27 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
+import androidx.palette.graphics.Palette
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
 import com.jet.article.data.HtmlElement
+import kotlinx.coroutines.ensureActive
 import mir.oslav.jet.html.article.R
 
 
@@ -48,7 +54,10 @@ fun HtmlImage(
     loading: @Composable BoxScope.() -> Unit = { HtmlImageDefaults.LoadingLayout(scope = this) },
     error: @Composable BoxScope.() -> Unit = { HtmlImageDefaults.ErrorLayout(scope = this) },
     diskCachePolicy: CachePolicy = CachePolicy.ENABLED,
-) {
+    allowHardware: Boolean = true,
+    onPainterReady: ((AsyncImagePainter) -> Unit)? = null,
+
+    ) {
 
     HtmlImage(
         modifier = modifier,
@@ -60,6 +69,8 @@ fun HtmlImage(
         loading = loading,
         error = error,
         diskCachePolicy = diskCachePolicy,
+        onPainterReady = onPainterReady,
+        allowHardware=allowHardware,
     )
 }
 
@@ -75,6 +86,8 @@ fun HtmlImage(
     loading: @Composable BoxScope.() -> Unit = { HtmlImageDefaults.LoadingLayout(scope = this) },
     error: @Composable BoxScope.() -> Unit = { HtmlImageDefaults.ErrorLayout(scope = this) },
     diskCachePolicy: CachePolicy = CachePolicy.ENABLED,
+    allowHardware: Boolean = true,
+    onPainterReady: ((AsyncImagePainter) -> Unit)? = null,
 ) {
     val context = LocalContext.current
 
@@ -83,13 +96,23 @@ fun HtmlImage(
             .data(data = url)
             .size(size = Size.ORIGINAL)
             .diskCachePolicy(diskCachePolicy)
+            .allowHardware(allowHardware)
             .diskCacheKey(key = if (diskCachePolicy == CachePolicy.ENABLED) url else null)
             .build()
     )
+
+
+    LaunchedEffect(
+        key1 = onPainterReady,
+        key2 = painter.state,
+    ) {
+        if (onPainterReady != null && painter.state is AsyncImagePainter.State.Success) {
+            onPainterReady(painter)
+        }
+    }
+
     Box(
         modifier = Modifier
-//            .fillMaxWidth()
-//            .wrapContentHeight()
             .then(other = modifier)
             .clip(shape = shape)
     ) {

@@ -35,7 +35,6 @@ abstract class LocalDatabase constructor() : RoomDatabase() {
         get() = postDao()
 
 
-
     protected abstract fun postDao(): PostDao
 
 
@@ -48,6 +47,10 @@ abstract class LocalDatabase constructor() : RoomDatabase() {
 
         @Query("SELECT EXISTS(SELECT id FROM posts WHERE url=:url)")
         fun contains(url: String): Boolean
+
+
+        @Query("SELECT last_insert_rowid()")
+        fun getLastPostId(): Int
     }
 
 

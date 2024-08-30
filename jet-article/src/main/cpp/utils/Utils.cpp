@@ -118,7 +118,11 @@ namespace utils {
     }
 
 
-    int indexOf(const std::string_view &input, const std::string &sub, const int &i) {
+    int indexOf(
+            const std::string_view &input,
+            const std::string &sub,
+            const size_t &i
+    ) {
         typename std::string_view::const_iterator sit = input.begin();
         std::advance(sit, i);
         typename std::string_view::const_iterator it = std::search(
@@ -135,7 +139,11 @@ namespace utils {
     }
 
 
-    int indexOfOrThrow(const std::string_view &input, const std::string &sub, const int &i) {
+    size_t indexOfOrThrow(
+            const std::string_view &input,
+            const std::string &sub,
+            const size_t &i
+    ) {
         int index = indexOf(input, sub, i);
 
         if (index == -1) {
@@ -173,19 +181,19 @@ namespace utils {
 
     bool canProcessIncomingTag(
             const std::string_view &input,
-            const int &l,
-            const int &s,
-            int &outIndex
+            const size_t &l,
+            const size_t &s,
+            size_t &outIndex
     ) {
 
         if (s >= l) {
             return false;
         }
 
-        int i = s;
+        size_t i = s;
         outIndex = i;
         if ((i + 3) < l) {
-            int il = i + 3;
+            size_t il = i + 3;
             std::string_view sub;
             try {
                 sub = input.substr(i + 1, 3);
@@ -194,7 +202,7 @@ namespace utils {
             }
 
             if (utils::fastCompare(sub, "!--")) {
-                int ei;
+                size_t ei;
                 try {
                     ei = utils::indexOfOrThrow(input, "-->", il);
                 } catch (ErrorCode e) {
@@ -206,7 +214,7 @@ namespace utils {
             }
         }
         if (i + 12 < l) {
-            int il = i + 12;
+            size_t il = i + 12;
             std::string_view sub;
 
             try {
@@ -221,7 +229,7 @@ namespace utils {
             }
         }
         if ((i + 14) < l) {
-            int il = i + 14;
+            size_t il = i + 14;
             std::string_view sub;
             try {
                 sub = input.substr(i + 1, 14);
@@ -237,15 +245,15 @@ namespace utils {
     }
 
 
-    const int findUnsupportedTagClosing(
+    size_t findUnsupportedTagClosing(
             const std::string_view &input,
             const std::string &tag,
-            int s
+            size_t s
     ) {
         std::string closingTag = "</" + tag + ">";
 
         try {
-            int ctsi = utils::indexOfOrThrow(input, closingTag, s);
+            size_t ctsi = utils::indexOfOrThrow(input, closingTag, s);
             return ctsi;
         } catch (ErrorCode e) {
 
@@ -258,19 +266,19 @@ namespace utils {
     }
 
 
-    const int findClosingTag(
+    size_t findClosingTag(
             const std::string_view &input,
             const std::string &searchedTag,
-            int s,
-            const int e
+            size_t s,
+            size_t e
     ) {
-        int i = s;
-        int outI = i;
+        size_t i = s;
+        size_t outI = i;
         //Clearing tempStack before another use
 
         tempWorkingInt = 0;
-
-        int end = e > 0 ? e : input.length();
+        size_t length = input.length();
+        size_t end = e > 0 ? e : length;
         while (i < end) {
             char ch = input[i];
             if (ch != '<' && i < end) {
@@ -279,7 +287,7 @@ namespace utils {
             }
 
             //char is '<'
-            if (!utils::canProcessIncomingTag(input, input.length(), i, outI)) {
+            if (!utils::canProcessIncomingTag(input, length, i, outI)) {
                 //Unable to process
                 if (i == outI) {
                     i += 1;
@@ -289,9 +297,9 @@ namespace utils {
                 continue;
             }
             //TagType closing index, index of next '>'
-            int tei = utils::indexOfOrThrow(input, ">", i);
+            size_t tei = utils::indexOfOrThrow(input, ">", i);
             // -1 to remove '<' at the end
-            int tagBodyLength = tei - i - 1;
+            size_t tagBodyLength = tei - i - 1;
             //tagbody within <>, i + 1 to remove '<'
             std::string_view tagBody = input.substr(i + 1, tagBodyLength);
             std::string rawTagName = utils::getTagName(tagBody);
@@ -308,12 +316,11 @@ namespace utils {
                     }
                 }
             } else {
-
                 if (unsupportedPairTags.contains(rawTagName)) {
                     //Unsuported tag found, probably script, has to be skipped
                     try {
                         std::string closingTag = "</" + rawTagName + ">";
-                        int ctsi = utils::indexOfOrThrow(input, closingTag, i);
+                        size_t ctsi = utils::indexOfOrThrow(input, closingTag, i);
                         i = ctsi + closingTag.length();
                     } catch (ErrorCode e) {
                         break;
@@ -341,14 +348,14 @@ namespace utils {
     }
 
 
-    const int findClosingTagWithLogs(
+    size_t findClosingTagWithLogs(
             const std::string_view &input,
             const std::string &tag,
-            int s,
-            const int e
+            size_t s,
+            size_t e
     ) {
-        int i = s;
-        int outI = i;
+        size_t i = s;
+        size_t outI = i;
         //Clearing tempStack before another use
 
         tempWorkingInt = 0;
@@ -360,7 +367,9 @@ namespace utils {
                 + " for tag: " + tag);
         utils::log("UTILS", "===================================");
 
-        int end = e > 0 ? e : input.length();
+        size_t length = input.length();
+        size_t end = e > 0 ? e : length;
+
         while (i < end) {
             char ch = input[i];
             if (ch != '<' && i < end) {
@@ -380,9 +389,9 @@ namespace utils {
                 continue;
             }
             //TagType closing index, index of next '>'
-            int tei = utils::indexOfOrThrow(input, ">", i);
+            size_t tei = utils::indexOfOrThrow(input, ">", i);
             // -1 to remove '<' at the end
-            int tagBodyLength = tei - i - 1;
+            size_t tagBodyLength = tei - i - 1;
             //tagbody within <>, i + 1 to remove '<'
             std::string_view tagBody = input.substr(i + 1, tagBodyLength);
             std::string rawTagName = utils::getTagName(tagBody);
@@ -410,13 +419,13 @@ namespace utils {
                     //Unsuported tag found, probably script, has to be skipped
                     utils::log("UTILS", "Skipping search becasuse of " + rawTagName);
                     try {
-                        int ctsiAlt = utils::findUnsupportedTagClosing(
+                        size_t ctsiAlt = utils::findUnsupportedTagClosing(
                                 input,
                                 rawTagName,
                                 tei
                         );
                         std::string closingTag = "</" + rawTagName + ">";
-                        int ctsi = utils::indexOfOrThrow(input, closingTag, i);
+                        size_t ctsi = utils::indexOfOrThrow(input, closingTag, i);
                         i = ctsiAlt + closingTag.length();
                         utils::log("UTILS",
                                    "CTSI: " + std::to_string(ctsi)
@@ -464,11 +473,11 @@ namespace utils {
     void clearUnsupportedTagsFromTextBlock(
             std::string &input,
             std::string &output,
-            int s,
-            int e
+            size_t s,
+            size_t e
     ) {
-        int i = s;
-        int outI = i;
+        size_t i = s;
+        size_t outI = i;
         output.clear();
 
         while (i < e) {
@@ -490,11 +499,11 @@ namespace utils {
             }
 
             //TagType closing index, index of next '>'
-            int tei = utils::indexOfOrThrow(input, ">", i);
+            size_t tei = utils::indexOfOrThrow(input, ">", i);
             // -1 to remove '<' at the end
             int tagBodyLength = tei - i - 1;
             //tagbody within <>, i + 1 to remove '<'
-            std::string_view tagBody = input.substr(i + 1, tagBodyLength);
+            std::string tagBody = input.substr(i + 1, tagBodyLength);
             std::string rawTagName = utils::getTagName(tagBody);
 
             if (rawTagName == "img") {
@@ -516,7 +525,7 @@ namespace utils {
             } else {
                 try {
                     std::string closingTag = "</" + rawTagName + ">";
-                    int ctsi = utils::indexOfOrThrow(input, closingTag, i);
+                    size_t ctsi = utils::indexOfOrThrow(input, closingTag, i);
                     output += std::string(input, i, (ctsi + closingTag.length()) - i);
                     i = ctsi + closingTag.length();
                 } catch (ErrorCode e) {
@@ -532,11 +541,12 @@ namespace utils {
     void clearUnsupportedTagsFromTextBlock(
             std::string_view &input,
             std::string &output,
-            int s,
-            int e
+            size_t s,
+            size_t e
     ) {
-        int i = s;
-        int outI = i;
+        size_t i = s;
+        size_t outI = i;
+        size_t length = input.length();
         output.clear();
 
         while (i < e) {
@@ -547,7 +557,7 @@ namespace utils {
                 continue;
             }
 
-            if (!utils::canProcessIncomingTag(input, input.length(), i, outI)) {
+            if (!utils::canProcessIncomingTag(input, length, i, outI)) {
                 //Unable to process
                 if (i == outI) {
                     i += 1;
@@ -558,9 +568,9 @@ namespace utils {
             }
 
             //TagType closing index, index of next '>'
-            int tei = utils::indexOfOrThrow(input, ">", i);
+            size_t tei = utils::indexOfOrThrow(input, ">", i);
             // -1 to remove '<' at the end
-            int tagBodyLength = tei - i - 1;
+            size_t tagBodyLength = tei - i - 1;
             //tagbody within <>, i + 1 to remove '<'
             std::string_view tagBody = input.substr(i + 1, tagBodyLength);
             std::string rawTagName = utils::getTagName(tagBody);
@@ -574,7 +584,7 @@ namespace utils {
                 //Unsuported tag found, probably script, has to be skipped
                 try {
                     std::string closingTag = "</" + rawTagName + ">";
-                    int ctsi = utils::indexOfOrThrow(input, closingTag, i);
+                    size_t ctsi = utils::indexOfOrThrow(input, closingTag, i);
                     i = ctsi + closingTag.length();
                 } catch (ErrorCode e) {
                     break;
@@ -712,16 +722,16 @@ namespace utils {
     void groupPairTagContents(
             const std::string_view &input,
             const std::string &tag,
-            const int &s,
-            const int &e,
+            const size_t &s,
+            const size_t &e,
             std::vector<std::string_view> &outputList
     ) {
         if (!outputList.empty()) {
             outputList.clear();
         }
 
-        int end = e != 0 ? e : input.length();
-        int i = s;
+        size_t end = e != 0 ? e : input.length();
+        size_t i = s;
         while (i < end) {
             char ch = input[i];
             if (ch != '<') {
@@ -729,14 +739,14 @@ namespace utils {
                 continue;
             }
 
-            int tei = utils::indexOfOrThrow(input, ">", i);
-            int tagBodyLength = tei - i - 1;
+            size_t tei = utils::indexOfOrThrow(input, ">", i);
+            size_t tagBodyLength = tei - i - 1;
             std::string tagBody = std::string(input.substr(i + 1, tagBodyLength));
             std::string rawTagName = utils::getTagName(tagBody);
 
             if (utils::fastCompare(tag, rawTagName)) {
                 std::string closingTag = "</" + tag + ">";
-                int ctsi = utils::indexOfOrThrow(input, closingTag, tei);
+                size_t ctsi = utils::indexOfOrThrow(input, closingTag, tei);
                 std::string_view foundTag = input.substr(tei + 1, ctsi - tei - 1);
                 outputList.push_back(foundTag);
                 i = ctsi + 1;

@@ -62,8 +62,10 @@ dependencies {
     implementation(libs.material3)
     implementation(libs.androidx.adaptive.android)
     implementation(libs.androidx.navigation.runtime.ktx)
-    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.palette.ktx)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.core.splashscreen)
+
 
     /** Adaptive UI */
     implementation(libs.androidx.adaptive)
@@ -84,6 +86,7 @@ dependencies {
 
     /** Hilt DI */
     implementation(libs.google.dagger.hilt)
+    implementation(libs.androidx.hilt.common)
     ksp(libs.google.dagger.hilt.compiler)
     ksp (libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)

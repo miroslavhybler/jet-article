@@ -13,18 +13,17 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.text.style.URLSpan
 import android.text.style.UnderlineSpan
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
-import androidx.compose.ui.text.LinkInteractionListener
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
+import com.jet.article.data.HtmlArticleData
 import com.jet.article.ui.LinkClickHandler
 import java.net.URI
 import java.net.URISyntaxException
@@ -58,19 +57,24 @@ public fun String.toDomainName(): String? {
  */
 public fun Spannable.toAnnotatedString(
     primaryColor: Color,
-    linkClickHandler: LinkClickHandler
+    linkClickHandler: LinkClickHandler?,
+    data: HtmlArticleData,
+    articleUrl: String,
 ): AnnotatedString {
     val builder = AnnotatedString.Builder(this.toString())
     val copierContext = CopierContext(primaryColor)
+
     SpanCopier.entries.forEach { copier ->
         getSpans(0, length, copier.spanClass).forEach { span ->
             copier.copySpan(
-                span,
-                getSpanStart(span),
-                getSpanEnd(span),
-                builder,
-                copierContext,
-                linkClickHandler
+                span = span,
+                start = getSpanStart(span),
+                end = getSpanEnd(span),
+                destination = builder,
+                context = copierContext,
+                linkClickHandler = linkClickHandler,
+                data = data,
+                articleUrl = articleUrl,
             )
         }
     }
@@ -83,7 +87,6 @@ private data class CopierContext(
 )
 
 
-//TODO refactor
 private enum class SpanCopier {
     URL {
         override val spanClass = URLSpan::class.java
@@ -93,28 +96,28 @@ private enum class SpanCopier {
             end: Int,
             destination: AnnotatedString.Builder,
             context: CopierContext,
-            linkClickHandler: LinkClickHandler,
+            linkClickHandler: LinkClickHandler?,
+            data: HtmlArticleData,
+            articleUrl: String,
         ) {
             val urlSpan = span as URLSpan
 
-            //TODO refactor - look at LinkClickHandler#onLink
             destination.addLink(
-                // url = LinkAnnotation.Url(url = urlSpan.url),
                 clickable = LinkAnnotation.Clickable(
                     tag = urlSpan.url,
                     linkInteractionListener = {
-                        //   linkClickHandler.handleLink(clickedText =)
+                        linkClickHandler?.handleLink(
+                            link = urlSpan.url,
+                            articleUrl = articleUrl,
+                            data = data,
+                        )?: kotlin.run {
+                            Log.w("Jet-Article", "Clicked on link but linkClickHandler is null")
+                        }
                     },
                 ),
                 start = start,
                 end = end
             )
-//            destination.addStringAnnotation(
-//                tag = name,
-//                annotation = urlSpan.url,
-//                start = start,
-//                end = end,
-//            )
             destination.addStyle(
                 style = SpanStyle(
                     color = context.primaryColor,
@@ -133,8 +136,11 @@ private enum class SpanCopier {
             end: Int,
             destination: AnnotatedString.Builder,
             context: CopierContext,
-            linkClickHandler: LinkClickHandler,
-        ) {
+            linkClickHandler: LinkClickHandler?,
+            data: HtmlArticleData,
+            articleUrl: String,
+
+            ) {
             val colorSpan = span as ForegroundColorSpan
             destination.addStyle(
                 style = SpanStyle(color = Color(colorSpan.foregroundColor)),
@@ -151,7 +157,9 @@ private enum class SpanCopier {
             end: Int,
             destination: AnnotatedString.Builder,
             context: CopierContext,
-            linkClickHandler: LinkClickHandler,
+            linkClickHandler: LinkClickHandler?,
+            data: HtmlArticleData,
+            articleUrl: String,
         ) {
             destination.addStyle(
                 style = SpanStyle(textDecoration = TextDecoration.Underline),
@@ -168,7 +176,9 @@ private enum class SpanCopier {
             end: Int,
             destination: AnnotatedString.Builder,
             context: CopierContext,
-            linkClickHandler: LinkClickHandler,
+            linkClickHandler: LinkClickHandler?,
+            data: HtmlArticleData,
+            articleUrl: String,
         ) {
             val styleSpan = span as StyleSpan
 
@@ -196,8 +206,11 @@ private enum class SpanCopier {
         end: Int,
         destination: AnnotatedString.Builder,
         context: CopierContext,
-        linkClickHandler: LinkClickHandler,
-    )
+        linkClickHandler: LinkClickHandler?,
+        data: HtmlArticleData,
+        articleUrl: String,
+
+        )
 }
 
 

@@ -42,16 +42,16 @@ fun HomeListPane(
 
     val posts by viewModel.posts.collectAsState()
 
-    LaunchedEffect(key1 = Unit) {
-        viewModel.loadIndexSite()
-    }
+//    LaunchedEffect(key1 = Unit) {
+//        viewModel.loadIndexSite()
+//    }
 
 
     HomeListPaneContent(
         onOpenPost = onOpenPost,
         data = posts,
         lazyListState = viewModel.lazyListState,
-        navHostController=navHostController,
+        navHostController = navHostController,
     )
 }
 
@@ -77,7 +77,7 @@ private fun HomeListPaneContent(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             MainTopBar(
-                text = stringResource(id= R.string.app_name),
+                text = stringResource(id = R.string.app_name),
                 navHostController = navHostController,
             )
         },
@@ -98,7 +98,10 @@ private fun HomeListPaneContent(
                     }
                 ),
             ) {
-                itemsIndexed(items = data) { index, item ->
+                itemsIndexed(
+                    items = data,
+                    key = { _, item -> item.id },
+                ) { index, item ->
                     HomeListItem(
                         modifier = Modifier,
                         onOpenPost = onOpenPost,

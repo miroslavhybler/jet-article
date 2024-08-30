@@ -14,8 +14,8 @@
 class IndexWrapper {
 
 private:
-    int index = 0;
-    int indexOnStart = 0;
+    size_t index = 0;
+    size_t indexOnStart = 0;
 
 public:
     IndexWrapper();
@@ -29,7 +29,7 @@ public:
      * @param i New index value
      * @since 1.0.0
      */
-    void moveIndex(int i);
+    void moveIndex(const size_t &i);
 
 
     /**
@@ -37,7 +37,7 @@ public:
      * @return Actual index value.
      * @since 1.0.0
      */
-    const int getIndex();
+    const size_t getIndex();
 
 
     /**
@@ -45,8 +45,7 @@ public:
      * @return
      * @since 1.0.0
      */
-    const int getIndexOnStart();
-
+    const size_t getIndexOnStart();
 
 
     /**

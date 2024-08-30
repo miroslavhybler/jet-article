@@ -283,8 +283,8 @@ public class JetHtmlArticleColors public constructor(
 /**
  * @since 1.0.0
  */
-internal val LocalLinkHandler: ProvidableCompositionLocal<LinkClickHandler> = compositionLocalOf(
-    defaultFactory = { error("LinkClickHandler not provided!") }
+internal val LocalLinkHandler: ProvidableCompositionLocal<LinkClickHandler?> = compositionLocalOf(
+    defaultFactory = { null }
 )
 
 

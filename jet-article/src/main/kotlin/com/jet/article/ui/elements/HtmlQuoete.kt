@@ -26,7 +26,9 @@ import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
+import com.jet.article.ui.LocalBaseArticleUrl
 import com.jet.article.ui.LocalColorScheme
+import com.jet.article.ui.LocalHtmlArticleData
 import com.jet.article.ui.LocalLinkHandler
 
 
@@ -44,6 +46,8 @@ fun HtmlQuoete(
     val colorScheme = LocalColorScheme.current
     val density = LocalDensity.current
     val linkClickHandler = LocalLinkHandler.current
+    val articleData = LocalHtmlArticleData.current
+    val articleUrl = LocalBaseArticleUrl.current
     var dividerHeight by remember { mutableStateOf(0.dp) }
 
     Row(
@@ -70,6 +74,8 @@ fun HtmlQuoete(
                     .toAnnotatedString(
                         primaryColor = colorScheme.quoteTextColor,
                         linkClickHandler = linkClickHandler,
+                        data = articleData,
+                        articleUrl=articleUrl,
                     )
             },
             style = MaterialTheme.typography.bodyMedium,

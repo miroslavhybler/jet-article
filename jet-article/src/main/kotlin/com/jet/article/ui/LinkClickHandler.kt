@@ -1,4 +1,4 @@
-@file:Suppress("RedundantVisibilityModifier")
+@file:Suppress("RedundantVisibilityModifier", "RedundantUnitReturnType")
 
 package com.jet.article.ui
 
@@ -46,13 +46,16 @@ public class LinkClickHandler internal constructor(
      * @param data Parsed data
      * @param scrollOffset
      */
+    @Deprecated(
+        message = "Was used with ClickableText which becames depricated, use the other handleLink() instead"
+    )
     internal fun handleLink(
         clickedText: AnnotatedString,
         clickOffset: Int,
         articleUrl: String,
         data: HtmlArticleData,
         scrollOffset: Int
-    ) {
+    ): Unit {
         val anotations = clickedText.getStringAnnotations(
             start = clickOffset,
             end = clickOffset,
@@ -71,6 +74,24 @@ public class LinkClickHandler internal constructor(
     }
 
 
+    internal fun handleLink(
+        link: String,
+        articleUrl: String,
+        data: HtmlArticleData,
+    ): Unit {
+        val linkData = getLink(
+            rawLink = link,
+            articleUrl = articleUrl
+        )
+        //TODO scroll offset
+        onLink(
+            link = linkData,
+            data = data,
+            scrollOffset = 0,
+        )
+    }
+
+
     /**
      * @since 1.0.0
      */
@@ -78,7 +99,7 @@ public class LinkClickHandler internal constructor(
         link: Link,
         data: HtmlArticleData,
         scrollOffset: Int
-    ) {
+    ): Unit {
         when (link) {
             is Link.UriLink -> {
                 callback.onUriLink(

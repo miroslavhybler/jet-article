@@ -21,10 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import com.jet.article.example.devblog.composables.CustomHtmlImage
 import com.jet.article.example.devblog.data.database.PostItem
 import com.jet.article.example.devblog.isExpanded
 import com.jet.article.example.devblog.isMedium
 import com.jet.article.ui.elements.HtmlImage
+import com.jet.article.ui.elements.HtmlTextBlock
 
 
 /**
@@ -117,7 +119,7 @@ private fun HomeListItemColumn(
                 bottom = 16.dp,
             )
     ) {
-        HtmlImage(
+        CustomHtmlImage(
             modifier = Modifier,
             url = item.image,
         )
@@ -128,13 +130,13 @@ private fun HomeListItemColumn(
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Text(
+        HtmlTextBlock(
             modifier = Modifier,
             text = item.title,
             style = MaterialTheme.typography.titleLarge,
             color = contentColor,
         )
-        Text(
+        HtmlTextBlock(
             modifier = Modifier,
             text = item.description,
             style = MaterialTheme.typography.bodyMedium,

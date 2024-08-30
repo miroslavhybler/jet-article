@@ -20,21 +20,7 @@ import kotlin.coroutines.CoroutineContext
  * created on 20.02.2024
  * @since 1.0.0
  */
-@Deprecated(
-    message = "Analyzer is buggy and probably will be removed or replaced by different component." +
-            "This was handy during library development but it doenst make much sence to have it.",
-    level = DeprecationLevel.WARNING,
-)
 public object ArticleAnalyzer {
-
-
-    /**
-     * @since 1.0.0
-     */
-    private val safeCoroutineContext: CoroutineContext = Executors
-        .newSingleThreadExecutor()
-        .asCoroutineDispatcher()
-        .plus(context = CoroutineName(name = "JetHtmlArticleAnalyzer"))
 
 
     /**
@@ -43,6 +29,10 @@ public object ArticleAnalyzer {
     private val mAnalyzerFlow: MutableStateFlow<ContentTag?> =
         MutableStateFlow(value = null)
     public val analyzerFlow: StateFlow<ContentTag?> = mAnalyzerFlow.asStateFlow()
+
+
+    private val safeCoroutineContext: CoroutineContext
+        get() = ArticleParser.safeCoroutineContext
 
     /**
      * @since 1.0.0
@@ -59,6 +49,7 @@ public object ArticleAnalyzer {
         onTag: suspend (tag: TagInfo) -> Unit,
     ): Unit = withContext(context = safeCoroutineContext) {
         AnalyzerNative.setInput(input = content)
+        jumpToBody()
         while (moveNext()) {
             val data = analyzerFlow.value
             if (data != null
@@ -74,9 +65,6 @@ public object ArticleAnalyzer {
     suspend fun moveNext(): Boolean = withContext(
         context = safeCoroutineContext
     ) {
-        val actualData = analyzerFlow.value
-        // AnalyzerNative.setRange(start = actualData.range.last, end = -1)
-
         if (!AnalyzerNative.hasNextStep()) {
             Log.w(
                 "ArticleAnalyzer",
@@ -89,7 +77,6 @@ public object ArticleAnalyzer {
         AnalyzerNative.doNextStep()
         val contentStart = AnalyzerNative.getCurrentTagStartIndex()
         val contentEnd = AnalyzerNative.getCurrentTagEndIndex()
-
 
         if (AnalyzerNative.isAbortingWithError()) {
             val errorMessage = AnalyzerNative.getErrorMessage()
@@ -107,7 +94,6 @@ public object ArticleAnalyzer {
         val name = AnalyzerNative.getCurrentTagName()
         val clazz = AnalyzerNative.getCurrentTagClass()
         val contentType = AnalyzerNative.getCurrentContentType()
-
 
         val attributesCount = AnalyzerNative.getCurrentTagAttributesCount()
 
@@ -143,11 +129,7 @@ public object ArticleAnalyzer {
                 clazz = clazz,
                 contentType = contentType,
             )
-
         }
-//        Log.d(
-//            "ArticleAnalyzer", "newInfo: $tagInfo"
-//        )
         val newData = ContentTag(
             tag = tagInfo,
             range = IntRange(start = contentStart, endInclusive = contentEnd)

@@ -41,7 +41,9 @@ import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
+import com.jet.article.ui.LocalBaseArticleUrl
 import com.jet.article.ui.LocalColorScheme
+import com.jet.article.ui.LocalHtmlArticleData
 import com.jet.article.ui.LocalLinkHandler
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -151,6 +153,8 @@ private fun TableCell(
 
     val colorScheme = LocalColorScheme.current
     val linkClickHandler = LocalLinkHandler.current
+    val articleData = LocalHtmlArticleData.current
+    val articleUrl = LocalBaseArticleUrl.current
     Box(
         modifier = modifier
             .sizeIn(minWidth = 128.dp, minHeight = 32.dp)
@@ -162,6 +166,8 @@ private fun TableCell(
                     .toAnnotatedString(
                         primaryColor = colorScheme.linkColor,
                         linkClickHandler = linkClickHandler,
+                        data = articleData,
+                        articleUrl = articleUrl,
                     )
             },
             modifier = Modifier

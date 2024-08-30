@@ -1,6 +1,7 @@
 package com.jet.article.example.devblog
 
 import androidx.activity.SystemBarStyle
+import androidx.annotation.FloatRange
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
@@ -121,6 +122,7 @@ suspend fun ArticleParser.parseWithInitialization(
         areImagesEnabled = true,
         isLoggingEnabled = false,
         isSimpleTextFormatAllowed = true,
+        isQueringTextOutsideTextTags = true,
     )
     ExcludeOption.devBlogExcludeRules.forEach { option ->
         addExcludeOption(
@@ -164,7 +166,10 @@ fun HtmlArticleData.getPostList(
             )
         }
         return list
-    } catch (e: Exception) {
+    } catch (e: ClassCastException) {
+        e.printStackTrace()
+        return emptyList()
+    } catch (e: NoSuchElementException) {
         e.printStackTrace()
         return emptyList()
     }
@@ -172,15 +177,13 @@ fun HtmlArticleData.getPostList(
 }
 
 
-
-
 @Composable
 fun rememberCurrentOffset(state: LazyListState): State<Int> {
     val position = remember { derivedStateOf { state.firstVisibleItemIndex } }
     val itemOffset = remember { derivedStateOf { state.firstVisibleItemScrollOffset } }
-    val lastPosition = rememberPrevious(position.value)
-    val lastItemOffset = rememberPrevious(itemOffset.value)
-    val currentOffset = remember { mutableStateOf(0) }
+    val lastPosition = rememberPrevious(current = position.value)
+    val lastItemOffset = rememberPrevious(current = itemOffset.value)
+    val currentOffset = remember { mutableStateOf(value = 0) }
 
     LaunchedEffect(position.value, itemOffset.value) {
         if (lastPosition == null || position.value == 0) {
@@ -223,7 +226,7 @@ fun <T> rememberRef(): MutableState<T?> {
     // for some reason it always recreated the value with vararg keys,
     // leaving out the keys as a parameter for remember for now
     return remember() {
-        object: MutableState<T?> {
+        object : MutableState<T?> {
             override var value: T? = null
 
             override fun component1(): T? = value

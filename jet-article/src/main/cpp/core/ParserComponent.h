@@ -25,7 +25,8 @@ protected:
     std::string input;
     IndexWrapper index;
     bool mHasNextStep;
-    int length;
+    size_t length;
+    bool isQueringTextOutsideTextTags = false;
 
     /**
      * True when parser is currently within <body> tag
@@ -39,7 +40,7 @@ protected:
     std::string errorMessage;
 
     //TODO maybe private
-    int temporaryOutIndex = 0;
+    size_t temporaryOutIndex = 0;
 
 
 public:
@@ -98,7 +99,7 @@ protected:
      */
     virtual void abortWithError(
             ErrorCode cause,
-            std::string message = ""
+            std::string message
     ) = 0;
 
 
@@ -131,8 +132,8 @@ protected:
             return false;
         }
 
-        int i = index.getIndex();
-        if (i >= length || i < 0) {
+        size_t i = index.getIndex();
+        if (i >= length) {
             //Index is at the and, unable to make next step.
             invalidateHasNextStep();
             utils::log("PARSER-COMPONENT", "out of range, i >= length || i < 0");
@@ -150,9 +151,7 @@ protected:
         }
 
         while (ch != '<' && i < length) {
-            if (ch != '>' && mHasBodyContext) {
-                //TODO this is including comments content between tags,
-                //TODO its because comments are outside body
+            if (isQueringTextOutsideTextTags && ch != '>' && mHasBodyContext) {
                 currentContentOutsideTag += ch;
             }
             i += 1;
@@ -199,7 +198,7 @@ protected:
      */
     bool isActualTagValidForNextProcessing(
             const std::string &tag,
-            const int &tei
+            const size_t &tei
     ) {
         if (utils::fastCompare(tag, "br/")
             || utils::fastCompare(tag, "br")
@@ -227,11 +226,11 @@ protected:
             //Can't use findClosingTag because script can contain '<' inside of it and that breaks
             //searching for closing tag
             std::string closingTag = "</" + tag + ">";
-            int ctsi;
+            size_t ctsi;
             try {
                 ctsi = utils::findUnsupportedTagClosing(input, tag, index.getIndex());
             } catch (ErrorCode e) {
-                abortWithError(e);
+                abortWithError(e, utils::emptyString);
                 return false;
             }
             index.moveIndex(ctsi + closingTag.length());

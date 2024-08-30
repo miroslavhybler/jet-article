@@ -20,6 +20,7 @@ internal object ParserNative {
         areImagesEnabled: Boolean,
         isLoggingEnabled: Boolean,
         isSimpleTextFormatAllowed: Boolean,
+        isQueringTextOutsideTextTags: Boolean,
     ): Unit
 
 

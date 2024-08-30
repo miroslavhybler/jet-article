@@ -15,7 +15,9 @@ import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
+import com.jet.article.ui.LocalBaseArticleUrl
 import com.jet.article.ui.LocalColorScheme
+import com.jet.article.ui.LocalHtmlArticleData
 import com.jet.article.ui.LocalLinkHandler
 
 
@@ -30,6 +32,8 @@ fun HtmlCode(
 ) {
     val colorScheme = LocalColorScheme.current
     val linkClickHandler = LocalLinkHandler.current
+    val articleData = LocalHtmlArticleData.current
+    val articleUrl = LocalBaseArticleUrl.current
 
     Box(
         modifier = Modifier
@@ -51,7 +55,9 @@ fun HtmlCode(
                     .toSpannable()
                     .toAnnotatedString(
                         primaryColor = colorScheme.linkColor,
-                        linkClickHandler = linkClickHandler
+                        linkClickHandler = linkClickHandler,
+                        data = articleData,
+                        articleUrl = articleUrl,
                     )
             },
             modifier = modifier

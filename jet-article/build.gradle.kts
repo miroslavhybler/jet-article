@@ -13,11 +13,11 @@ plugins {
 
 android {
     namespace = "mir.oslav.jet.html.article"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 35
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
         externalNativeBuild {
@@ -103,6 +103,7 @@ dependencies {
     api(libs.coil.compose)
     implementation(libs.material)
     implementation(libs.android.joda)
+    implementation(libs.androidx.palette.ktx)
 
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.test.manifest)

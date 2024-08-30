@@ -17,13 +17,21 @@ ContentParser::ContentParser() {
 
 ContentParser::~ContentParser() = default;
 
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wshadow"
+
 void ContentParser::initialize(
-        bool areImagesEnabled,
-        bool isSimpleTextFormatAllowed
+        const bool &areImagesEnabled,
+        const bool &isSimpleTextFormatAllowed,
+        const bool &isQueringTextOutsideTextTags
 ) {
     this->areImagesEnabled = areImagesEnabled;
     this->isSimpleTextFormatAllowed = isSimpleTextFormatAllowed;
+    this->isQueringTextOutsideTextTags = isQueringTextOutsideTextTags;
 }
+
+#pragma clang diagnostic pop
 
 
 void ContentParser::setInput(std::string content) {
@@ -55,7 +63,7 @@ std::string ContentParser::getTempContent() {
         return "";
     }
 
-    int n = tempContentIndexEnd - tempContentIndexStart;
+    size_t n = tempContentIndexEnd - tempContentIndexStart;
 
     if (n == 0) {
         return "";
@@ -111,16 +119,16 @@ void ContentParser::doNextStep() {
 
 
     //Tag end index
-    int tei;
+    size_t tei;
     try {
         tei = utils::indexOfOrThrow(input, ">", index.getIndex());
     } catch (ErrorCode e) {
-        abortWithError(e);
+        abortWithError(e, utils::emptyString);
         return;
     }
 
     // -1 to remove '<' at the end
-    int tagBodyLength = tei - index.getIndex() - 1;
+    size_t tagBodyLength = tei - index.getIndex() - 1;
     //tagbody within <>, i + 1 to remove '<'
     currentTagBody = input.substr(index.getIndex() + 1, tagBodyLength);
     currentTagId = utils::getTagAttribute(currentTagBody, "id");
@@ -145,11 +153,11 @@ void ContentParser::doNextStep() {
     } else if (!wasHeadParsed && utils::fastCompare(tag, "head")) {
         try {
             //Closing tag start index
-            int ctsi = utils::findClosingTag(input, tag, index.getIndex());
+            size_t ctsi = utils::findClosingTag(input, tag, index.getIndex());
             parseHeadData(ctsi);
             wasHeadParsed = false;
         } catch (ErrorCode e) {
-            abortWithError(e);
+            abortWithError(e, utils::emptyString);
             return;
         }
     } else if (!mHasBodyContext && utils::fastCompare(tag, "body")) {
@@ -160,7 +168,7 @@ void ContentParser::doNextStep() {
 }
 
 
-void ContentParser::parseHeadData(int e) {
+void ContentParser::parseHeadData(size_t e) {
     while (index.getIndex() < e) {
         if (!moveIndexToNextTag()) {
             //No tag to process
@@ -169,15 +177,15 @@ void ContentParser::parseHeadData(int e) {
 
         //char is < and its probably start of valid tag
         //tag end index, index of next '>'
-        int tei;
+        size_t tei;
         try {
             tei = utils::indexOfOrThrow(input, ">", index.getIndex());
         } catch (ErrorCode e) {
-            abortWithError(e);
+            abortWithError(e, utils::emptyString);
             return;
         }
         // -1 to remove '<' at the end
-        int tagBodyLength = tei - index.getIndex() - 1;
+        size_t tagBodyLength = tei - index.getIndex() - 1;
         //tagbody within <>, i + 1 to remove '<'
         std::string tagBody = input.substr(index.getIndex() + 1, tagBodyLength);
         std::string tag = utils::getTagName(tagBody);
@@ -185,13 +193,13 @@ void ContentParser::parseHeadData(int e) {
 
         if (utils::fastCompare(tag, "title")) {
             try {
-                int ctsi = utils::findClosingTag(input, tag, index.getIndex(), e);
+                size_t ctsi = utils::findClosingTag(input, tag, index.getIndex(), e);
                 std::string titleContent = input.substr(tei + 1, ctsi - tei - 1);
                 title = titleContent;
-                int i = index.getIndex() + ctsi + 7;
+                size_t i = index.getIndex() + ctsi + 7;
                 index.moveIndex(i);
             } catch (ErrorCode e) {
-                abortWithError(e);
+                abortWithError(e, utils::emptyString);
                 return;
             }
         }
@@ -205,7 +213,7 @@ void ContentParser::parseHeadData(int e) {
 }
 
 
-void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
+void ContentParser::parseNextTagWithinBodyContext(std::string &tag, size_t &tei) {
     if (tag.find('/', 0) == 0) {
         //Skipping closing tag
         //its because after we parse out nested content, we don't know the "right" closing tag
@@ -218,8 +226,8 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
     if (!isActualTagValidForNextProcessing(tag, tei)) {
         //Tag is some tag which this library can't support like script, noscript, meta, ...
         //For full list visit isActualTagValidForNextProcessing function
-        tempContentIndexStart = -1;
-        tempContentIndexEnd = -1;
+        tempContentIndexStart = 0;
+        tempContentIndexEnd = 0;
         return;
     }
 
@@ -235,7 +243,7 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
 
     index.moveIndex(tei + 1);
     //closing tag start index
-    int ctsi;
+    size_t ctsi;
     try {
         ctsi = utils::findClosingTag(input, tag, index.getIndex());
         tempContentIndexStart = index.getIndex();
@@ -272,10 +280,12 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
         utils::groupPairTagContents(
                 input, "li", index.getIndex(), ctsi, tempOutputVector
         );
-    } else if (utils::fastCompare(tag, "picture")) {
-        //TODO maybe? handle picture, get image url from srcset from  source tag
-        hasContentToProcess = false;
-    } else if (utils::fastCompare(tag, "table")) {
+    }
+//    else if (utils::fastCompare(tag, "picture")) {
+//        //TODO maybe? handle picture, get image url from srcset from  source tag
+//        hasContentToProcess = false;
+//    }
+    else if (utils::fastCompare(tag, "table")) {
         //Table is skipped temporary
         currentContentType = TABLE;
         hasContentToProcess = true;
@@ -292,28 +302,13 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
     } else {
         currentContentType = NO_CONTENT;
         hasContentToProcess = false;
-        tempContentIndexStart = -1;
-        tempContentIndexEnd = -1;
+        tempContentIndexStart = 0;
+        tempContentIndexEnd = 0;
     }
 
     currentTag = tag;
     if (hasContentToProcess) {
         //Moves  at next char after closing of pair tag
-//        int next;
-//        try {
-//            std::string  closingTag = "/" + tag + ">";
-//            next = utils::indexOfOrThrow(input, ">", ctsi);
-//            //TODO check
-//
-//            char ch = input[next];
-//            if (ch != '>') {
-//                throw "Hello";
-//            }
-//
-//        } catch (ErrorCode e) {
-//            abortWithError(e);
-//            return;
-//        }
         index.moveIndex(ctsi);
     } else {
         //Moves at next char after open tag
@@ -323,7 +318,7 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, int &tei) {
 }
 
 
-void ContentParser::parseImageTag(const int &tei) {
+void ContentParser::parseImageTag(const size_t &tei) {
 
     if (!areImagesEnabled) {
         return;
@@ -337,25 +332,26 @@ void ContentParser::parseImageTag(const int &tei) {
     if (!tempOutputMap.empty()) {
         tempOutputMap.clear();
     }
-    int n = tempContentIndexEnd - tempContentIndexStart;
+    size_t n = tempContentIndexEnd - tempContentIndexStart;
     std::string tagBody = input.substr(tempContentIndexStart, n);
     utils::getTagAttributes(tagBody, tempOutputMap);
     invalidateHasNextStep();
 }
 
 
-void ContentParser::parseTableTag(const int &ctsi) {
+void ContentParser::parseTableTag(const size_t &ctsi) {
     bool wasHeaderRowParsed = false;
     utils::groupPairTagContents(
             input, "tr", index.getIndex(), ctsi, tempOutputVector
     );
     for (auto row: tempOutputVector) {
         std::vector<std::string_view> columns;
+        size_t length = row.length();
         if (!wasHeaderRowParsed) {
-            utils::groupPairTagContents(row, "th", 0, row.length(), columns);
+            utils::groupPairTagContents(row, "th", 0, length, columns);
             wasHeaderRowParsed = true;
         } else {
-            utils::groupPairTagContents(row, "td", 0, row.length(), columns);
+            utils::groupPairTagContents(row, "td", 0, length, columns);
         }
         tableHolder.push_back(columns);
     }
@@ -363,8 +359,6 @@ void ContentParser::parseTableTag(const int &ctsi) {
 
 
 bool ContentParser::tryMoveToContainerClosing() {
-
-    //TODO maybe use direct tag check
     if (currentContentType == TEXT
         || currentContentType == TITLE
         || currentContentType == QUOTE
@@ -376,16 +370,13 @@ bool ContentParser::tryMoveToContainerClosing() {
     }
 
     std::string closing = "</" + currentTag + ">";
-    int ctsi = utils::findClosingTag(input, currentTag, index.getIndex());
-    if (ctsi == -1) {
-        return false;
-    }
+    size_t ctsi = utils::findClosingTag(input, currentTag, index.getIndex());
     index.moveIndex(ctsi + closing.length());
     return true;
 }
 
 
-int ContentParser::getTempListSize() {
+size_t ContentParser::getTempListSize() {
     return tempOutputVector.size();
 }
 
@@ -395,12 +386,14 @@ const std::vector<std::vector<std::string_view>> &ContentParser::getTable() {
 }
 
 
-std::string ContentParser::getTempListItem(int i) {
+std::string ContentParser::getTempListItem(size_t i) {
     auto iterator = tempOutputVector.begin();
     std::advance(iterator, i);
     std::string_view input = std::string_view(*iterator);
-    std::string output = "";
-    utils::clearUnsupportedTagsFromTextBlock(input, output, 0, iterator->length());
+    std::string output;
+    size_t s = 0;
+    size_t e = iterator->length();
+    utils::clearUnsupportedTagsFromTextBlock(input, output, s, e);
     return output;
 }
 
@@ -410,7 +403,7 @@ std::string ContentParser::getTempMapItem(const std::string &attributeName) {
 }
 
 
-std::string ContentParser::getTitle() {
+std::string ContentParser::getTitle() const {
     return title;
 }
 
@@ -420,7 +413,10 @@ bool ContentParser::isAbortingWithError() {
 }
 
 
-void ContentParser::abortWithError(ErrorCode cause, std::string message) {
+void ContentParser::abortWithError(
+        const ErrorCode cause,
+        std::string message
+) {
     this->error = cause;
     isAbortingWithException = true;
     hasContentToProcess = false;
@@ -440,26 +436,27 @@ void ContentParser::abortWithError(ErrorCode cause, std::string message) {
 
 
 void ContentParser::clearAllResources() {
-    input = "";
-    title = "";
-    lang = "";
-    currentTag = "";
-    currentTagBody = "";
-    currentTagId = "";
+    input.clear();
+    title.clear();
+    lang.clear();
+    currentTag.clear();
+    currentTagBody.clear();
+    currentTagId.clear();
     currentContentType = NO_CONTENT;
 
     hasContentToProcess = false;
     mHasBodyContext = false;
     wasHeadParsed = false;
     isAbortingWithException = false;
+
     error = NO_ERROR;
-    errorMessage = "";
+    errorMessage.clear();
     index.reset();
     tableHolder.clear();
 
     length = 0;
-    tempContentIndexStart = -1;
-    tempContentIndexEnd = -1;
+    tempContentIndexStart = 0;
+    tempContentIndexEnd = 0;
     temporaryOutIndex = 0;
 
     tempOutputVector.clear();

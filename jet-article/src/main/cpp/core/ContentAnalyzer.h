@@ -23,25 +23,25 @@ public:
     std::string currentPairTagContent;
 
 private:
-    int actualInputStart = 0;
-    int actualInputEnd = 0;
+    size_t actualInputStart = 0;
+    size_t actualInputEnd = 0;
     std::vector<std::string> currentTagAttributeKeys;
     std::map<std::string, std::string> currentTagAttributes;
 
 
     bool mHasBodyContext;
     bool mWasHtmlTagFound;
-    int length;
+    size_t length;
     bool hasContentToProcess;
     bool wasHeadParsed;
-    int currentTagStartIndex = -1;
-    int currentTagEndIndex = -1;
+    size_t currentTagStartIndex = 0;
+    size_t currentTagEndIndex = 0;
     std::vector<std::string_view> tempOutputVector;
     std::vector<std::vector<std::string_view>> tableHolder;
     bool isAbortingWithException;
     ErrorCode error;
-    std::string errorMessage = "";
-    int temporaryOutIndex = 0;
+    std::string errorMessage;
+    size_t temporaryOutIndex = 0;
 
 
 public:
@@ -66,19 +66,19 @@ public:
     int getCurrentAttributesSize();
 
 
-    int getCurrentTagStartIndex() const;
+    size_t getCurrentTagStartIndex() const;
 
-    int getCurrentTagEndIndex() const;
+    size_t getCurrentTagEndIndex() const;
 
     std::string getCurrentPairTagContent();
 
 
-    bool hasPairTagContent() const;
+    [[nodiscard]] bool hasPairTagContent() const;
 
-    void clearAllResources();
+    void clearAllResources() override;
 
 
-    void abortWithError(ErrorCode cause, std::string message = "");
+    void abortWithError(ErrorCode cause, std::string message = "") override;
 };
 
 

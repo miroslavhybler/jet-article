@@ -10,9 +10,7 @@ ContentAnalyzer::ContentAnalyzer() {
 }
 
 
-ContentAnalyzer::~ContentAnalyzer() {
-
-}
+ContentAnalyzer::~ContentAnalyzer() = default;
 
 
 void ContentAnalyzer::setInput(std::string content) {
@@ -29,11 +27,11 @@ void ContentAnalyzer::doNextStep() {
     }
 
     index.invalidate();
-    currentTag = "";
-    currentTagBody = "";
-    currentTagId = "";
-    currentTagClass = "";
-    currentPairTagContent = "";
+    currentTag.clear();
+    currentTagBody.clear();
+    currentTagId.clear();
+    currentTagClass.clear();
+    currentPairTagContent.clear();
     currentTagAttributes.clear();
 
 
@@ -49,7 +47,7 @@ void ContentAnalyzer::doNextStep() {
 
 
     //Tag end index
-    int tei;
+    size_t tei;
     try {
         tei = utils::indexOfOrThrow(input, ">", index.getIndex());
     } catch (ErrorCode e) {
@@ -58,7 +56,7 @@ void ContentAnalyzer::doNextStep() {
     }
 
     // -1 to remove '<' at the end
-    int tagBodyLength = tei - index.getIndex() - 1;
+    size_t tagBodyLength = tei - index.getIndex() - 1;
     //tagbody within <>, i + 1 to remove '<'
 
     currentTagBody = input.substr(index.getIndex() + 1, tagBodyLength);
@@ -94,7 +92,7 @@ void ContentAnalyzer::doNextStep() {
         utils::log("ANALYZER",
                    "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         utils::log("ANALYZER", "tag: " + currentTag);
-        utils::log("ANALYZER", "name: "  + currentTagName);
+        utils::log("ANALYZER", "name: " + currentTagName);
         utils::log("ANALYZER", "classes: " + currentTagClass);
         utils::log("ANALYZER", "body: " + currentTagBody);
 
@@ -192,11 +190,11 @@ int ContentAnalyzer::getCurrentAttributesSize() {
 }
 
 
-int ContentAnalyzer::getCurrentTagStartIndex() const {
+size_t ContentAnalyzer::getCurrentTagStartIndex() const {
     return currentTagStartIndex;
 }
 
-int ContentAnalyzer::getCurrentTagEndIndex() const {
+size_t ContentAnalyzer::getCurrentTagEndIndex() const {
     return currentTagEndIndex;
 }
 
@@ -230,11 +228,11 @@ void ContentAnalyzer::clearAllResources() {
     actualInputStart = 0;
     actualInputEnd = 0;
 
-    input = "";
-    currentTag = "";
-    currentTagBody = "";
-    currentTagId = "";
-    currentPairTagContent = "";
+    input.clear();
+    currentTag.clear();
+    currentTagBody.clear();
+    currentTagId.clear();
+    currentPairTagContent .clear();
     currentContentType = NO_CONTENT;
 
     hasContentToProcess = false;
@@ -243,13 +241,13 @@ void ContentAnalyzer::clearAllResources() {
     wasHeadParsed = false;
     isAbortingWithException = false;
     error = NO_ERROR;
-    errorMessage = "";
+    errorMessage.clear();
     index.reset();
     tableHolder.clear();
 
     length = 0;
-    currentTagStartIndex = -1;
-    currentTagEndIndex = -1;
+    currentTagStartIndex = 0;
+    currentTagEndIndex = 0;
     temporaryOutIndex = 0;
 
     tempOutputVector.clear();

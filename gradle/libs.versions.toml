@@ -33,7 +33,7 @@ junitKtx = "1.2.1"
 uiTestManifest = "1.6.8"
 uiToolingPreviewAndroid = "1.7.0-rc01"
 coreKtx = "1.6.1"
-agp = "8.5.2"
+agp = "8.6.0"
 uiTooling = "1.6.8"
 adaptiveAndroid = "1.0.0-rc01"
 jetUtils = "1.1.2"
@@ -52,6 +52,7 @@ androidx-adaptive = { module = "androidx.compose.material3.adaptive:adaptive", v
 androidx-adaptive-navigation = { module = "androidx.compose.material3.adaptive:adaptive-navigation", version.ref = "adaptive" }
 androidx-adaptive-navigation-suite = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite-android", version.ref = "material3" }
 
+androidx-hilt-common = { module = "androidx.hilt:hilt-common", version.ref = "hiltCompilerVersion" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompilerVersion" }
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltCompilerVersion" }
 androidx-palette-ktx = { module = "androidx.palette:palette-ktx", version.ref = "paletteKtx" }

@@ -59,7 +59,8 @@ fun DevelopmentAnimation(
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 3_000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
-        ), label = "wheel 1 rotation"
+        ),
+        label = "wheel 1 rotation",
     )
 
 
@@ -69,7 +70,8 @@ fun DevelopmentAnimation(
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 12_000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
-        ), label = "wheel 2 rotation"
+        ),
+        label = "wheel 2 rotation",
     )
 
 

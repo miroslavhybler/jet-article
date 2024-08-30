@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -28,8 +29,14 @@ import mir.oslav.jet.annotations.JetExperimental
 class MainActivity : ComponentActivity() {
 
 
+    companion object {
+        var isActive: Boolean = false
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
+        isActive = true
         setContent {
             DevBlogAppTheme {
                 val systemBarsStyle = rememberSystemBarsStyle()
@@ -69,5 +76,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        isActive =false
+        super.onDestroy()
     }
 }

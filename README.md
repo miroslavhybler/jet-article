@@ -62,6 +62,11 @@ ArticleParser.initialize(
     isSimpleTextFormatAllowed = true,
 )
 
+//Add custom exclude options to filter out unwanted elements
+ArticleParser.addExcludeOption(
+    tag = "menu"
+)
+
 //Load html content, you need to load html code and put it into string variable
 val content:String = TODO("Load html content")
 //Process the content

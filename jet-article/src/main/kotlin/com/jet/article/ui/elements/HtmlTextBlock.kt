@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.text.toSpannable
@@ -43,6 +44,8 @@ fun HtmlTextBlock(
     text: HtmlElement.TextBlock,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
     color: Color = MaterialTheme.colorScheme.onBackground,
+    maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.Clip,
 ) {
 
     HtmlTextBlock(
@@ -50,6 +53,8 @@ fun HtmlTextBlock(
         text = text.text,
         style = style,
         color = color,
+        maxLines = maxLines,
+        overflow = overflow,
     )
 }
 
@@ -60,7 +65,10 @@ fun HtmlTextBlock(
     text: String,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
     color: Color = MaterialTheme.colorScheme.onBackground,
-) {
+    maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.Clip,
+
+    ) {
     val linkClickHandler = LocalLinkHandler.current
     val articleUrl = LocalBaseArticleUrl.current
     val data = LocalHtmlArticleData.current
@@ -82,6 +90,8 @@ fun HtmlTextBlock(
                 .toAnnotatedString(
                     primaryColor = colorScheme.linkColor,
                     linkClickHandler = linkClickHandler,
+                    data = data,
+                    articleUrl = articleUrl,
                 )
         } else {
             buildAnnotatedString {
@@ -99,25 +109,16 @@ fun HtmlTextBlock(
 //        }
 //        initialAlpha = 1f
 //    })
+
+
     Text(
+        modifier = modifier,
+        //    .alpha(alpha = alpha.value),
         text = formattedText,
         style = remember(key1 = style, key2 = color) {
             style.copy(color = color)
         },
-//        onClick = { offset ->
-//            linkClickHandler?.handleLink(
-//                clickedText = formattedText,
-//                clickOffset = offset,
-//                articleUrl = articleUrl,
-//                data = data,
-//                scrollOffset = screenHeightPx
-//                        - size.height
-//                        - density.dpToPx(dp = contentPadding.calculateTopPadding())
-//                    .toInt()
-//            )
-//        },
-        modifier = modifier
-        //    .alpha(alpha = alpha.value),
-
+        maxLines = maxLines,
+        overflow = overflow,
     )
 }

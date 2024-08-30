@@ -24,6 +24,7 @@ import androidx.navigation.NavHostController
 import com.jet.article.example.devblog.R
 import com.jet.article.example.devblog.horizontalPadding
 import com.jet.article.example.devblog.ui.Routes
+import com.jet.article.ui.elements.HtmlTextBlock
 
 
 /**
@@ -100,7 +101,6 @@ fun MainTopBar(
 }
 
 
-
 @Composable
 fun PostTopBar(
     modifier: Modifier = Modifier,
@@ -109,28 +109,31 @@ fun PostTopBar(
     backgroundAlpha: Float,
     actions: @Composable RowScope.() -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
-    onNavigationIcon: (() -> Unit)? =null,
+    onNavigationIcon: (() -> Unit)? = null,
     navigationActionContentDescription: String? = null,
+    titleColor: Color = MaterialTheme.colorScheme.onBackground,
 ) {
     LargeTopAppBar(
         modifier = modifier,
         title = {
-            Text(
+            HtmlTextBlock(
+                modifier = Modifier.horizontalPadding(),
                 text = title,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.titleLarge,
             )
         },
         colors = TopAppBarDefaults.largeTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.background.copy(alpha = backgroundAlpha),
-            titleContentColor = MaterialTheme.colorScheme.onBackground,
-            scrolledContainerColor =MaterialTheme.colorScheme.background.copy(alpha = backgroundAlpha),
+            titleContentColor = titleColor,
+            scrolledContainerColor = MaterialTheme.colorScheme.background.copy(alpha = backgroundAlpha),
             actionIconContentColor = MaterialTheme.colorScheme.onBackground,
             navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
         ),
         actions = actions,
         navigationIcon = {
-            if (onNavigationIcon != null){
+            if (onNavigationIcon != null) {
                 IconButton(
                     onClick = onNavigationIcon,
                     content = {
@@ -143,6 +146,6 @@ fun PostTopBar(
                 )
             }
         },
-        scrollBehavior = scrollBehavior
+        scrollBehavior = scrollBehavior,
     )
 }

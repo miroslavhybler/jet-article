@@ -1,6 +1,18 @@
+@file:Suppress("RedundantVisibilityModifier")
+
 package com.jet.article.example.devblog.data
 
+import android.Manifest
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.compose.ui.util.fastForEach
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.PendingIntentCompat
+import androidx.core.content.ContextCompat
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
@@ -11,17 +23,14 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.jet.article.ArticleAnalyzer
-import com.jet.article.ArticleParser
-import com.jet.article.data.TagInfo
-import com.jet.article.example.devblog.Constants
+import com.jet.article.example.devblog.AndroidDevBlogApp
+import com.jet.article.example.devblog.R
 import com.jet.article.example.devblog.data.database.DatabaseRepo
-import com.jet.article.example.devblog.getPostList
-import com.jet.article.example.devblog.parseWithInitialization
+import com.jet.article.example.devblog.data.database.PostItem
+import com.jet.article.example.devblog.ui.MainActivity
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
 
 /**
@@ -30,7 +39,7 @@ import javax.inject.Inject
  * created on 16.08.2024
  */
 @HiltWorker
-class ContentSyncWorker @AssistedInject constructor(
+public class ContentSyncWorker @AssistedInject public constructor(
     @Assisted context: Context,
     @Assisted workerParameters: WorkerParameters,
     private var databaseRepo: DatabaseRepo,
@@ -41,17 +50,16 @@ class ContentSyncWorker @AssistedInject constructor(
 ) {
 
 
-
     companion object {
         fun register(context: Context) {
-//            val request = getRequest()
-//            val workManager = WorkManager.getInstance(context)
-//
-//            workManager.enqueueUniquePeriodicWork(
-//                "update-post-list",
-//                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-//                request,
-//            )
+            val request = getRequest()
+            val workManager = WorkManager.getInstance(context)
+
+            workManager.enqueueUniquePeriodicWork(
+                "update-post-list",
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                request,
+            )
         }
 
         private fun getRequest(): PeriodicWorkRequest {
@@ -72,41 +80,82 @@ class ContentSyncWorker @AssistedInject constructor(
 
 
     override suspend fun doWork(): Result {
-        val htmlCode = coreRepo.loadHtmlFromUrl(url = Constants.indexUrl) ?: return Result.failure()
+        try {
+            val data = coreRepo.loadPostsFromRemote()
+            if (data.isEmpty()) {
+                return Result.failure()
+            }
 
-        val data = ArticleParser.parseWithInitialization(
-            content = htmlCode,
-            url = Constants.indexUrl,
-        )
-        val links: ArrayList<TagInfo> = ArrayList()
+            val dao = databaseRepo.postDao
+            var newPost: PostItem? = null
 
-        ArticleParser.initialize(
-            isLoggingEnabled = false,
-            areImagesEnabled = true,
-            isSimpleTextFormatAllowed = true,
-        )
-        ArticleAnalyzer.process(
-            content = htmlCode,
-            onTag = { tag ->
-                if (tag.tag == "a" && tag.clazz == "featured__href") {
-                    links.add(element = tag)
+            data.fastForEach { post ->
+                if (!dao.contains(url = post.url)) {
+                    dao.insert(item = post)
+                    newPost = post
                 }
             }
-        )
-        val finalData = data.getPostList(links = links)
 
-        if (finalData.isEmpty()) {
-            return Result.failure()
-        }
-
-        val dao = databaseRepo.postDao
-        finalData.forEach { post ->
-            if (!dao.contains(url = post.url)) {
-                dao.insert(item = post)
+            if (newPost != null) {
+                tryShowNotification(
+                    title = newPost!!.title,
+                    content = newPost!!.description.take(n = 100) + "...",
+                    localPostId = dao.getLastPostId()
+                )
+            }
+        } catch (e: IndexOutOfBoundsException) {
+            e.printStackTrace()
+        } finally {
+            if (MainActivity.isActive) {
+                coreRepo.loadPosts()
             }
         }
+
 
 
         return Result.success()
+    }
+
+
+    private fun tryShowNotification(
+        title: String,
+        content: String,
+        localPostId: Int,
+    ) {
+
+        val notification = NotificationCompat.Builder(
+            applicationContext,
+            AndroidDevBlogApp.notificationNewPostsChannelId
+        )
+            .setContentTitle(title)
+            .setContentText(content)
+            .setSmallIcon(R.drawable.ic_android)
+            .setSound(null)
+            .setVibrate(null)
+            .setContentIntent(
+                PendingIntentCompat.getActivity(
+                    applicationContext,
+                    0,
+                    Intent(applicationContext, MainActivity::class.java)
+                        .putExtra("postId", localPostId),
+                    PendingIntent.FLAG_UPDATE_CURRENT,
+                    false
+                )
+            )
+            .build()
+
+        val manager = NotificationManagerCompat.from(applicationContext)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    applicationContext,
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                manager.notify(10_000, notification)
+            }
+        } else {
+            manager.notify(10_000, notification)
+        }
     }
 }

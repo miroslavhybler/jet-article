@@ -15,6 +15,8 @@ import com.jet.article.data.HtmlArticleData
 import com.jet.article.data.HtmlElement
 import com.jet.article.data.HtmlHeadData
 import com.jet.article.data.TagInfo
+import kotlinx.coroutines.asCoroutineDispatcher
+import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
 
@@ -29,8 +31,10 @@ public object ArticleParser {
     /**
      * @since 1.0.0
      */
-    private val safeCoroutineContext: CoroutineContext = Dispatchers.Default
-        .plus(context = CoroutineName(name = "JetHtmlArticleParse"))
+    internal val safeCoroutineContext: CoroutineContext = Executors
+        .newSingleThreadExecutor()
+        .asCoroutineDispatcher()
+        .plus(context = CoroutineName(name = "JetHtmlArticleParser"))
 
 
     var isSimpleTextFormatAllowed: Boolean by mutableStateOf(value = true)
@@ -38,22 +42,27 @@ public object ArticleParser {
 
 
     /**
-     * @param areImagesEnabled True when you want to enable images being included in output, false otherwise.
-     * @param isLoggingEnabled True if you want to enable logs from native libs, false otherwise
+     * @param areImagesEnabled True when you want to enable images from <img> tag being included in
+     * output, false otherwise. False by default.
+     * @param isLoggingEnabled True if you want to enable logs from native libs, false otherwise. False by default.
      * @param isSimpleTextFormatAllowed True if you want to use simple html formatting like bold, italic, ...
-     * for the text. False otherwise.
+     * for the text. False otherwise. True by default.
+     * @param isQueringTextOutsideTextTags True if you want to query and show text that is outside of
+     * causal text tags like <span>, <p>, .... False otherwise. False by default.
      * @since 1.0.0
      */
     public fun initialize(
-        areImagesEnabled: Boolean,
-        isLoggingEnabled: Boolean,
-        isSimpleTextFormatAllowed: Boolean,
+        areImagesEnabled: Boolean = false,
+        isLoggingEnabled: Boolean = false,
+        isSimpleTextFormatAllowed: Boolean = true,
+        isQueringTextOutsideTextTags: Boolean = false,
     ): Unit {
         this.isSimpleTextFormatAllowed = isSimpleTextFormatAllowed
         ParserNative.initialize(
             areImagesEnabled = areImagesEnabled,
             isLoggingEnabled = isLoggingEnabled,
             isSimpleTextFormatAllowed = isSimpleTextFormatAllowed,
+            isQueringTextOutsideTextTags = isQueringTextOutsideTextTags,
         )
     }
 

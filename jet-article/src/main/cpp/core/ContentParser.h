@@ -71,7 +71,11 @@ public:
      * @param enabled
      * @since 1.0.0
      */
-    void initialize(bool areImagesEmabled, bool isSimpleTextFormatAllowed);
+    void initialize(
+            const bool &areImagesEmabled,
+            const bool &isSimpleTextFormatAllowed,
+            const bool &isQueringTextOutsideTextTags
+    );
 
 
     /**
@@ -128,7 +132,7 @@ public:
      * @return
      * @since 1.0.0
      */
-    [[nodiscard]] int getTempListSize();
+    [[nodiscard]] size_t getTempListSize();
 
 
     /**
@@ -145,7 +149,7 @@ public:
      * @return
      * @since 1.0.0
      */
-    std::string getTempListItem(int i);
+    std::string getTempListItem(size_t i);
 
 
     /**
@@ -162,7 +166,7 @@ public:
      * @return Title of the html article, similar to <title> tag in <head>
      * @since 1.0.0
      */
-    std::string getTitle();
+    std::string getTitle() const;
 
 
     /**
@@ -184,7 +188,7 @@ public:
      *
      * @return
      */
-    int getCurrentIndex() {
+    size_t getCurrentIndex() {
         return index.getIndex();
     }
 
@@ -205,13 +209,13 @@ private:
      * @param e End index. The program already knows where <head> tag has closing, this
      * @since 1.0.0
      */
-    void parseHeadData(int e);
+    void parseHeadData(size_t e);
 
 
     /**
      * @since 1.0.0
      */
-    void parseNextTagWithinBodyContext(std::string &tag, int &tei);
+    void parseNextTagWithinBodyContext(std::string &tag, size_t &tei);
 
 
     /**
@@ -220,7 +224,7 @@ private:
      * @since 1.0.0
      */
 
-    void parseImageTag(const int &tei);
+    void parseImageTag(const size_t &tei);
 
 
     /**
@@ -228,7 +232,7 @@ private:
      * @param ctsi Closing tag start index. Start index of </table> tag.
      * @since 1.0.0
      */
-    void parseTableTag(const int &ctsi);
+    void parseTableTag(const size_t &ctsi);
 
 
     /**
@@ -237,7 +241,7 @@ private:
      * @param message
      * @since 1.0.0
      */
-    void abortWithError(ErrorCode cause, std::string message = "") override;
+    void abortWithError(ErrorCode cause, std::string message) override;
 };
 
 

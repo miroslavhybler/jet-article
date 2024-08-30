@@ -1,13 +1,18 @@
-@file:Suppress("OPT_IN_USAGE")
 @file:OptIn(ExperimentalMaterial3Api::class)
 
 package com.jet.article.example.devblog.ui.main
 
+import android.animation.ArgbEvaluator
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.compose.animation.Animatable
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.background
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,11 +20,9 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -32,25 +35,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.palette.graphics.Palette
 import com.jet.article.data.HtmlArticleData
 import com.jet.article.example.devblog.R
+import com.jet.article.example.devblog.composables.CustomHtmlImage
+import com.jet.article.example.devblog.composables.CustomHtmlImageWithPalette
 import com.jet.article.example.devblog.composables.PostTopBar
 import com.jet.article.example.devblog.data.AdjustedPostData
 import com.jet.article.example.devblog.rememberCurrentOffset
@@ -58,10 +63,9 @@ import com.jet.article.example.devblog.ui.LocalDimensions
 import com.jet.article.ui.JetHtmlArticleContent
 import com.jet.article.ui.Link
 import com.jet.article.ui.LinkClickHandler
-import com.jet.article.ui.elements.HtmlImage
-import com.jet.utils.dpToPx
 import com.jet.utils.plus
 import com.jet.utils.pxToDp
+import kotlinx.coroutines.launch
 
 
 /**
@@ -78,22 +82,28 @@ fun PostPane(
     val dimensions = LocalDimensions.current
     val mainState = LocalMainScreenState.current
     val density = LocalDensity.current
+    val colorScheme = MaterialTheme.colorScheme
 
-    val scrolLState = rememberScrollState()
+    val colorEvaluator = remember { ArgbEvaluator() }
+    val coroutineScope = rememberCoroutineScope()
     val scrollOffset by rememberCurrentOffset(state = listState)
     var topBarAlpha by rememberSaveable { mutableFloatStateOf(value = 0f) }
-    var imageOffset by remember { mutableStateOf(value = 0) }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         state = rememberTopAppBarState()
     )
-    var topAppBarHeight by remember { mutableIntStateOf(value = 0) }
     val statusBarPadding = WindowInsets.statusBars.getTop(density = density)
 
-
-    val headerImageHeight = TopAppBarDefaults.LargeAppBarExpandedHeight
-        .plus(other = density.pxToDp(px = statusBarPadding))
-
+    var headerImageHeight by remember {
+        mutableStateOf(
+            value = TopAppBarDefaults.LargeAppBarExpandedHeight
+                .plus(other = density.pxToDp(px = statusBarPadding))
+        )
+    }
+    var palette: Palette? by remember { mutableStateOf(value = null) }
+    var titleStartColor by remember { mutableStateOf(value = colorScheme.background) }
+    val titleEndColor = colorScheme.onBackground
+    val titleColor = remember { Animatable(initialValue = colorScheme.onBackground) }
     val linkCallback = remember {
         object : LinkClickHandler.LinkCallback() {
             override fun onOtherDomainLink(link: Link.OtherDomainLink) {
@@ -123,41 +133,56 @@ fun PostPane(
         }
     }
 
-
     LaunchedEffect(
         key1 = scrollOffset,
+        key2 = titleStartColor,
     ) {
-        topBarAlpha = if (scrollOffset > 128) 0.85f else scrollOffset / (128f * 0.85f)
-
-        val max = TopAppBarDefaults.LargeAppBarExpandedHeight
-        val min = TopAppBarDefaults.LargeAppBarCollapsedHeight
-
-        val headerImagePx = density.dpToPx(dp = headerImageHeight)
-        val maxImageOffset = headerImagePx / 2f
-        imageOffset = -((scrollOffset * 0.5f)
-            .coerceAtMost(maximumValue = maxImageOffset))
-            .toInt()
+        val alpha = if (scrollOffset < 128) (scrollOffset / (128f)) else 0.85f
+        topBarAlpha = alpha.coerceIn(minimumValue = 0.15f, maximumValue = 0.85f)
+        titleColor.snapTo(
+            targetValue = Color(
+                color = colorEvaluator.evaluate(
+                    alpha.coerceIn(minimumValue = 0f, maximumValue = 1f),
+                    titleStartColor.toArgb(),
+                    titleEndColor.toArgb(),
+                ) as Int
+            )
+        )
     }
 
 
     Scaffold(
         modifier = Modifier
             .nestedScroll(connection = scrollBehavior.nestedScrollConnection),
-        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             PostTopBar(
-                modifier = Modifier.onSizeChanged { newSize -> topAppBarHeight = newSize.height },
+                modifier = Modifier
+                    .onSizeChanged { newSize ->
+                        headerImageHeight = density.pxToDp(px = newSize.height)
+                    },
                 title = data.title.text,
                 scrollBehavior = scrollBehavior,
                 backgroundAlpha = topBarAlpha,
+                titleColor = titleColor.value,
             )
         },
         content = { paddingValues ->
-            //TODO custom layout
             Box(
                 modifier = Modifier
                     .fillMaxSize(),
             ) {
+
+                AnimatedVisibility(
+                    modifier = Modifier.align(alignment = Alignment.Center),
+                    visible = data.postData.isEmpty,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut()
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(alignment = Alignment.Center)
+                    )
+                }
+
                 JetHtmlArticleContent(
                     modifier = Modifier
                         .fillMaxSize()
@@ -176,33 +201,28 @@ fun PostPane(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     linkClickCallback = linkCallback,
                     image = { image ->
-                        HtmlImage(
+                        CustomHtmlImage(
                             modifier = Modifier.animateContentSize(),
-                            data = image,
-                            loading = {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(height = 128.dp)
-                                        .background(
-                                            color = MaterialTheme.colorScheme.outline,
-                                            shape = MaterialTheme.shapes.medium,
-                                        )
-                                )
-                            }
+                            image = image,
                         )
                     }
                 )
 
-                HtmlImage(
+                CustomHtmlImageWithPalette(
                     modifier = Modifier
-                        .align(alignment = Alignment.TopCenter)
                         .fillMaxWidth()
                         .height(height = headerImageHeight)
-                        .animateContentSize()
-                        .offset { IntOffset(x = 0, y = imageOffset) },
-                    data = data.headerImage,
-                    contentScale = ContentScale.Crop,
+                        .animateContentSize(),
+                    image = data.headerImage,
+                    onPallete = { newPallete ->
+                        palette = newPallete
+                        coroutineScope.launch {
+                            newPallete.darkMutedSwatch?.rgb?.let {
+                                titleStartColor = Color(color = it)
+                                //  titleColor.animateTo(targetValue = Color(color = it))
+                            }
+                        }
+                    }
                 )
             }
         },

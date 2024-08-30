@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Dev Blog for Android</string>
+
+    <string name="ntfc_def_group_name">App Functions</string>
+    <string name="ntfc_def_group_desc">Default notification group.</string>
+
+    <string name="ntfc_def_channel_name">New Posts</string>
+    <string name="ntfc_def_channel_desc">App will notify you when new post is published. App is checking for new posts once a week on background, or when opened.</string>
+
 </resources>

@@ -17,17 +17,17 @@ IndexWrapper::~IndexWrapper() {
 }
 
 
-void IndexWrapper::moveIndex(int i) {
+void IndexWrapper::moveIndex(const size_t &i) {
     this->index = i;
 }
 
 
-const int IndexWrapper::getIndex() {
+const size_t IndexWrapper::getIndex() {
     return index;
 }
 
 
-const int IndexWrapper::getIndexOnStart() {
+const size_t IndexWrapper::getIndexOnStart() {
     return indexOnStart;
 }
 

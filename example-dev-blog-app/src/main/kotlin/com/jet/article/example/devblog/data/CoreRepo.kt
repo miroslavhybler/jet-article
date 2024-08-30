@@ -8,6 +8,7 @@ import com.jet.article.data.HtmlArticleData
 import com.jet.article.data.HtmlElement
 import com.jet.article.data.TagInfo
 import com.jet.article.example.devblog.Constants
+import com.jet.article.example.devblog.data.database.DatabaseRepo
 import com.jet.article.example.devblog.data.database.PostItem
 import com.jet.article.example.devblog.getPostList
 import com.jet.article.example.devblog.parseWithInitialization
@@ -39,6 +40,7 @@ import javax.inject.Singleton
 @Singleton
 class CoreRepo @Inject constructor(
     @ApplicationContext context: Context,
+    private val databaseRepo: DatabaseRepo,
 ) {
 
     companion object {
@@ -68,36 +70,11 @@ class CoreRepo @Inject constructor(
     suspend fun loadPosts(
         isRefresh: Boolean = false,
     ): Unit = withContext(context = Dispatchers.Default) {
-        val htmlCode = loadHtmlFromUrl(
-            url = Constants.indexUrl,
-            isRefresh = isRefresh
-        ) ?: return@withContext
-
-        val data = ArticleParser.parseWithInitialization(
-            content = htmlCode,
-            url = Constants.indexUrl,
-        )
-
-
-        val links: ArrayList<TagInfo> = ArrayList()
-
-        ArticleParser.initialize(
-            isLoggingEnabled = false,
-            areImagesEnabled = true,
-            isSimpleTextFormatAllowed = true,
-        )
-
-        ArticleAnalyzer.jumpToBody()
-        ArticleAnalyzer.process(
-            content = htmlCode,
-            onTag = { tag ->
-                if (tag.tag == "a" && tag.clazz == "adb-card__href") {
-                    links.add(element = tag)
-                }
-            }
-        )
-        val finalData = data.getPostList(links = links)
-        mPosts.value = finalData
+        if (isRefresh) {
+            loadPostsFromRemote()
+            return@withContext
+        }
+        mPosts.value = databaseRepo.postDao.getAll()
     }
 
 
@@ -112,48 +89,88 @@ class CoreRepo @Inject constructor(
 
         val original = ArticleParser.parseWithInitialization(
             content = htmlCode,
+            url = url,
+        )
+
+        try {
+            val title = original.elements
+                .first { it is HtmlElement.Title } as HtmlElement.Title
+            val headerImage = original.elements
+                .first { it is HtmlElement.Image } as HtmlElement.Image
+            val date = original.elements
+                .first { it is HtmlElement.TextBlock } as HtmlElement.TextBlock
+
+            val newElements = ArrayList(original.elements).apply {
+                remove(element = headerImage)
+                remove(element = title)
+                remove(element = date)
+            }
+
+            return@withContext AdjustedPostData(
+                postData = original.copy(elements = newElements),
+                headerImage = headerImage,
+                date = date,
+                title = title,
+            )
+        } catch (e: NoSuchElementException) {
+            e.printStackTrace()
+            return@withContext null
+        }
+    }
+
+
+    suspend fun loadPostsFromRemote(): List<PostItem> = withContext(context = Dispatchers.IO) {
+        val htmlCode = loadHtmlFromUrl(
+            url = Constants.indexUrl,
+            isRefresh = true,
+        ) ?: return@withContext emptyList()
+
+        val data = ArticleParser.parseWithInitialization(
+            content = htmlCode,
             url = Constants.indexUrl,
         )
-        val title = original.elements
-            .first { it is HtmlElement.Title } as HtmlElement.Title
-        val headerImage = original.elements
-            .first { it is HtmlElement.Image } as HtmlElement.Image
-        val date = original.elements
-            .first { it is HtmlElement.TextBlock } as HtmlElement.TextBlock
 
-        val newElements = ArrayList(original.elements).apply {
-            remove(headerImage)
-            remove(title)
-            remove(date)
-        }
+        val links: ArrayList<TagInfo> = ArrayList()
 
-        return@withContext AdjustedPostData(
-            postData = original.copy(elements = newElements),
-            headerImage = headerImage,
-            date = date,
-            title = title,
-        )
-    }
+      ArticleParser.initialize(
+          isLoggingEnabled = false,
+          areImagesEnabled = true,
+          isSimpleTextFormatAllowed = true,
+          isQueringTextOutsideTextTags = true,
+      )
+
+        ArticleAnalyzer.process(
+          content = htmlCode,
+          onTag = { tag ->
+              if (tag.tag == "a" && tag.clazz == "adb-card__href") {
+                  links.add(element = tag)
+              }
+          }
+      )
+
+      val finalData = data.getPostList(links = links)
+      return@withContext finalData
+  }
 
 
-    suspend fun loadHtmlFromUrl(
-        url: String,
-        isRefresh: Boolean = false
-    ): String? {
-        try {
-            val response: HttpResponse = ktorHttpClient.get {
-                url(urlString = url)
-                if (isRefresh) {
-                    parameter(
-                        key = "refresh",
-                        value = System.currentTimeMillis()
-                    )
-                }
-            }
-            return response.bodyAsText()
-        } catch (e: IOException) {
-            e.printStackTrace()
-            return null
-        }
-    }
+  private suspend fun loadHtmlFromUrl(
+      url: String,
+      isRefresh: Boolean = false
+  ): String? {
+      try {
+          val response: HttpResponse = ktorHttpClient.get {
+              url(urlString = url)
+              if (isRefresh) {
+                  parameter(
+                      key = "refresh",
+                      value = System.currentTimeMillis()
+                  )
+              }
+          }
+          return response.bodyAsText()
+      } catch (e: IOException) {
+          e.printStackTrace()
+          return null
+      }
+  }
 }

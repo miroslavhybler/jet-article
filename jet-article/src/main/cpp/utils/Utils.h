@@ -20,6 +20,10 @@
  */
 namespace utils {
 
+
+    const std::string emptyString;
+
+
     /**
      *
      * @param isEnabled
@@ -35,7 +39,11 @@ namespace utils {
      * @return index of first found substring, -1 if not found
      * @since 1.0.0
      */
-    int indexOf(const std::string_view &input, const std::string &sub, const int &i);
+    int indexOf(
+            const std::string_view &input,
+            const std::string &sub,
+            const size_t &i
+    );
 
 
     /**
@@ -47,7 +55,11 @@ namespace utils {
      * @return index of first found substring
      * @since 1.0.0
      */
-    int indexOfOrThrow(const std::string_view &input, const std::string &sub, const int &i);
+    size_t indexOfOrThrow(
+            const std::string_view &input,
+            const std::string &sub,
+            const size_t &i
+    );
 
 
     /**
@@ -90,7 +102,7 @@ namespace utils {
      * Called after Parser finds a '<' char and needs to check if its valid tag. Checks for sequences
      * that are not supported like comments, cdata and doctype. If the input at index after the '<'
      * is considered unsupported, index will be moved at the end of the invalid sequence. The index
-     * has to be set at '<' otherwise output is irrelevant.
+     * has to be set at '<' otherwise output is irrelevant.</br>
      *
      * Note: There is no check whatever is tag valid, the sequence after '<' is considered being
      * able to parse.
@@ -103,9 +115,9 @@ namespace utils {
      */
     bool canProcessIncomingTag(
             const std::string_view &input,
-            const int &l,
-            const int &s,
-            int &outIndex
+            const size_t &l,
+            const size_t &s,
+            size_t &outIndex
     );
 
 
@@ -130,27 +142,27 @@ namespace utils {
     * @return Index if start of the closing tag, index of '<' char
     * @since 1.0.0
     */
-    const int findClosingTag(
+    size_t findClosingTag(
             const std::string_view &input,
             const std::string &tag,
-            int s,
-            const int e = 0
+            size_t s,
+            size_t e = 0
     );
 
 
     /**
-     *
+     * Same as findClosingTags() but with logs, used for debbuging only
      * @param input
      * @param tag
      * @param s
      * @param e
      * @return
      */
-    const int findClosingTagWithLogs(
+    size_t findClosingTagWithLogs(
             const std::string_view &input,
             const std::string &tag,
-            int s,
-            const int e = 0
+            size_t s,
+            size_t e = 0
     );
 
 
@@ -161,10 +173,10 @@ namespace utils {
      * @param s
      * @return
      */
-    const int findUnsupportedTagClosing(
+    size_t findUnsupportedTagClosing(
             const std::string_view &input,
             const std::string &tag,
-            int s
+            size_t s
     );
 
 
@@ -179,8 +191,8 @@ namespace utils {
     void clearUnsupportedTagsFromTextBlock(
             std::string &input,
             std::string &output,
-            int s,
-            int e
+            size_t s,
+            size_t e
     );
 
 
@@ -195,8 +207,8 @@ namespace utils {
     void clearUnsupportedTagsFromTextBlock(
             std::string_view &input,
             std::string &output,
-            int s,
-            int e
+            size_t s,
+            size_t e
     );
 
 
@@ -213,8 +225,8 @@ namespace utils {
     void groupPairTagContents(
             const std::string_view &input,
             const std::string &tag,
-            const int &s,
-            const int &e,
+            const size_t &s,
+            const size_t &e,
             std::vector<std::string_view> &outputList
     );
 
