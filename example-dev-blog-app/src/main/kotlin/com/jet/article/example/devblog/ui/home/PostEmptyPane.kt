@@ -1,4 +1,4 @@
-package com.jet.article.example.devblog.ui.main
+package com.jet.article.example.devblog.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,7 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.jet.article.example.devblog.R
-import com.jet.article.example.devblog.composables.DevelopmentAnimation
+import com.jet.article.example.devblog.composables.EmptyAnimation
 import com.jet.article.example.devblog.ui.DevBlogAppTheme
 import com.jet.utils.dpToPx
 
@@ -40,7 +40,7 @@ fun PostEmptyPane() {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
-        DevelopmentAnimation(modifier = Modifier)
+        EmptyAnimation(modifier = Modifier)
 
 
         Box(
@@ -55,7 +55,7 @@ fun PostEmptyPane() {
                     .scale(scale = 1.3f),
                 painter = painterResource(id = R.drawable.android_robot),
                 contentDescription = null,
-                tint = DevBlogAppTheme.colorAndroid,
+                tint = MaterialTheme.colorScheme.primary,
             )
             Icon(
                 modifier = Modifier
@@ -67,7 +67,7 @@ fun PostEmptyPane() {
                         translationY = density.dpToPx(dp = 2.dp)
                     ),
                 painter = painterResource(id = R.drawable.ic_wrench),
-                tint = MaterialTheme.colorScheme.onBackground,
+                tint = MaterialTheme.colorScheme.secondary,
                 contentDescription = null,
             )
         }

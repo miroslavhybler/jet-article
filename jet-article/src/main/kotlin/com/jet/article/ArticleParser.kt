@@ -21,6 +21,8 @@ import kotlin.coroutines.CoroutineContext
 
 
 /**
+ * Main component of the library, enables you parse html content and get [HtmlArticleData].
+ * @see com.jet.article.ui.JetHtmlArticle
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
  * created on 03.01.2024
@@ -29,6 +31,9 @@ public object ArticleParser {
 
 
     /**
+     * Safe coroutine context for the parser and all of its work. Native code does not handle thread
+     * safety at all!! So all things form kotlin code **has to be called on single thread** otherwise
+     * you are at hight risk of getting native crash related to pointer memory issue.
      * @since 1.0.0
      */
     internal val safeCoroutineContext: CoroutineContext = Executors
@@ -37,18 +42,25 @@ public object ArticleParser {
         .plus(context = CoroutineName(name = "JetHtmlArticleParser"))
 
 
+    /**
+     * Holds flag if its simple text format enabled passed in [initialize].
+     * @since 1.0.0
+     */
     var isSimpleTextFormatAllowed: Boolean by mutableStateOf(value = true)
         private set
 
 
     /**
+     * Sets up input options for parser. Keep in mind that this function should be called before [parse].
      * @param areImagesEnabled True when you want to enable images from <img> tag being included in
      * output, false otherwise. False by default.
      * @param isLoggingEnabled True if you want to enable logs from native libs, false otherwise. False by default.
      * @param isSimpleTextFormatAllowed True if you want to use simple html formatting like bold, italic, ...
-     * for the text. False otherwise. True by default.
+     * for the text. False otherwise. True by default. Keep in mind that putting false will also
+     * disable links inside text blocks.
      * @param isQueringTextOutsideTextTags True if you want to query and show text that is outside of
-     * causal text tags like <span>, <p>, .... False otherwise. False by default.
+     * causal text tags like <span>, <p>, .... False otherwise. False by default. Queried text
+     * will be passed as [HtmlElement.TextBlock] in output data.
      * @since 1.0.0
      */
     public fun initialize(
@@ -66,7 +78,14 @@ public object ArticleParser {
         )
     }
 
+
     /**
+     * Adds rule for text processing. At least one parameters should be set. Operator applied is AND.
+     * @param tag Set if you want to exclude specific tag, like <p> -> "p"
+     * @param clazz Set if you want to exclude specific class, like "menu"
+     * @param id Set if you want to exclude tag with specific id, like "menu"
+     * @param keyword Set if you want to exclude tag based on its id or class by
+     * specific keyword, like "cookies"
      * @since 1.0.0
      */
     fun addExcludeOption(
@@ -85,7 +104,8 @@ public object ArticleParser {
 
 
     /**
-     * Parses the [content] and creates [HtmlArticleData]
+     * Parses the [content] and creates [HtmlArticleData]. Don't forget to call [initialize] before
+     * parsing.
      * @param content Html code
      * @param url Original url of the article
      * @since 1.0.0
@@ -295,7 +315,9 @@ public object ArticleParser {
      * Holds util functions which can be used independentely from [ArticleParser]
      * @since 1.0.0
      */
+    //TODO add function to clear/replace entities
     object Utils {
+
 
         /**
          * @param input

@@ -23,8 +23,9 @@ import java.net.URISyntaxException
 
 
 /**
- * @param lazyListState
- * @param context
+ * @param lazyListState Lazy list state of parent [JetHtmlArticle] which is needed in case of click
+ * to link wich leads to another section of the same page.
+ * @param context Context
  * @param callback
  * @see LinkCallback
  * @see rememberLinkClickHandler

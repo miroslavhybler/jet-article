@@ -4,8 +4,9 @@ package com.jet.article.data
 
 
 /**
- * @param elements
- * @param headData
+ * @param url Original full url of the article
+ * @param elements List of [HtmlElement] parsed out of article.
+ * @param headData Metadata extracted from <head> tag.
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
  * created on 15.07.2023
@@ -33,9 +34,4 @@ public data class HtmlArticleData public constructor(
         get() = elements.isEmpty()
 
 
-    /**
-     * @since 1.0.0
-     */
-    val firstTitle: HtmlElement.Title?
-        get() = elements.firstOrNull { it is HtmlElement.Title } as? HtmlElement.Title
 }

@@ -38,12 +38,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
-import jet.html.article.example.content.ArticlesScreen
 import jet.html.article.example.content.BenchmarksScreen
 import jet.html.article.example.data.ExcludeRule
-import jet.html.article.example.content.article.ArticleScreen
 import jet.html.article.example.content.HomeScreen
-import jet.html.article.example.content.benchmark.BenchmarkScreen
+import jet.html.article.example.content.test.PerformanceScreen
 
 /**
  *
@@ -93,21 +91,14 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(navHostController = navHostController)
                         }
                         composable(
-                            route = "articles",
-                            enterTransition = { fadeIn() },
-                            exitTransition = { fadeOut() }
-                        ) {
-                            ArticlesScreen(navHostController = navHostController)
-                        }
-                        composable(
-                            route = "benchmarks",
+                            route = "tests",
                             enterTransition = { fadeIn() },
                             exitTransition = { fadeOut() }
                         ) {
                             BenchmarksScreen(navHostController = navHostController)
                         }
                         composable(
-                            route = "article-screen?article={article}",
+                            route = "test-screen?article={article}",
                             enterTransition = { slideInHorizontally { it } },
                             exitTransition = { slideOutHorizontally { it } },
                             arguments = listOf(
@@ -119,26 +110,7 @@ class MainActivity : ComponentActivity() {
                         ) {
                             val res = it.arguments?.getString("article")
                                 ?: throw NullPointerException("")
-                            ArticleScreen(
-                                article = res,
-                                navHostController = navHostController,
-                                viewModel = hiltViewModel(),
-                            )
-                        }
-                        composable(
-                            route = "benchmark-screen?article={article}",
-                            enterTransition = { slideInHorizontally { it } },
-                            exitTransition = { slideOutHorizontally { it } },
-                            arguments = listOf(
-                                navArgument(name = "article") {
-                                    type = NavType.StringType
-                                    nullable = false
-                                },
-                            )
-                        ) {
-                            val res = it.arguments?.getString("article")
-                                ?: throw NullPointerException("")
-                            BenchmarkScreen(
+                            PerformanceScreen(
                                 article = res,
                                 viewModel = hiltViewModel(),
                                 navHostController = navHostController
@@ -179,28 +151,15 @@ fun JetHtmlArticleExampleTheme(
     )
 }
 
-fun benchmarkRoute(name: String, excludeRules: List<ExcludeRule>): String {
+fun testRoute(name: String, excludeRules: List<ExcludeRule>): String {
     ExcludeRule.globalRules = excludeRules
-    return "benchmark-screen?article=$name"
+    return "test-screen?article=$name"
 }
 
-fun articleRoute(name: String, excludeRules: List<ExcludeRule>): String {
-    ExcludeRule.globalRules = excludeRules
-    return "article-screen?article=$name"
-}
-
-fun NavHostController.navigateToArticle(
+fun NavHostController.navigateToTest(
     name: String,
     excludeRules: List<ExcludeRule> = emptyList()
 ) {
     ExcludeRule.globalRules = excludeRules
-    navigate(route = articleRoute(name = name, excludeRules = excludeRules))
-}
-
-fun NavHostController.navigateToBenchmark(
-    name: String,
-    excludeRules: List<ExcludeRule> = emptyList()
-) {
-    ExcludeRule.globalRules = excludeRules
-    navigate(route = benchmarkRoute(name = name, excludeRules = excludeRules))
+    navigate(route = testRoute(name = name, excludeRules = excludeRules))
 }

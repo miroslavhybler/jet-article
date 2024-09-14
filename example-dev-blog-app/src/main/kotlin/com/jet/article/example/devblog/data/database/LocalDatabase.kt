@@ -4,9 +4,14 @@ import android.content.Context
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Insert
+import androidx.room.ProvidedTypeConverter
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
+import com.jet.article.example.devblog.data.Month
+import com.jet.article.example.devblog.data.SimpleDate
 
 
 /**
@@ -14,9 +19,16 @@ import androidx.room.RoomDatabase
  * created on 20.08.2024
  */
 @Database(
-    entities = [PostItem::class],
+    entities = [
+        PostItem::class
+    ],
     version = 1,
     exportSchema = true,
+)
+@TypeConverters(
+    value = [
+        LocalDatabase.SimpleDateConverter::class,
+    ]
 )
 abstract class LocalDatabase constructor() : RoomDatabase() {
 
@@ -41,7 +53,7 @@ abstract class LocalDatabase constructor() : RoomDatabase() {
     @Dao
     interface PostDao : BaseDao<PostItem> {
 
-        @Query("SELECT * FROM posts")
+        @Query("SELECT * FROM posts ORDER BY datetime(date)")
         fun getAll(): List<PostItem>
 
 
@@ -62,4 +74,26 @@ abstract class LocalDatabase constructor() : RoomDatabase() {
         @Insert
         fun insert(items: List<T>)
     }
+
+
+    object SimpleDateConverter {
+
+        @TypeConverter
+        fun simpleDateToString(input: SimpleDate): String {
+            return "${input.dayOfMonth} ${input.month.value} ${input.year}"
+        }
+
+
+        @TypeConverter
+        fun stringToSimpleDate(input: String): SimpleDate {
+            val array = input.split(' ')
+            val day = array[0].toInt()
+            val monthNumber = array[1].toInt()
+            val year = array[2].toInt()
+            val month = Month.entries.first { it.value == monthNumber }
+            return SimpleDate(year = year, month = month, dayOfMonth = day)
+        }
+    }
+
+
 }

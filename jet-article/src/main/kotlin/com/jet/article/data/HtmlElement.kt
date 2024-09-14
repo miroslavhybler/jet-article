@@ -30,7 +30,8 @@ sealed class HtmlElement private constructor(
 
 
     /**
-     * @param text Styled text containing simple html formatting tags like b, i, u,...
+     * @param text Text of the text block. Can include entities formatting tags like <b>, <i>, etc when
+     * [com.jet.article.ArticleParser.isSimpleTextFormatAllowed] is set to true by [com.jet.article.ArticleParser.initialize].
      * @since 1.0.0
      */
     @Keep

@@ -18,7 +18,7 @@ import jet.html.article.example.composables.HomeCard
 import jet.html.article.example.composables.SimpleTopaBar
 import jet.html.article.example.composables.spacedCard
 import jet.html.article.example.data.ExcludeRule
-import jet.html.article.example.navigateToBenchmark
+import jet.html.article.example.navigateToTest
 
 
 /**
@@ -47,7 +47,7 @@ fun BenchmarksScreen(
                 title = "Exclude rules",
                 description = "Testing excuding some content, simple test of exclude rules",
                 onClick = {
-                    navHostController.navigateToBenchmark(
+                    navHostController.navigateToTest(
                         name = "ignore-test",
                         excludeRules = listOf(
                             ExcludeRule(tag = "div", clazz = "menu"),
@@ -74,7 +74,7 @@ fun BenchmarksScreen(
                 title = "Text unsupported",
                 description = "Clearing unsupported tags from text blocks",
                 onClick = {
-                    navHostController.navigateToBenchmark(
+                    navHostController.navigateToTest(
                         name = "text-unsupported",
                     )
                 },
@@ -84,7 +84,7 @@ fun BenchmarksScreen(
                 title = "Links",
                 description = "Testing links",
                 onClick = {
-                    navHostController.navigateToBenchmark(
+                    navHostController.navigateToTest(
                         name = "links-test",
                     )
                 },
@@ -95,7 +95,7 @@ fun BenchmarksScreen(
                 title = "Elements test",
                 description = "Simple preview of supported attributes",
                 onClick = {
-                    navHostController.navigateToBenchmark(name = "elements-test")
+                    navHostController.navigateToTest(name = "elements-test")
                 },
                 modifier = Modifier.spacedCard()
             )
@@ -103,7 +103,7 @@ fun BenchmarksScreen(
                 title = "Simple file",
                 description = "",
                 onClick = {
-                    navHostController.navigateToBenchmark(name = "simple")
+                    navHostController.navigateToTest(name = "simple")
                 },
                 modifier = Modifier.spacedCard()
             )

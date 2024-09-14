@@ -1,4 +1,4 @@
-@file:Suppress("RedundantUnitReturnType")
+@file:Suppress("RedundantUnitReturnType", "unused")
 
 package com.jet.article
 

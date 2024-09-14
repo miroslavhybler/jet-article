@@ -42,6 +42,7 @@ fun TitleTopBar(
         modifier = Modifier
             .background(color = MaterialTheme.colorScheme.background)
             .then(other = modifier)
+            .horizontalPadding()
             .statusBarsPadding(),
         title = { Text(text = text) },
         navigationIcon = {
@@ -77,7 +78,13 @@ fun MainTopBar(
             .horizontalPadding()
             .statusBarsPadding()
             .then(other = modifier),
-        title = { Text(text = text) },
+        title = {
+            Text(
+                text = text,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
         navigationIcon = {
             Icon(
                 painter = painterResource(R.drawable.ic_android),

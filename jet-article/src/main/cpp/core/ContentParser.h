@@ -28,6 +28,7 @@ public:
 private:
     bool hasContentToProcess = false;
     bool wasHeadParsed = false;
+    //TODO use size_t with 0 as default
     int tempContentIndexStart = -1;
     int tempContentIndexEnd = -1;
     bool areImagesEnabled = false;
@@ -175,7 +176,7 @@ public:
      * parsed properly.
      * @since 1.0.0
      */
-    bool isAbortingWithError() override;
+    const bool isAbortingWithError();
 
 
     /**

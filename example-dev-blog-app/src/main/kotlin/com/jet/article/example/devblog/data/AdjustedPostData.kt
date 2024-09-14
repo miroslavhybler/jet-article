@@ -11,7 +11,7 @@ import com.jet.article.data.HtmlElement
 data class AdjustedPostData constructor(
     val headerImage: HtmlElement.Image,
     val postData: HtmlArticleData,
-    val date: HtmlElement.TextBlock,
+    val date: SimpleDate,
     val title: HtmlElement.Title,
 ) {
 

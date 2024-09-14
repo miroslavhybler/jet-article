@@ -226,6 +226,7 @@ public fun JetHtmlArticleContent(
 /**
  * @since 1.0.0
  */
+//TODO color schemes must reflect app color scheme
 public object JetHtmlArticleDefaults {
 
 

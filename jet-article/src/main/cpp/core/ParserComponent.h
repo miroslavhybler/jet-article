@@ -54,7 +54,7 @@ public:
     virtual void clearAllResources() = 0;
 
 
-    virtual bool isAbortingWithError() {
+    bool isAbortingWithError() const {
         return isAbortingWithException;
     }
 

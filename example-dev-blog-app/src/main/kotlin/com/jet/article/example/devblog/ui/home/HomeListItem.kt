@@ -1,4 +1,4 @@
-package com.jet.article.example.devblog.ui.main
+package com.jet.article.example.devblog.ui.home
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -124,12 +125,16 @@ private fun HomeListItemColumn(
             url = item.image,
         )
 
+        Spacer(modifier = Modifier.height(height = 4.dp))
+
         Text(
             modifier = Modifier,
-            text = item.time,
+            text = item.date.getDateString(),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onBackground,
         )
+
+
         HtmlTextBlock(
             modifier = Modifier,
             text = item.title,
@@ -182,7 +187,7 @@ private fun HomeListItemRow(
         Column(modifier = Modifier.weight(weight = 1f)) {
             Text(
                 modifier = Modifier,
-                text = item.time,
+                text = item.date.getDateString(),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onBackground,
                 maxLines = 1,

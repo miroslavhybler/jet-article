@@ -6,17 +6,22 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.jet.article.example.devblog.data.SettingsStorage
+import com.jet.article.example.devblog.isAppDark
 import com.jet.article.example.devblog.rememberSystemBarsStyle
-import com.jet.article.example.devblog.ui.main.MainScreen
+import com.jet.article.example.devblog.ui.home.MainScreen
 import com.jet.article.example.devblog.ui.settings.SettingsScreen
 import dagger.hilt.android.AndroidEntryPoint
 import mir.oslav.jet.annotations.JetExperimental
@@ -28,6 +33,7 @@ import mir.oslav.jet.annotations.JetExperimental
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    private val viewModel: MainViewModel by viewModels()
 
     companion object {
         var isActive: Boolean = false
@@ -38,12 +44,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         isActive = true
         setContent {
-            DevBlogAppTheme {
-                val systemBarsStyle = rememberSystemBarsStyle()
+            val settings by viewModel.settings.collectAsState(
+                initial = SettingsStorage.Settings()
+            )
+            val systemBarsStyle = rememberSystemBarsStyle(settings = settings)
+            val dimensions = rememberDimensions()
+
+            DevBlogAppTheme(
+                isUsingDynamicColors = settings.isUsingDynamicColors,
+                darkTheme = isAppDark(settings = settings),
+            ) {
                 CompositionLocalProvider(
-                    LocalDimensions provides rememberDimensions()
+                    value = LocalDimensions provides dimensions,
                 ) {
-                    LaunchedEffect(key1 = Unit) {
+                    LaunchedEffect(key1 = systemBarsStyle) {
                         enableEdgeToEdge(
                             statusBarStyle = systemBarsStyle,
                             navigationBarStyle = systemBarsStyle,
@@ -54,7 +68,6 @@ class MainActivity : ComponentActivity() {
                         navController = navHostController,
                         startDestination = Routes.main,
                     ) {
-
                         composable(route = Routes.main) {
                             MainScreen(
                                 viewModel = hiltViewModel(),
@@ -79,7 +92,7 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-        isActive =false
+        isActive = false
         super.onDestroy()
     }
 }

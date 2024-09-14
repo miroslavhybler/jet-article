@@ -11,15 +11,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
+import mir.oslav.jet.annotations.JetExperimental
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
 
 /**
+ * Main component of the library.
  * @author Miroslav Hýbler <br>
  * created on 20.02.2024
  * @since 1.0.0
  */
+@JetExperimental
 public object ArticleAnalyzer {
 
 
@@ -132,7 +135,10 @@ public object ArticleAnalyzer {
         }
         val newData = ContentTag(
             tag = tagInfo,
-            range = IntRange(start = contentStart, endInclusive = contentEnd)
+            range = IntRange(
+                start = contentStart,
+                endInclusive = contentEnd,
+            )
         )
 
         mAnalyzerFlow.value = newData
@@ -140,6 +146,9 @@ public object ArticleAnalyzer {
     }
 
 
+    /**
+     * @since 1.0.0
+     */
     suspend fun jumpToBody() {
         while (
             AnalyzerNative.getCurrentTag() != "body"

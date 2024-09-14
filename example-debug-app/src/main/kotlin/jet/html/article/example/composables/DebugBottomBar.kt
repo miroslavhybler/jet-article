@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 fun DebugBottomBar(
     modifier: Modifier = Modifier,
     onTest: () -> Unit,
-    onAnalyzer: () -> Unit,
     onSearchByIndex: () -> Unit,
 ) {
 
@@ -28,10 +27,6 @@ fun DebugBottomBar(
     ) {
         Button(onClick = onTest) {
             Text(text = "Run Test")
-        }
-
-        Button(onClick = onAnalyzer) {
-            Text(text = "Analyzer")
         }
 
         Button(onClick = onSearchByIndex) {

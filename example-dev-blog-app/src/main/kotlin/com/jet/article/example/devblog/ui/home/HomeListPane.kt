@@ -1,24 +1,32 @@
-package com.jet.article.example.devblog.ui.main
+package com.jet.article.example.devblog.ui.home
 
+import android.util.Log
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.jet.article.example.devblog.R
+import com.jet.article.example.devblog.composables.ErrorLayout
 import com.jet.article.example.devblog.composables.MainTopBar
 import com.jet.article.example.devblog.data.database.PostItem
 import com.jet.article.example.devblog.isExpanded
@@ -41,10 +49,7 @@ fun HomeListPane(
 ) {
 
     val posts by viewModel.posts.collectAsState()
-
-//    LaunchedEffect(key1 = Unit) {
-//        viewModel.loadIndexSite()
-//    }
+    val hasError by viewModel.hasError.collectAsState()
 
 
     HomeListPaneContent(
@@ -52,6 +57,7 @@ fun HomeListPane(
         data = posts,
         lazyListState = viewModel.lazyListState,
         navHostController = navHostController,
+        hasError = hasError,
     )
 }
 
@@ -59,9 +65,10 @@ fun HomeListPane(
 @Composable
 private fun HomeListPaneContent(
     onOpenPost: (index: Int, item: PostItem) -> Unit,
-    data: List<PostItem>,
+    data: Result<List<PostItem>>?,
     lazyListState: LazyListState,
     navHostController: NavHostController,
+    hasError: Boolean,
 ) {
     val mainState = LocalMainScreenState.current
     val context = LocalContext.current
@@ -73,6 +80,11 @@ private fun HomeListPaneContent(
             || mainState.role == ListDetailPaneScaffoldRole.Extra
     val isLargeWidth = windowWidth.isExpanded || windowWidth.isMedium
 
+    val postList = remember(key1 = data) {
+        Log.d("mirek", "result: $data")
+        data?.getOrNull()
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
@@ -83,7 +95,7 @@ private fun HomeListPaneContent(
         },
         content = { paddingValues ->
             LazyColumn(
-                modifier = Modifier,
+                modifier = Modifier.animateContentSize(),
                 state = lazyListState,
                 contentPadding = paddingValues + PaddingValues(
                     start = dimensions.sidePadding,
@@ -98,16 +110,44 @@ private fun HomeListPaneContent(
                     }
                 ),
             ) {
-                itemsIndexed(
-                    items = data,
-                    key = { _, item -> item.id },
-                ) { index, item ->
-                    HomeListItem(
-                        modifier = Modifier,
-                        onOpenPost = onOpenPost,
-                        item = item,
-                        index = index,
-                    )
+                if (
+                    hasError
+                    || (data?.isSuccess == true && postList.isNullOrEmpty())
+                    || data?.isFailure == true
+                ) {
+                    item {
+                        ErrorLayout(title = "Unable to load new posts")
+                    }
+
+                }
+
+                if (data == null && !hasError) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier
+                                    .size(size = 24.dp)
+                            )
+                        }
+                    }
+                }
+
+
+                if (data?.isSuccess == true && !postList.isNullOrEmpty()) {
+                    itemsIndexed(
+                        items = postList,
+                        key = { _, item -> item.id },
+                    ) { index, item ->
+                        HomeListItem(
+                            modifier = Modifier,
+                            onOpenPost = onOpenPost,
+                            item = item,
+                            index = index,
+                        )
+                    }
                 }
             }
         }

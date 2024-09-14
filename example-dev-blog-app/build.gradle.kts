@@ -56,6 +56,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.datastore.preferences.core)
+    implementation(libs.androidx.datastore.preferences)
+
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.ui.tooling.preview)
@@ -65,6 +68,8 @@ dependencies {
     implementation(libs.androidx.palette.ktx)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.core.splashscreen)
+
+    implementation(libs.android.joda)
 
 
     /** Adaptive UI */
@@ -77,6 +82,8 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.datastore.core.android)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.storage)
     ksp(libs.androidx.room.compiler)
 
     /** KTOR */

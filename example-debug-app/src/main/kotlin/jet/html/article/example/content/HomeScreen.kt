@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -50,26 +51,19 @@ fun HomeScreen(navHostController: NavHostController) {
 
 
             Text(
-                text = "Testing and benchmarking application for Jet-Article library",
+                text = "Testing application for Jet-Article library",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp, top = 32.dp, bottom = 16.dp)
             )
 
             HomeCard(
-                title = "Benchmark",
-                description = "Section contains articles that are used for benchmarking and testing. " +
+                title = "Tests",
+                description = "Section contains articles that are used for testing. " +
                         "Those are not real and may be adjusted to specific test scenario",
                 onClick = {
-                    navHostController.navigate(route = "benchmarks")
+                    navHostController.navigate(route = "tests")
                 },
-                modifier = Modifier.spacedCard()
-            )
-
-            HomeCard(
-                title = "Articles",
-                description = "Problematic real articles used for the development to increase relaibility of the library",
-                onClick = { navHostController.navigate(route = "articles") },
                 modifier = Modifier.spacedCard()
             )
 
@@ -88,22 +82,8 @@ fun HomeScreen(navHostController: NavHostController) {
 
 
 @Composable
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
-    showSystemUi = true,
-)
+@PreviewLightDark
 private fun HomePagePreview() {
-    JetHtmlArticleExampleTheme {
-        HomeScreen(navHostController = rememberNavController())
-    }
-}
-
-
-@Composable
-@Preview(
-    showSystemUi = true,
-)
-private fun HomePagePreviewLightMode() {
     JetHtmlArticleExampleTheme {
         HomeScreen(navHostController = rememberNavController())
     }

@@ -43,7 +43,6 @@ fun CustomHtmlImageWithPalette(
         },
         loading = {
             CustomHtmlImageDefaults.Loading()
-
         },
         error = { HtmlImageDefaults.ErrorLayout(scope = this) }
     )

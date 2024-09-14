@@ -1,6 +1,5 @@
 package com.jet.article.example.devblog.composables
 
-import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -9,7 +8,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
@@ -39,7 +37,7 @@ import kotlin.math.sin
  * created on 19.08.2024
  */
 @Composable
-fun DevelopmentAnimation(
+fun EmptyAnimation(
     modifier: Modifier = Modifier,
 ) {
     val colorScheme = MaterialTheme.colorScheme
@@ -99,7 +97,7 @@ fun DevelopmentAnimation(
             }
         ) {
             drawSprocketWheel(
-                color = colorScheme.tertiary,
+                color = colorScheme.primary,
                 center = wheel2Center,
                 radius = 56.dp.toPx(),
                 path = wheel2Path,
@@ -119,7 +117,7 @@ fun DevelopmentAnimation(
             }
         ) {
             drawSprocketWheel(
-                color = colorScheme.primary,
+                color = colorScheme.secondary,
                 radius = 32.dp.toPx(),
                 center = wheel1Center,
                 path = wheel1Path,
@@ -233,6 +231,6 @@ private fun DrawScope.drawSprocketWheel(
 @PreviewLightDark
 private fun DevelopmentAnimationPreview() {
     DevBlogAppTheme {
-        DevelopmentAnimation()
+        EmptyAnimation()
     }
 }

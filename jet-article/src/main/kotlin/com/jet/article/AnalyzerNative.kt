@@ -1,12 +1,16 @@
+@file:Suppress("RedundantUnitReturnType")
+
 package com.jet.article
 
 import com.jet.article.data.HtmlContentType
 
 
 /**
+ * JNI Interface for library. All functions should be called only via [ArticleParser].
  * @author Miroslav Hýbler <br>
  * created on 19.02.2024
  */
+
 internal object AnalyzerNative {
 
 

@@ -1,6 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
-package jet.html.article.example.content.article
+package jet.html.article.example.content.test
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -12,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,28 +21,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.jet.article.data.HtmlArticleData
 import com.jet.article.ui.JetHtmlArticle
 import jet.html.article.example.composables.DebugBottomBar
 import jet.html.article.example.composables.Results
 import jet.html.article.example.composables.SimpleTopaBar
 import jet.html.article.example.highlightstring.HighlightStringActivity
 
+
+/**
+ * @author Miroslav Hýbler <br>
+ * created on 30.01.2024
+ */
 @Composable
-fun ArticleScreen(
+fun PerformanceScreen(
     article: String,
-    viewModel: ArticleViewModel,
+    viewModel: BenchmarkViewModel,
     navHostController: NavHostController,
 ) {
     val context = LocalContext.current
-
-    val data: HtmlArticleData by viewModel.articleData.collectAsState()
-
+    val data by viewModel.articleData.collectAsState()
     val testResults by viewModel.testResults.collectAsState()
-
-    BackHandler(enabled = testResults != null) {
-        viewModel.testResults.value = null
-    }
 
     LaunchedEffect(key1 = Unit, block = {
         viewModel.loadArticleFromResources(
@@ -53,9 +48,14 @@ fun ArticleScreen(
         )
     })
 
+    BackHandler(enabled = testResults != null) {
+        viewModel.testResults.value = null
+    }
+
+
     Scaffold(
         topBar = {
-            SimpleTopaBar(text = data.headData.title ?: "---")
+            SimpleTopaBar(text = "Benchmark: ${data.headData.title}")
         },
         content = { paddingValues ->
             Box(modifier = Modifier.fillMaxSize()) {
@@ -71,7 +71,6 @@ fun ArticleScreen(
                         )
                     }
                 )
-
 
                 AnimatedVisibility(
                     visible = testResults != null,
@@ -94,9 +93,6 @@ fun ArticleScreen(
         bottomBar = {
             DebugBottomBar(
                 onTest = viewModel::runTest,
-                onAnalyzer = {
-                    navHostController.navigate(route = "analyzer?articlePath=${viewModel.articlePath}")
-                },
                 onSearchByIndex = {
                     HighlightStringActivity.launch(
                         context = context,
@@ -106,12 +102,4 @@ fun ArticleScreen(
             )
         }
     )
-}
-
-
-@Composable
-fun rememberIgnoreRules(vararg rules: Pair<String, String>): List<Pair<String, String>> {
-    return remember {
-        rules.toList()
-    }
 }

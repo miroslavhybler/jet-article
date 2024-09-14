@@ -1,8 +1,9 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.jet.article.example.devblog.ui.main
+package com.jet.article.example.devblog.ui.home
 
 import android.animation.ArgbEvaluator
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -20,6 +21,8 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.CircularProgressIndicator
@@ -56,8 +59,10 @@ import com.jet.article.data.HtmlArticleData
 import com.jet.article.example.devblog.R
 import com.jet.article.example.devblog.composables.CustomHtmlImage
 import com.jet.article.example.devblog.composables.CustomHtmlImageWithPalette
+import com.jet.article.example.devblog.composables.ErrorLayout
 import com.jet.article.example.devblog.composables.PostTopBar
 import com.jet.article.example.devblog.data.AdjustedPostData
+import com.jet.article.example.devblog.horizontalPadding
 import com.jet.article.example.devblog.rememberCurrentOffset
 import com.jet.article.example.devblog.ui.LocalDimensions
 import com.jet.article.ui.JetHtmlArticleContent
@@ -74,7 +79,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun PostPane(
-    data: AdjustedPostData,
+    data: Result<AdjustedPostData>?,
     onOpenContests: () -> Unit,
     listState: LazyListState,
 ) {
@@ -83,6 +88,9 @@ fun PostPane(
     val mainState = LocalMainScreenState.current
     val density = LocalDensity.current
     val colorScheme = MaterialTheme.colorScheme
+    val post = remember(key1 = data) {
+        data?.getOrNull()
+    }
 
     val colorEvaluator = remember { ArgbEvaluator() }
     val coroutineScope = rememberCoroutineScope()
@@ -107,28 +115,42 @@ fun PostPane(
     val linkCallback = remember {
         object : LinkClickHandler.LinkCallback() {
             override fun onOtherDomainLink(link: Link.OtherDomainLink) {
-                Log.d("link-click", "other domain ${link.fullLink}")
-                context.startActivity(
-                    Intent(Intent.ACTION_VIEW)
-                        .setData(link.fullLink.toUri())
-                )
+                try {
+                    context.startActivity(
+                        Intent(Intent.ACTION_VIEW)
+                            .setData(link.fullLink.toUri())
+                    )
+                } catch (e: ActivityNotFoundException) {
+                    e.printStackTrace()
+                }
             }
 
             override fun onSameDomainLink(link: Link.SameDomainLink) {
-                Log.d("link-click", "same domain  ${link.fullLink}")
             }
 
             override fun onUriLink(link: Link.UriLink, context: Context) {
-                Log.d("link-click", "uri  ${link.fullLink}")
             }
 
             override fun onSectionLink(
                 link: Link.SectionLink,
                 lazyListState: LazyListState,
                 data: HtmlArticleData,
-                scrollOffset: Int
+                scrollOffset: Int,
             ) {
-                Log.d("link-click", "section  ${link.fullLink}")
+                coroutineScope.launch {
+                    val i = data.elements.indexOfFirst { element ->
+                        element.id == link.rawLink.removePrefix(prefix = "#")
+                    }
+
+                    i.takeIf { index -> index != -1 }
+                        ?.let { index ->
+                            lazyListState.animateScrollToItem(
+                                index = index,
+                                scrollOffset = scrollOffset
+                            )
+                        }
+
+                }
             }
         }
     }
@@ -160,7 +182,7 @@ fun PostPane(
                     .onSizeChanged { newSize ->
                         headerImageHeight = density.pxToDp(px = newSize.height)
                     },
-                title = data.title.text,
+                title = post?.title?.text ?: "",
                 scrollBehavior = scrollBehavior,
                 backgroundAlpha = topBarAlpha,
                 titleColor = titleColor.value,
@@ -174,7 +196,7 @@ fun PostPane(
 
                 AnimatedVisibility(
                     modifier = Modifier.align(alignment = Alignment.Center),
-                    visible = data.postData.isEmpty,
+                    visible = data == null,
                     enter = fadeIn() + scaleIn(),
                     exit = fadeOut() + scaleOut()
                 ) {
@@ -183,47 +205,63 @@ fun PostPane(
                     )
                 }
 
-                JetHtmlArticleContent(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .nestedScroll(connection = scrollBehavior.nestedScrollConnection),
-                    containerColor = Color.Transparent,
-                    listState = listState,
-                    contentPadding = paddingValues + PaddingValues(
-                        start = dimensions.topLinePadding,
-                        top = dimensions.topLinePadding,
-                        end = dimensions.sidePadding,
-                        //56.dp from FabPrimaryTokens.ContainerHeight
-                        bottom = dimensions.bottomLinePadding + 56.dp,
-                    ),
-                    data = data.postData,
-                    verticalArrangement = Arrangement.spacedBy(space = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    linkClickCallback = linkCallback,
-                    image = { image ->
-                        CustomHtmlImage(
-                            modifier = Modifier.animateContentSize(),
-                            image = image,
-                        )
-                    }
-                )
 
-                CustomHtmlImageWithPalette(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(height = headerImageHeight)
-                        .animateContentSize(),
-                    image = data.headerImage,
-                    onPallete = { newPallete ->
-                        palette = newPallete
-                        coroutineScope.launch {
-                            newPallete.darkMutedSwatch?.rgb?.let {
-                                titleStartColor = Color(color = it)
-                                //  titleColor.animateTo(targetValue = Color(color = it))
+                if (
+                    data?.isFailure == true
+                    || (data?.isSuccess == true && post?.postData?.elements.isNullOrEmpty())
+                ) {
+                    ErrorLayout(
+                        modifier = Modifier
+                            .padding(top = dimensions.topLinePadding)
+                            .horizontalPadding()
+                            .align(alignment = Alignment.TopCenter),
+                        title = "Unable to show the post"
+                    )
+                }
+
+                if (post != null) {
+                    JetHtmlArticleContent(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .nestedScroll(connection = scrollBehavior.nestedScrollConnection),
+                        containerColor = Color.Transparent,
+                        listState = listState,
+                        contentPadding = paddingValues + PaddingValues(
+                            start = dimensions.topLinePadding,
+                            top = dimensions.topLinePadding,
+                            end = dimensions.sidePadding,
+                            //56.dp from FabPrimaryTokens.ContainerHeight
+                            bottom = dimensions.bottomLinePadding + 56.dp,
+                        ),
+                        data = post.postData,
+                        verticalArrangement = Arrangement.spacedBy(space = 24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        linkClickCallback = linkCallback,
+                        image = { image ->
+                            CustomHtmlImage(
+                                modifier = Modifier.animateContentSize(),
+                                image = image,
+                            )
+                        }
+                    )
+
+                    CustomHtmlImageWithPalette(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(height = headerImageHeight)
+                            .animateContentSize(),
+                        image = post.headerImage,
+                        onPallete = { newPallete ->
+                            palette = newPallete
+                            coroutineScope.launch {
+                                newPallete.darkMutedSwatch?.rgb?.let {
+                                    titleStartColor = Color(color = it)
+                                    //  titleColor.animateTo(targetValue = Color(color = it))
+                                }
                             }
                         }
-                    }
-                )
+                    )
+                }
             }
         },
         floatingActionButton = {

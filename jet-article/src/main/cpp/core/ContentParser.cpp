@@ -408,7 +408,7 @@ std::string ContentParser::getTitle() const {
 }
 
 
-bool ContentParser::isAbortingWithError() {
+const bool ContentParser::isAbortingWithError() {
     return isAbortingWithException;
 }
 

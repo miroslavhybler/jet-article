@@ -8,6 +8,7 @@ import androidx.annotation.IntDef
 /**
  * @author Miroslav Hýbler <br>
  * created on 22.01.2024
+ * @since 1.0.0
  */
 @IntDef(
     ErrorCode.NO_ERROR,

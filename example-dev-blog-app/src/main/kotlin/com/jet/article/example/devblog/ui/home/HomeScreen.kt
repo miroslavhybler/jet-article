@@ -1,8 +1,9 @@
 @file:OptIn(ExperimentalMaterial3AdaptiveApi::class)
 
-package com.jet.article.example.devblog.ui.main
+package com.jet.article.example.devblog.ui.home
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -26,6 +27,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.SaverScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -48,7 +50,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun MainScreen(
-    viewModel: MainViewModel,
+    viewModel: HomeViewModel,
     navHostController: NavHostController,
 ) {
     val state = rememberMainScreenState()
@@ -57,7 +59,6 @@ fun MainScreen(
     val navigator = rememberListDetailPaneScaffoldNavigator<Nothing>(
         scaffoldDirective = calculatePaneScaffoldDirective(currentWindowAdaptiveInfo()),
     )
-
     BackHandler(
         enabled = state.role != ListDetailPaneScaffoldRole.List
     ) {
@@ -87,7 +88,7 @@ fun MainScreen(
 @Composable
 fun MainScreenContent(
     state: MainScreenState,
-    postData: AdjustedPostData?,
+    postData: Result<AdjustedPostData>?,
     onLoad: (url: String) -> Unit,
     navigator: ThreePaneScaffoldNavigator<Nothing>,
     navHostController: NavHostController,
@@ -95,6 +96,10 @@ fun MainScreenContent(
     val density = LocalDensity.current
     val postListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+    val selectedPost = remember(key1 = postData) {
+        Log.d("mirek", "$postData")
+        postData?.getOrNull()
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -149,7 +154,7 @@ fun MainScreenContent(
                 extraPane = {
                     AnimatedPane {
                         ContentsPane(
-                            data = postData,
+                            data = selectedPost,
                             onSelected = { index, title ->
                                 navigator.navigateTo(pane = ListDetailPaneScaffoldRole.Detail)
                                 coroutineScope.launch {

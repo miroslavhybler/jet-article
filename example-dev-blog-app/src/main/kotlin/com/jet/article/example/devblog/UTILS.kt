@@ -2,6 +2,7 @@ package com.jet.article.example.devblog
 
 import androidx.activity.SystemBarStyle
 import androidx.annotation.FloatRange
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -29,6 +31,9 @@ import com.jet.article.data.HtmlArticleData
 import com.jet.article.data.HtmlElement
 import com.jet.article.data.TagInfo
 import com.jet.article.example.devblog.data.ExcludeOption
+import com.jet.article.example.devblog.data.Month
+import com.jet.article.example.devblog.data.SettingsStorage
+import com.jet.article.example.devblog.data.SimpleDate
 import com.jet.article.example.devblog.ui.LocalDimensions
 import com.jet.article.example.devblog.data.database.PostItem
 import com.jet.utils.pxToDp
@@ -88,11 +93,29 @@ val WindowHeightSizeClass.isExpanded: Boolean
 
 @Composable
 fun rememberSystemBarsStyle(
+    settings: SettingsStorage.Settings,
+    lightScrim: Color = Color.Black,
+    darkScrim: Color = Color.Black,
 ): SystemBarStyle {
     return rememberSystemBarsStyle(
-        lightScrim = Color.Black,
-        darkScrim = Color.Black,
+        lightScrim = lightScrim,
+        darkScrim = darkScrim,
+        isAppDark = isAppDark(settings = settings),
     )
+}
+
+
+@Composable
+fun isAppDark(settings: SettingsStorage.Settings): Boolean {
+    val isSystemDarkMode = isSystemInDarkTheme()
+    return remember(key1 = isSystemDarkMode, key2 = settings) {
+        when (settings.nightModeFlags) {
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM -> isSystemDarkMode
+            AppCompatDelegate.MODE_NIGHT_YES -> true
+            AppCompatDelegate.MODE_NIGHT_NO -> false
+            else -> false
+        }
+    }
 }
 
 
@@ -106,7 +129,7 @@ fun rememberSystemBarsStyle(
         SystemBarStyle.auto(
             lightScrim = lightScrim.toArgb(),
             darkScrim = darkScrim.toArgb(),
-            detectDarkMode = { resourrces ->
+            detectDarkMode = { resources ->
                 isAppDark
             }
         )
@@ -140,40 +163,57 @@ suspend fun ArticleParser.parseWithInitialization(
 /**
  *
  */
-//TODO add support for featured item
 fun HtmlArticleData.getPostList(
     links: List<TagInfo>,
-): List<PostItem> {
+): Result<List<PostItem>> {
     try {
         val newList = ArrayList<HtmlElement>()
         newList.addAll(elements = elements)
 
         //Removing "featured" item
-        newList.removeAt(0)
-        newList.removeAt(0)
-        newList.removeAt(0)
-        newList.removeAt(0)
+        newList.removeAt(index = 0)
+        newList.removeAt(index = 0)
+        newList.removeAt(index = 0)
+        newList.removeAt(index = 0)
 
         val chunked = newList.chunked(size = 4)
         val list = chunked.mapIndexed { index, sublist ->
+            val date = (sublist[2] as HtmlElement.TextBlock).text
             PostItem(
                 image = (sublist[0] as HtmlElement.Image).url,
                 title = (sublist[1] as HtmlElement.TextBlock).text,
-                time = (sublist[2] as HtmlElement.TextBlock).text,
+                date = processDate(date = date)!!,
                 description = (sublist[3] as HtmlElement.TextBlock).text,
                 url = links[index].tagAttributes["href"]
                     ?: throw NullPointerException("Unable to extract href from ${links[index]}"),
             )
         }
-        return list
+        return Result.success(value = list)
     } catch (e: ClassCastException) {
         e.printStackTrace()
-        return emptyList()
+        return Result.failure(exception = e)
     } catch (e: NoSuchElementException) {
         e.printStackTrace()
-        return emptyList()
+        return Result.failure(exception = e)
+    } catch (e: IndexOutOfBoundsException) {
+        e.printStackTrace()
+        return Result.failure(exception = e)
     }
+}
 
+fun processDate(
+    date: String
+): SimpleDate? {
+    val array = date.split(' ')
+    val day = array.getOrNull(index = 0)?.toIntOrNull()
+    val monthString = array.getOrNull(index = 1)
+    val month = Month.entries.find { it.displayName == monthString }
+    val year = array.getOrNull(index = 2)?.toInt()
+
+
+    return if (day != null && month != null && year != null) {
+        SimpleDate(year = year, month = month, dayOfMonth = day)
+    } else null
 }
 
 
@@ -183,17 +223,17 @@ fun rememberCurrentOffset(state: LazyListState): State<Int> {
     val itemOffset = remember { derivedStateOf { state.firstVisibleItemScrollOffset } }
     val lastPosition = rememberPrevious(current = position.value)
     val lastItemOffset = rememberPrevious(current = itemOffset.value)
-    val currentOffset = remember { mutableStateOf(value = 0) }
+    val currentOffset = remember { mutableIntStateOf(value = 0) }
 
     LaunchedEffect(position.value, itemOffset.value) {
         if (lastPosition == null || position.value == 0) {
-            currentOffset.value = itemOffset.value
+            currentOffset.intValue = itemOffset.value
         } else if (lastPosition == position.value) {
-            currentOffset.value += (itemOffset.value - (lastItemOffset ?: 0))
+            currentOffset.intValue += (itemOffset.value - (lastItemOffset ?: 0))
         } else if (lastPosition > position.value) {
-            currentOffset.value -= (lastItemOffset ?: 0)
+            currentOffset.intValue -= (lastItemOffset ?: 0)
         } else { // lastPosition.value < position.value
-            currentOffset.value += itemOffset.value
+            currentOffset.intValue += itemOffset.value
         }
     }
 

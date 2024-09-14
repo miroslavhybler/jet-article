@@ -6,6 +6,7 @@
 package com.jet.article.example.devblog.ui
 
 import android.os.Build
+import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
@@ -19,34 +20,37 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jet.article.example.devblog.isCompat
 import com.jet.article.example.devblog.isExpanded
 import com.jet.article.example.devblog.isMedium
+import com.jet.utils.theme.MaterialColors
 
 private val Green80: Color = Color(color = 0xFF13B041)
 private val Green90: Color = Color(color = 0xFF07882B)
 private val Green40: Color = Color(color = 0xFF3ddc84)
 
-val LightColorScheme: ColorScheme = lightColorScheme(
+private val LightColorScheme: ColorScheme = lightColorScheme(
     primary = Green80,
     onPrimary = Color.White,
     primaryContainer = Green90,
     onPrimaryContainer = Color.White,
     secondary = Color(color = 0xFF08677f),
     onSecondary = Color(color = 0xFFffffff),
-    secondaryContainer = Color(color = 0xFFb7eaff),
+    secondaryContainer = Color(color = 0xFFC8EBFF),
     onSecondaryContainer = Color(color = 0xFF001f28),
-    error = Color.Red,
+    error = Color(color = 0xFFBA1A1A),
     onError = Color.White,
-    errorContainer = Color.Red,
-    onErrorContainer = Color.White,
-    background = Color.White,
+    errorContainer = Color(color = 0xFFFFEDED),
+    onErrorContainer = Color(color = 0xFF410000),
+    background = Color(color = 0xFFEFEFEF),
     onBackground = Color.Black,
-    surface = Color.White,
+    surface = Color(color = 0xFFEFEFEF),
     onSurface = Color.Black,
     surfaceVariant = Color(color = 0xFFE7E0EC),
     onSurfaceVariant = Color(color = 0xFF49454F),
@@ -54,23 +58,23 @@ val LightColorScheme: ColorScheme = lightColorScheme(
 )
 
 
-val DarkColorScheme = darkColorScheme(
+private val DarkColorScheme = darkColorScheme(
     primary = Green80,
-    onPrimary = Color.Black,
+    onPrimary = Color.White,
     primaryContainer = Green90,
     onPrimaryContainer = Color.Black,
     secondary = Color(color = 0xFF88d1ec),
     onSecondary = Color(color = 0xFF003544),
-    secondaryContainer = Color(color = 0xFF004d61),
-    onSecondaryContainer = Color(color = 0xFFb7eaff),
+    secondaryContainer = Color(color = 0xFF003544),
+    onSecondaryContainer = Color(color = 0xFFBDE8FF),
     tertiary = Green80,
     onTertiary = Color.Black,
     tertiaryContainer = Green90,
     onTertiaryContainer = Color.Black,
-    error = Color.Red,
-    onError = Color.Black,
-    errorContainer = Color.Red,
-    onErrorContainer = Color.Black,
+    error = Color(color = 0xFF420000),
+    onError = Color(color = 0xFFFFFFFF),
+    errorContainer = Color(color = 0xFF420000),
+    onErrorContainer = Color(0xFFFFFFFF),
     background = Color.Black,
     onBackground = Color.White,
     surface = Color.Black,
@@ -83,12 +87,11 @@ val DarkColorScheme = darkColorScheme(
 @Composable
 fun DevBlogAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    isUsingDynamicColors: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+        isUsingDynamicColors && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
@@ -180,11 +183,22 @@ fun rememberDimensions(): Dimensions {
  */
 val LocalDimensions: ProvidableCompositionLocal<Dimensions> = compositionLocalOf(
     defaultFactory = Dimensions.Companion::default,
-    )
-
+)
 
 
 data object Routes {
-    const val main: String ="main"
-    const val settings: String ="settings"
+    const val main: String = "main"
+    const val settings: String = "settings"
+}
+
+
+@Composable
+@PreviewLightDark
+private fun ThemePreview() {
+    DevBlogAppTheme {
+        MaterialColors(
+            modifier = Modifier
+                .background(color = MaterialTheme.colorScheme.background)
+        )
+    }
 }

@@ -1,3 +1,5 @@
+@file:OptIn(JetExperimental::class)
+
 package com.jet.article.example.devblog.data
 
 import android.content.Context
@@ -12,6 +14,7 @@ import com.jet.article.example.devblog.data.database.DatabaseRepo
 import com.jet.article.example.devblog.data.database.PostItem
 import com.jet.article.example.devblog.getPostList
 import com.jet.article.example.devblog.parseWithInitialization
+import com.jet.article.example.devblog.processDate
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
@@ -27,7 +30,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
+import mir.oslav.jet.annotations.JetExperimental
 import okio.IOException
+import org.joda.time.DateTime
 import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -47,9 +52,11 @@ class CoreRepo @Inject constructor(
         private const val TIME_OUT = 5_000
     }
 
-    private val mPosts: MutableStateFlow<List<PostItem>> = MutableStateFlow(value = emptyList())
-    val posts: StateFlow<List<PostItem>> = mPosts.asStateFlow()
+    private val mPosts: MutableStateFlow<Result<List<PostItem>>?> = MutableStateFlow(value = null)
+    val posts: StateFlow<Result<List<PostItem>>?> = mPosts.asStateFlow()
 
+    private val mHasErrorFromRemote: MutableStateFlow<Boolean> = MutableStateFlow(value = false)
+    val hasErrorFromRemote: StateFlow<Boolean> = mHasErrorFromRemote.asStateFlow()
 
     private val ktorHttpClient: HttpClient = HttpClient(
         engineFactory = Android,
@@ -71,21 +78,36 @@ class CoreRepo @Inject constructor(
         isRefresh: Boolean = false,
     ): Unit = withContext(context = Dispatchers.Default) {
         if (isRefresh) {
-            loadPostsFromRemote()
+            val result = loadPostsFromRemote()
+            when {
+                result.isSuccess -> {
+                    mPosts.value = Result.success(value = databaseRepo.postDao.getAll())
+                }
+
+                result.isFailure -> {
+                    mPosts.value = Result.failure(exception = result.exceptionOrNull()!!)
+                }
+            }
+
+
             return@withContext
         }
-        mPosts.value = databaseRepo.postDao.getAll()
+        mPosts.value = Result.success(value = databaseRepo.postDao.getAll())
     }
 
 
     suspend fun loadPostDetail(
         url: String,
         isRefresh: Boolean = false,
-    ): AdjustedPostData? = withContext(context = Dispatchers.IO) {
+    ): Result<AdjustedPostData> = withContext(context = Dispatchers.IO) {
         val htmlCode = loadHtmlFromUrl(
             url = url,
             isRefresh = isRefresh
-        ) ?: return@withContext null
+        )
+
+        if (htmlCode == null) {
+            return@withContext Result.failure(exception = NullPointerException("Html code is null"))
+        }
 
         val original = ArticleParser.parseWithInitialization(
             content = htmlCode,
@@ -100,30 +122,53 @@ class CoreRepo @Inject constructor(
             val date = original.elements
                 .first { it is HtmlElement.TextBlock } as HtmlElement.TextBlock
 
+
+            val simpleDate = processDate(date = date.text)
             val newElements = ArrayList(original.elements).apply {
                 remove(element = headerImage)
                 remove(element = title)
                 remove(element = date)
             }
 
-            return@withContext AdjustedPostData(
-                postData = original.copy(elements = newElements),
-                headerImage = headerImage,
-                date = date,
-                title = title,
+            if (simpleDate == null) {
+                mHasErrorFromRemote.value = true
+                return@withContext Result.failure(
+                    exception = NullPointerException("Unable to get date")
+                )
+            }
+
+            mHasErrorFromRemote.value = false
+            return@withContext Result.success(
+                value = AdjustedPostData(
+                    postData = original.copy(elements = newElements),
+                    headerImage = headerImage,
+                    date = simpleDate,
+                    title = title,
+                )
             )
         } catch (e: NoSuchElementException) {
             e.printStackTrace()
-            return@withContext null
+            return@withContext Result.failure(
+                exception = NoSuchElementException("Unable to adjust html data")
+            )
         }
     }
 
 
-    suspend fun loadPostsFromRemote(): List<PostItem> = withContext(context = Dispatchers.IO) {
+    suspend fun loadPostsFromRemote(): Result<List<PostItem>> = withContext(
+        context = Dispatchers.IO
+    ) {
         val htmlCode = loadHtmlFromUrl(
             url = Constants.indexUrl,
             isRefresh = true,
-        ) ?: return@withContext emptyList()
+        )
+
+        if (htmlCode == null) {
+            mHasErrorFromRemote.value = true
+            return@withContext Result.failure(
+                exception = NullPointerException("Html code is null")
+            )
+        }
 
         val data = ArticleParser.parseWithInitialization(
             content = htmlCode,
@@ -132,45 +177,46 @@ class CoreRepo @Inject constructor(
 
         val links: ArrayList<TagInfo> = ArrayList()
 
-      ArticleParser.initialize(
-          isLoggingEnabled = false,
-          areImagesEnabled = true,
-          isSimpleTextFormatAllowed = true,
-          isQueringTextOutsideTextTags = true,
-      )
+        ArticleParser.initialize(
+            isLoggingEnabled = false,
+            areImagesEnabled = true,
+            isSimpleTextFormatAllowed = true,
+            isQueringTextOutsideTextTags = true,
+        )
 
         ArticleAnalyzer.process(
-          content = htmlCode,
-          onTag = { tag ->
-              if (tag.tag == "a" && tag.clazz == "adb-card__href") {
-                  links.add(element = tag)
-              }
-          }
-      )
+            content = htmlCode,
+            onTag = { tag ->
+                if (tag.tag == "a" && tag.clazz == "adb-card__href") {
+                    links.add(element = tag)
+                }
+            }
+        )
 
-      val finalData = data.getPostList(links = links)
-      return@withContext finalData
-  }
+        val finalData = data.getPostList(links = links)
+        mHasErrorFromRemote.value = finalData.isFailure
+        return@withContext finalData
+    }
 
 
-  private suspend fun loadHtmlFromUrl(
-      url: String,
-      isRefresh: Boolean = false
-  ): String? {
-      try {
-          val response: HttpResponse = ktorHttpClient.get {
-              url(urlString = url)
-              if (isRefresh) {
-                  parameter(
-                      key = "refresh",
-                      value = System.currentTimeMillis()
-                  )
-              }
-          }
-          return response.bodyAsText()
-      } catch (e: IOException) {
-          e.printStackTrace()
-          return null
-      }
-  }
+    private suspend fun loadHtmlFromUrl(
+        url: String,
+        isRefresh: Boolean = false
+    ): String? {
+        try {
+            val response: HttpResponse = ktorHttpClient.get {
+                url(urlString = url)
+                if (isRefresh) {
+                    parameter(
+                        key = "refresh",
+                        value = System.currentTimeMillis()
+                    )
+                }
+            }
+            return response.bodyAsText()
+        } catch (e: IOException) {
+            e.printStackTrace()
+            return null
+        }
+    }
 }

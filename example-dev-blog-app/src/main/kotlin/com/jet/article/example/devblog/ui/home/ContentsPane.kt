@@ -1,9 +1,8 @@
-package com.jet.article.example.devblog.ui.main
+package com.jet.article.example.devblog.ui.home
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -13,12 +12,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.jet.article.ArticleParser
-import com.jet.article.data.HtmlArticleData
 import com.jet.article.data.HtmlElement
 import com.jet.article.example.devblog.composables.TitleTopBar
 import com.jet.article.example.devblog.data.AdjustedPostData
 import com.jet.article.example.devblog.horizontalPadding
-import com.jet.article.ui.elements.HtmlTextBlock
 
 
 /**

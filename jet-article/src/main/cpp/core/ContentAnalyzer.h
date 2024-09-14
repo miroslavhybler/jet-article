@@ -38,7 +38,6 @@ private:
     size_t currentTagEndIndex = 0;
     std::vector<std::string_view> tempOutputVector;
     std::vector<std::vector<std::string_view>> tableHolder;
-    bool isAbortingWithException;
     ErrorCode error;
     std::string errorMessage;
     size_t temporaryOutIndex = 0;
@@ -51,10 +50,10 @@ public:
     ~ContentAnalyzer();
 
 
-    void setInput(std::string input);
+    void setInput(std::string input) override;
 
 
-    void doNextStep();
+    void doNextStep() override;
 
     std::string getCurrentTagAttributeName(int index);
 
@@ -66,9 +65,9 @@ public:
     int getCurrentAttributesSize();
 
 
-    size_t getCurrentTagStartIndex() const;
+    [[nodiscard]] size_t getCurrentTagStartIndex() const;
 
-    size_t getCurrentTagEndIndex() const;
+    [[nodiscard]] size_t getCurrentTagEndIndex() const;
 
     std::string getCurrentPairTagContent();
 

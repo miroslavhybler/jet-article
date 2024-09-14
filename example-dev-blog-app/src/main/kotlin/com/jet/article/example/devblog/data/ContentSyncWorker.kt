@@ -19,7 +19,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -49,22 +48,10 @@ public class ContentSyncWorker @AssistedInject public constructor(
     params = workerParameters,
 ) {
 
-
     companion object {
         fun register(context: Context) {
-            val request = getRequest()
-            val workManager = WorkManager.getInstance(context)
-
-            workManager.enqueueUniquePeriodicWork(
-                "update-post-list",
-                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-                request,
-            )
-        }
-
-        private fun getRequest(): PeriodicWorkRequest {
-            return PeriodicWorkRequestBuilder<ContentSyncWorker>(
-                repeatInterval = 7,
+            val request = PeriodicWorkRequestBuilder<ContentSyncWorker>(
+                repeatInterval = 2,
                 repeatIntervalTimeUnit = TimeUnit.DAYS,
             )
                 .setConstraints(
@@ -74,6 +61,13 @@ public class ContentSyncWorker @AssistedInject public constructor(
                 )
                 .setInputData(Data.Builder().putBoolean("", true).build())
                 .build()
+            val workManager = WorkManager.getInstance(context)
+
+            workManager.enqueueUniquePeriodicWork(
+                "update-post-list",
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                request,
+            )
         }
 
     }
@@ -82,26 +76,37 @@ public class ContentSyncWorker @AssistedInject public constructor(
     override suspend fun doWork(): Result {
         try {
             val data = coreRepo.loadPostsFromRemote()
-            if (data.isEmpty()) {
+            if (data.isFailure) {
                 return Result.failure()
             }
 
             val dao = databaseRepo.postDao
             var newPost: PostItem? = null
+            val postList = data.getOrNull()
 
-            data.fastForEach { post ->
-                if (!dao.contains(url = post.url)) {
-                    dao.insert(item = post)
-                    newPost = post
+            if (postList == null) {
+                return Result.failure()
+            }
+
+            postList.fastForEach { post ->
+                databaseRepo.withTransaction {
+                    if (!dao.contains(url = post.url)) {
+                        dao.insert(item = post)
+                        if (newPost == null) {
+                            newPost = post
+                        }
+                    }
                 }
             }
 
-            if (newPost != null) {
-                tryShowNotification(
-                    title = newPost!!.title,
-                    content = newPost!!.description.take(n = 100) + "...",
-                    localPostId = dao.getLastPostId()
-                )
+            if (newPost != null && !MainActivity.isActive) {
+                databaseRepo.withTransaction {
+                    tryShowNotification(
+                        title = newPost.title,
+                        content = newPost.description.take(n = 100) + "...",
+                        localPostId = dao.getLastPostId(),
+                    )
+                }
             }
         } catch (e: IndexOutOfBoundsException) {
             e.printStackTrace()
@@ -110,9 +115,6 @@ public class ContentSyncWorker @AssistedInject public constructor(
                 coreRepo.loadPosts()
             }
         }
-
-
-
         return Result.success()
     }
 
