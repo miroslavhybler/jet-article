@@ -84,10 +84,6 @@ public fun JetHtmlArticle(
         snackbarHostState = snackbarHostState,
         coroutineScope = rememberCoroutineScope(),
     ),
-    colors: JetHtmlArticleColors = if (isSystemInDarkTheme())
-        JetHtmlArticleDefaults.darkColorScheme
-    else
-        JetHtmlArticleDefaults.lightColorScheme,
     containerColor: Color = MaterialTheme.colorScheme.background,
 ) {
     JetHtmlArticleContent(
@@ -100,7 +96,6 @@ public fun JetHtmlArticle(
         header = header,
         footer = footer,
         snackbarHostState = snackbarHostState,
-        colors = colors,
         linkClickCallback = linkClickCallback,
         containerColor = containerColor,
     )
@@ -133,10 +128,6 @@ public fun JetHtmlArticleContent(
         snackbarHostState = snackbarHostState,
         coroutineScope = rememberCoroutineScope(),
     ),
-    colors: JetHtmlArticleColors = if (isSystemInDarkTheme())
-        JetHtmlArticleDefaults.darkColorScheme
-    else
-        JetHtmlArticleDefaults.lightColorScheme,
     containerColor: Color = MaterialTheme.colorScheme.background,
 
     ) {
@@ -152,7 +143,6 @@ public fun JetHtmlArticleContent(
         LocalLinkHandler provides linkHandler,
         LocalHtmlArticleData provides data,
         LocalContentPadding provides contentPadding,
-        LocalColorScheme provides colors
     ) {
         //TODO remove scaffold and use box or something instead
         Scaffold(
@@ -226,59 +216,9 @@ public fun JetHtmlArticleContent(
 /**
  * @since 1.0.0
  */
-//TODO color schemes must reflect app color scheme
 public object JetHtmlArticleDefaults {
 
-
-    /**
-     * @since 1.0.0
-     */
-    val lightColorScheme: JetHtmlArticleColors = getDefaultColors(
-        colorScheme = lightColorScheme()
-    )
-
-
-    /**
-     * @since 1.0.0
-     */
-    val darkColorScheme: JetHtmlArticleColors = getDefaultColors(
-        colorScheme = darkColorScheme()
-    )
-
-
-    /**
-     * @since 1.0.0
-     */
-    private fun getDefaultColors(
-        colorScheme: ColorScheme
-    ): JetHtmlArticleColors = JetHtmlArticleColors(
-        linkColor = colorScheme.primary,
-        quoteTextColor = colorScheme.onBackground,
-        quoteBarColor = colorScheme.tertiary,
-
-        codeBackgroundColor = colorScheme.surface,
-        codeBorderColor = colorScheme.primary,
-        codeTextColor = colorScheme.onSurface,
-
-        tableTextColor = colorScheme.onPrimaryContainer,
-        tableBackgroundColor = colorScheme.primaryContainer
-    )
 }
-
-
-/**
- * @since 1.0.0
- */
-public class JetHtmlArticleColors public constructor(
-    val linkColor: Color,
-    val quoteTextColor: Color,
-    val quoteBarColor: Color,
-    val codeBorderColor: Color,
-    val codeBackgroundColor: Color,
-    val codeTextColor: Color,
-    val tableBackgroundColor: Color,
-    val tableTextColor: Color,
-)
 
 
 /**
@@ -311,12 +251,3 @@ internal val LocalHtmlArticleData: ProvidableCompositionLocal<HtmlArticleData> =
 internal val LocalContentPadding: ProvidableCompositionLocal<PaddingValues> = compositionLocalOf(
     defaultFactory = { PaddingValues() }
 )
-
-
-/**
- * @since 1.0.0
- */
-internal val LocalColorScheme: ProvidableCompositionLocal<JetHtmlArticleColors> =
-    compositionLocalOf(
-        defaultFactory = JetHtmlArticleDefaults::lightColorScheme
-    )

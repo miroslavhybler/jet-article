@@ -6,6 +6,9 @@
 
 
 ContentAnalyzer::ContentAnalyzer() {
+    length = 0;
+    errorMessage = "";
+    error = NO_ERROR;
     index = IndexWrapper();
 }
 
@@ -13,11 +16,11 @@ ContentAnalyzer::ContentAnalyzer() {
 ContentAnalyzer::~ContentAnalyzer() = default;
 
 
-void ContentAnalyzer::setInput(std::string content) {
+void ContentAnalyzer::setInput(std::string &content) {
     clearAllResources();
     this->input = content;
     length = content.length();
-    invalidateHasNextStep();
+    mHasNextStep = length > 0;
 }
 
 void ContentAnalyzer::doNextStep() {
@@ -89,6 +92,7 @@ void ContentAnalyzer::doNextStep() {
         currentTagClass = utils::getTagAttribute(currentTagBody, "class");
 
         utils::getTagAttributes(currentTagBody, currentTagAttributes);
+
         utils::log("ANALYZER",
                    "-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
         utils::log("ANALYZER", "tag: " + currentTag);
@@ -101,7 +105,6 @@ void ContentAnalyzer::doNextStep() {
             //Pushing keys (attribute names) to separate array so it can be get better from kotlin code
             currentTagAttributeKeys.push_back(pair.first);
         }
-
         invalidateHasNextStep();
 
         if (!isActualTagValidForNextProcessing(currentTag, tei)) {
@@ -153,7 +156,6 @@ void ContentAnalyzer::doNextStep() {
     index.moveIndex(tei + 1);
 
     if (utils::fastCompare(currentTag, "html")) {
-        mWasHtmlTagFound = true;
         // lang = utils::getTagAttribute(currentTagBody, "lang");
     } else if (!wasHeadParsed && utils::fastCompare(currentTag, "head")) {
         try {
@@ -185,7 +187,7 @@ std::string ContentAnalyzer::getCurrentTagAttributeValue(
 }
 
 
-int ContentAnalyzer::getCurrentAttributesSize() {
+size_t ContentAnalyzer::getCurrentAttributesSize() {
     return currentTagAttributes.size();
 }
 
@@ -206,10 +208,12 @@ std::string ContentAnalyzer::getCurrentPairTagContent() {
     return currentPairTagContent;
 }
 
-void ContentAnalyzer::abortWithError(ErrorCode cause, std::string message) {
+void ContentAnalyzer::abortWithError(
+        ErrorCode cause,
+        std::string message
+) {
     this->error = cause;
     isAbortingWithException = true;
-    hasContentToProcess = false;
     mHasNextStep = false;
 
     errorMessage = "ABORTING ANALIZING WITH ERROR WITH CAUSE: " + std::to_string(cause) + "\n"
@@ -225,19 +229,14 @@ void ContentAnalyzer::abortWithError(ErrorCode cause, std::string message) {
 
 
 void ContentAnalyzer::clearAllResources() {
-    actualInputStart = 0;
-    actualInputEnd = 0;
-
     input.clear();
     currentTag.clear();
     currentTagBody.clear();
     currentTagId.clear();
-    currentPairTagContent .clear();
+    currentPairTagContent.clear();
     currentContentType = NO_CONTENT;
 
-    hasContentToProcess = false;
     mHasBodyContext = false;
-    mWasHtmlTagFound = false;
     wasHeadParsed = false;
     isAbortingWithException = false;
     error = NO_ERROR;

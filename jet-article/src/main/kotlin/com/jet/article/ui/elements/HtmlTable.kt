@@ -1,7 +1,5 @@
 package com.jet.article.ui.elements
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
@@ -14,8 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,12 +40,8 @@ import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
 import com.jet.article.ui.LocalBaseArticleUrl
-import com.jet.article.ui.LocalColorScheme
 import com.jet.article.ui.LocalHtmlArticleData
 import com.jet.article.ui.LocalLinkHandler
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.withContext
-import java.util.concurrent.Executors
 
 
 /**
@@ -61,7 +55,6 @@ fun HtmlTable(
     data: HtmlElement.Table,
 ) {
     val density = LocalDensity.current
-    val colorScheme = LocalColorScheme.current
 
     val textMeasurer = rememberTextMeasurer()
     val typography = MaterialTheme.typography
@@ -87,7 +80,7 @@ fun HtmlTable(
             .clip(MaterialTheme.shapes.small)
             .border(
                 width = 1.dp,
-                color = colorScheme.tableBackgroundColor,
+                color = MaterialTheme.colorScheme.outline,
                 shape = MaterialTheme.shapes.small
             ),
     ) {
@@ -129,11 +122,12 @@ fun HtmlTable(
                 }
             }
 
-            Divider(
-                modifier = Modifier.width(width = with(density) {
-                    fullRowWidth.toFloat().toDp() + 1.dp * columnCount
-                }),
-                color = colorScheme.tableTextColor,
+            HorizontalDivider(
+                modifier = Modifier
+                    .width(width = with(density) {
+                        fullRowWidth.toFloat().toDp() + 1.dp * columnCount
+                    }),
+                color = MaterialTheme.colorScheme.outline,
                 thickness = 1.dp
             )
         }
@@ -151,10 +145,10 @@ private fun TableCell(
     rowCount: Int,
 ) {
 
-    val colorScheme = LocalColorScheme.current
     val linkClickHandler = LocalLinkHandler.current
     val articleData = LocalHtmlArticleData.current
     val articleUrl = LocalBaseArticleUrl.current
+    val colorScheme = MaterialTheme.colorScheme
     Box(
         modifier = modifier
             .sizeIn(minWidth = 128.dp, minHeight = 32.dp)
@@ -164,7 +158,7 @@ private fun TableCell(
                 value.toHtml()
                     .toSpannable()
                     .toAnnotatedString(
-                        primaryColor = colorScheme.linkColor,
+                        primaryColor =  colorScheme.primary,
                         linkClickHandler = linkClickHandler,
                         data = articleData,
                         articleUrl = articleUrl,
@@ -179,7 +173,7 @@ private fun TableCell(
             else
                 MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
-            color = colorScheme.tableTextColor,
+            color = colorScheme.onBackground,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )

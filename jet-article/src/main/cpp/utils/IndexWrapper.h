@@ -37,7 +37,7 @@ public:
      * @return Actual index value.
      * @since 1.0.0
      */
-    const size_t getIndex();
+    size_t getIndex() const;
 
 
     /**
@@ -45,7 +45,7 @@ public:
      * @return
      * @since 1.0.0
      */
-    const size_t getIndexOnStart();
+    size_t getIndexOnStart() const;
 
 
     /**
@@ -65,7 +65,7 @@ public:
      * @return
      * @since 1.0.0
      */
-    std::string toString();
+    std::string toString() const;
 
 };
 

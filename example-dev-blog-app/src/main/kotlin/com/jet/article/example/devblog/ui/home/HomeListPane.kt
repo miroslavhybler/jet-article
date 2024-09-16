@@ -81,7 +81,6 @@ private fun HomeListPaneContent(
     val isLargeWidth = windowWidth.isExpanded || windowWidth.isMedium
 
     val postList = remember(key1 = data) {
-        Log.d("mirek", "result: $data")
         data?.getOrNull()
     }
 

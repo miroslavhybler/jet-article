@@ -24,7 +24,8 @@ Java_com_jet_article_AnalyzerNative_setInput(
         jstring content
 ) {
     jboolean isCopy;
-    jni::analyzer->setInput(environment->GetStringUTFChars(content, &isCopy));
+    std::string input = environment->GetStringUTFChars(content, &isCopy);
+    jni::analyzer->setInput(input);
 }
 
 

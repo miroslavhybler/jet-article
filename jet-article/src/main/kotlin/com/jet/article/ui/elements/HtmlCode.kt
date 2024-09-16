@@ -16,7 +16,6 @@ import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
 import com.jet.article.ui.LocalBaseArticleUrl
-import com.jet.article.ui.LocalColorScheme
 import com.jet.article.ui.LocalHtmlArticleData
 import com.jet.article.ui.LocalLinkHandler
 
@@ -24,28 +23,28 @@ import com.jet.article.ui.LocalLinkHandler
 /**
  * @author Miroslav Hýbler <br>
  * created on 12.12.2023
+ * @since 1.0.0
  */
 @Composable
 fun HtmlCode(
     modifier: Modifier = Modifier,
     code: HtmlElement.Code
 ) {
-    val colorScheme = LocalColorScheme.current
     val linkClickHandler = LocalLinkHandler.current
     val articleData = LocalHtmlArticleData.current
     val articleUrl = LocalBaseArticleUrl.current
-
+    val colorScheme = MaterialTheme.colorScheme
     Box(
         modifier = Modifier
             .padding(vertical = 4.dp)
             .fillMaxWidth()
             .background(
-                color = colorScheme.codeBackgroundColor,
+                color = MaterialTheme.colorScheme.surface,
                 shape = MaterialTheme.shapes.small
             )
             .border(
                 shape = MaterialTheme.shapes.small,
-                color = colorScheme.codeBorderColor,
+                color = MaterialTheme.colorScheme.outline,
                 width = 1.dp
             )
     ) {
@@ -54,7 +53,7 @@ fun HtmlCode(
                 code.content.toHtml()
                     .toSpannable()
                     .toAnnotatedString(
-                        primaryColor = colorScheme.linkColor,
+                        primaryColor = colorScheme.primary,
                         linkClickHandler = linkClickHandler,
                         data = articleData,
                         articleUrl = articleUrl,
@@ -63,7 +62,7 @@ fun HtmlCode(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 6.dp, vertical = 4.dp),
-            color = colorScheme.codeTextColor
+            color = MaterialTheme.colorScheme.onBackground,
         )
     }
 }

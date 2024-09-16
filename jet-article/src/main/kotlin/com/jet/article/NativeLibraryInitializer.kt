@@ -17,12 +17,8 @@ import com.jet.article.ui.JetHtmlArticle
  */
 public class NativeLibraryInitializer public constructor() : Initializer<Unit> {
 
-
     override fun create(context: Context) {
         System.loadLibrary("jet-article")
-        //   CoroutineScope(Dispatchers.Default).launch {
-        //    JetHtmlArticleParser.warmup(context = context)
-        //       }
     }
 
     override fun dependencies(): MutableList<Class<out Initializer<*>>> {

@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +27,6 @@ import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
 import com.jet.article.ui.LocalBaseArticleUrl
-import com.jet.article.ui.LocalColorScheme
 import com.jet.article.ui.LocalHtmlArticleData
 import com.jet.article.ui.LocalLinkHandler
 
@@ -43,11 +42,11 @@ fun HtmlQuoete(
     data: HtmlElement.Quote
 ) {
 
-    val colorScheme = LocalColorScheme.current
     val density = LocalDensity.current
     val linkClickHandler = LocalLinkHandler.current
     val articleData = LocalHtmlArticleData.current
     val articleUrl = LocalBaseArticleUrl.current
+    val colorScheme = MaterialTheme.colorScheme
     var dividerHeight by remember { mutableStateOf(0.dp) }
 
     Row(
@@ -56,12 +55,12 @@ fun HtmlQuoete(
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .height(height = dividerHeight)
                 .width(width = 5.dp)
                 .clip(shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp)),
-            color = colorScheme.quoteBarColor,
+            color = MaterialTheme.colorScheme.tertiary,
             thickness = 5.dp,
         )
 
@@ -72,10 +71,10 @@ fun HtmlQuoete(
                 data.text.toHtml()
                     .toSpannable()
                     .toAnnotatedString(
-                        primaryColor = colorScheme.quoteTextColor,
+                        primaryColor = colorScheme.primary,
                         linkClickHandler = linkClickHandler,
                         data = articleData,
-                        articleUrl=articleUrl,
+                        articleUrl = articleUrl,
                     )
             },
             style = MaterialTheme.typography.bodyMedium,

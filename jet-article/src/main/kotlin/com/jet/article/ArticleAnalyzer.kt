@@ -34,17 +34,8 @@ public object ArticleAnalyzer {
     public val analyzerFlow: StateFlow<ContentTag?> = mAnalyzerFlow.asStateFlow()
 
 
-    private val safeCoroutineContext: CoroutineContext
-        get() = ArticleParser.safeCoroutineContext
-
-    /**
-     * @since 1.0.0
-     */
-    suspend fun setInput(
-        content: String
-    ): Unit = withContext(context = safeCoroutineContext) {
-        AnalyzerNative.setInput(input = content)
-    }
+    private val safeCoroutineContext: CoroutineContext =
+        ArticleParser.safeCoroutineContext
 
 
     suspend fun process(
@@ -65,9 +56,7 @@ public object ArticleAnalyzer {
     }
 
 
-    suspend fun moveNext(): Boolean = withContext(
-        context = safeCoroutineContext
-    ) {
+    private suspend fun moveNext(): Boolean = withContext(context = safeCoroutineContext) {
         if (!AnalyzerNative.hasNextStep()) {
             Log.w(
                 "ArticleAnalyzer",
@@ -149,7 +138,7 @@ public object ArticleAnalyzer {
     /**
      * @since 1.0.0
      */
-    suspend fun jumpToBody() {
+    suspend fun jumpToBody() = withContext(context = safeCoroutineContext) {
         while (
             AnalyzerNative.getCurrentTag() != "body"
             && !AnalyzerNative.isAbortingWithError()

@@ -23,25 +23,17 @@ public:
     std::string currentPairTagContent;
 
 private:
-    size_t actualInputStart = 0;
-    size_t actualInputEnd = 0;
     std::vector<std::string> currentTagAttributeKeys;
     std::map<std::string, std::string> currentTagAttributes;
 
-
-    bool mHasBodyContext;
-    bool mWasHtmlTagFound;
-    size_t length;
-    bool hasContentToProcess;
-    bool wasHeadParsed;
+    bool mHasBodyContext{};
+    bool wasHeadParsed{};
     size_t currentTagStartIndex = 0;
     size_t currentTagEndIndex = 0;
     std::vector<std::string_view> tempOutputVector;
     std::vector<std::vector<std::string_view>> tableHolder;
     ErrorCode error;
     std::string errorMessage;
-    size_t temporaryOutIndex = 0;
-
 
 public:
     ContentAnalyzer();
@@ -50,7 +42,7 @@ public:
     ~ContentAnalyzer();
 
 
-    void setInput(std::string input) override;
+    void setInput(std::string &input) override;
 
 
     void doNextStep() override;
@@ -62,7 +54,7 @@ public:
     );
 
 
-    int getCurrentAttributesSize();
+    size_t getCurrentAttributesSize();
 
 
     [[nodiscard]] size_t getCurrentTagStartIndex() const;
@@ -77,7 +69,13 @@ public:
     void clearAllResources() override;
 
 
-    void abortWithError(ErrorCode cause, std::string message = "") override;
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "google-default-arguments"
+    void abortWithError(
+            ErrorCode cause,
+            std::string message = ""
+    ) override;
+#pragma clang diagnostic pop
 };
 
 

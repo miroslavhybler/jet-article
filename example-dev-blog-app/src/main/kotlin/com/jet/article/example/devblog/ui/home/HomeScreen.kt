@@ -97,7 +97,6 @@ fun MainScreenContent(
     val postListState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val selectedPost = remember(key1 = postData) {
-        Log.d("mirek", "$postData")
         postData?.getOrNull()
     }
 

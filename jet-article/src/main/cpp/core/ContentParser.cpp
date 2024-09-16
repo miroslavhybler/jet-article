@@ -34,7 +34,7 @@ void ContentParser::initialize(
 #pragma clang diagnostic pop
 
 
-void ContentParser::setInput(std::string content) {
+void ContentParser::setInput(std::string &content) {
     clearAllResources();
     this->input = content;
     length = content.length();

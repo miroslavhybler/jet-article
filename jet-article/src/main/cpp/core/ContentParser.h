@@ -64,7 +64,7 @@ public:
      * @param input
      * @since 1.0.0
      */
-    void setInput(std::string input) override;
+    void setInput(std::string &input) override;
 
 
     /**

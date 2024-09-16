@@ -13,7 +13,7 @@
 
 class AbstractParserComponent {
 
-    //TODO make protected
+    //TODO make protected and getters
 public:
     std::string currentTag;
     std::string currentTagBody;
@@ -45,7 +45,7 @@ protected:
 
 public:
 
-    virtual void setInput(std::string input) = 0;
+    virtual void setInput(std::string &input) = 0;
 
 
     virtual void doNextStep() = 0;
@@ -54,7 +54,7 @@ public:
     virtual void clearAllResources() = 0;
 
 
-    bool isAbortingWithError() const {
+    [[nodiscard]] bool isAbortingWithError() const {
         return isAbortingWithException;
     }
 

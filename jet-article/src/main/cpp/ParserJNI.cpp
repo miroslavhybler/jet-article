@@ -41,7 +41,7 @@ Java_com_jet_article_ParserNative_initialize(
             areImagesEnabled,
             isSimpleTextFormatAllowed,
             isQueringTextOutsideTextTags
-            );
+    );
     utils::setIsLoggingEnabled(isLoggingEnabled);
 }
 
@@ -53,7 +53,8 @@ Java_com_jet_article_ParserNative_setInput(
         jstring content
 ) {
     jboolean isCopy;
-    jni::contentParser->setInput(environment->GetStringUTFChars(content, &isCopy));
+    std::string input = environment->GetStringUTFChars(content, &isCopy);
+    jni::contentParser->setInput(input);
 }
 
 
@@ -253,7 +254,8 @@ Java_com_jet_article_ParserNative_warmup(
         JNIEnv *environment, jobject caller, jstring content
 ) {
     jboolean isCopy;
-    jni::contentParser->setInput(environment->GetStringUTFChars(content, &isCopy));
+    std::string input = environment->GetStringUTFChars(content, &isCopy);
+    jni::contentParser->setInput(input);
 
     while (jni::contentParser->hasNextStep()) {
         jni::contentParser->doNextStep();
