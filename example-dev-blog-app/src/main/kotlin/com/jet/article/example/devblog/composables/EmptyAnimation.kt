@@ -8,15 +8,24 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -25,9 +34,14 @@ import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.jet.article.example.devblog.R
 import com.jet.article.example.devblog.ui.DevBlogAppTheme
+import com.jet.utils.dpToPx
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -36,6 +50,42 @@ import kotlin.math.sin
  * @author Miroslav Hýbler <br>
  * created on 19.08.2024
  */
+
+@Composable
+fun Android(
+    modifier: Modifier = Modifier
+) {
+    val density = LocalDensity.current
+    Box(
+        modifier = modifier
+            .wrapContentSize()
+            .clipToBounds()
+            .padding(horizontal = 32.dp)
+    ) {
+        Icon(
+            modifier = Modifier
+                .wrapContentSize()
+                .scale(scale = 1.3f),
+            painter = painterResource(id = R.drawable.android_robot),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+        )
+        Icon(
+            modifier = Modifier
+                .align(alignment = Alignment.BottomEnd)
+                .scale(scale = 1.5f)
+                .graphicsLayer(
+                    rotationZ = 75f,
+                    translationX = density.dpToPx(dp = 16.dp),
+                    translationY = density.dpToPx(dp = 2.dp)
+                ),
+            painter = painterResource(id = R.drawable.ic_wrench),
+            tint = MaterialTheme.colorScheme.secondary,
+            contentDescription = null,
+        )
+    }
+}
+
 @Composable
 fun EmptyAnimation(
     modifier: Modifier = Modifier,
@@ -85,7 +135,11 @@ fun EmptyAnimation(
     Canvas(
         modifier = modifier
             .fillMaxWidth()
-            .height(height = 128.dp)
+            .sizeIn(
+                minWidth = 256.dp,
+                maxWidth = 700.dp,
+                minHeight = 128.dp,
+            )
             .background(color = MaterialTheme.colorScheme.background)
     ) {
         if (wheel2Center == Offset.Zero) {
@@ -231,6 +285,12 @@ private fun DrawScope.drawSprocketWheel(
 @PreviewLightDark
 private fun DevelopmentAnimationPreview() {
     DevBlogAppTheme {
-        EmptyAnimation()
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            EmptyAnimation()
+
+            Android()
+        }
     }
 }

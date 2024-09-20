@@ -58,7 +58,6 @@ import androidx.palette.graphics.Palette
 import com.jet.article.data.HtmlArticleData
 import com.jet.article.example.devblog.R
 import com.jet.article.example.devblog.composables.CustomHtmlImage
-import com.jet.article.example.devblog.composables.CustomHtmlImageWithPalette
 import com.jet.article.example.devblog.composables.ErrorLayout
 import com.jet.article.example.devblog.composables.PostTopBar
 import com.jet.article.example.devblog.data.AdjustedPostData
@@ -91,6 +90,7 @@ fun PostPane(
     val post = remember(key1 = data) {
         data?.getOrNull()
     }
+    var lastUrl: String? by remember { mutableStateOf(value = null) }
 
     val colorEvaluator = remember { ArgbEvaluator() }
     val coroutineScope = rememberCoroutineScope()
@@ -108,7 +108,6 @@ fun PostPane(
                 .plus(other = density.pxToDp(px = statusBarPadding))
         )
     }
-    var palette: Palette? by remember { mutableStateOf(value = null) }
     var titleStartColor by remember { mutableStateOf(value = colorScheme.background) }
     val titleEndColor = colorScheme.onBackground
     val titleColor = remember { Animatable(initialValue = colorScheme.onBackground) }
@@ -152,6 +151,14 @@ fun PostPane(
 
                 }
             }
+        }
+    }
+
+
+    LaunchedEffect(key1 = data) {
+        if (data != null && data.isSuccess && data.getOrNull()?.postData?.url != lastUrl) {
+            listState.scrollToItem(index = 0, scrollOffset = 0)
+            lastUrl = data.getOrNull()?.postData?.url
         }
     }
 
@@ -245,21 +252,12 @@ fun PostPane(
                         }
                     )
 
-                    CustomHtmlImageWithPalette(
+                    CustomHtmlImage(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(height = headerImageHeight)
                             .animateContentSize(),
                         image = post.headerImage,
-                        onPallete = { newPallete ->
-                            palette = newPallete
-                            coroutineScope.launch {
-                                newPallete.darkMutedSwatch?.rgb?.let {
-                                    titleStartColor = Color(color = it)
-                                    //  titleColor.animateTo(targetValue = Color(color = it))
-                                }
-                            }
-                        }
                     )
                 }
             }
@@ -272,7 +270,7 @@ fun PostPane(
                 || mainState.role == ListDetailPaneScaffoldRole.Extra
             ) {
                 FloatingActionButton(
-                    onClick = onOpenContests
+                    onClick = onOpenContests,
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_content),

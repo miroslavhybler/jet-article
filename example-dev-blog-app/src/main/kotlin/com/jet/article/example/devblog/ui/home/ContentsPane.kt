@@ -57,7 +57,11 @@ fun ContentsPane(
                             .clickable(onClick = { onSelected(item.originalIndex, item.title) })
                             .horizontalPadding()
                             .padding(vertical = 16.dp),
-                        text = "${index + 1}. - ${ArticleParser.Utils.clearTagsFromText(item.title.text)}",
+                        text = "${index + 1}. - ${
+                            ArticleParser.Utils.clearTagsAndReplaceEntitiesFromText(
+                                input = item.title.text
+                            )
+                        }",
                         style = MaterialTheme.typography.titleMedium,
                     )
                 }

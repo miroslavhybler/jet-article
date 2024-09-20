@@ -3,6 +3,7 @@
 package com.jet.article.data
 
 import androidx.annotation.Keep
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.unit.IntSize
 
 /**
@@ -10,7 +11,9 @@ import androidx.compose.ui.unit.IntSize
  * @author Miroslav Hýbler <br>
  * created on 30.06.2023
  */
+//TODO add something to serve as key for JetHtmlArticle lazy column
 @Keep
+@Immutable
 sealed class HtmlElement private constructor(
     open val id: String?
 ) {
@@ -34,6 +37,7 @@ sealed class HtmlElement private constructor(
      * [com.jet.article.ArticleParser.isSimpleTextFormatAllowed] is set to true by [com.jet.article.ArticleParser.initialize].
      * @since 1.0.0
      */
+    //TODO add formatted, move annotated string build into ArticleParser
     @Keep
     public data class TextBlock public constructor(
         val text: String,

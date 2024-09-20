@@ -52,8 +52,7 @@ abstract class LocalDatabase constructor() : RoomDatabase() {
 
     @Dao
     interface PostDao : BaseDao<PostItem> {
-
-        @Query("SELECT * FROM posts ORDER BY datetime(date)")
+        @Query("SELECT * FROM posts")
         fun getAll(): List<PostItem>
 
 
@@ -80,16 +79,16 @@ abstract class LocalDatabase constructor() : RoomDatabase() {
 
         @TypeConverter
         fun simpleDateToString(input: SimpleDate): String {
-            return "${input.dayOfMonth} ${input.month.value} ${input.year}"
+            return "${input.year}-${input.month.value}-${input.dayOfMonth}"
         }
 
 
         @TypeConverter
         fun stringToSimpleDate(input: String): SimpleDate {
-            val array = input.split(' ')
-            val day = array[0].toInt()
+            val array = input.split('-')
+            val year = array[0].toInt()
             val monthNumber = array[1].toInt()
-            val year = array[2].toInt()
+            val day = array[2].toInt()
             val month = Month.entries.first { it.value == monthNumber }
             return SimpleDate(year = year, month = month, dayOfMonth = day)
         }

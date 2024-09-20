@@ -315,7 +315,6 @@ public object ArticleParser {
      * Holds util functions which can be used independentely from [ArticleParser]
      * @since 1.0.0
      */
-    //TODO add function to clear/replace entities
     object Utils {
 
 
@@ -326,6 +325,16 @@ public object ArticleParser {
          */
         fun clearTagsFromText(input: String): String {
             return UtilsNative.clearTagsFromText(input = input)
+        }
+
+
+        /**
+         * @param input
+         * @return
+         * @since 1.0.0
+         */
+        fun clearTagsAndReplaceEntitiesFromText(input: String): String {
+            return UtilsNative.clearTagsAndReplaceEntitiesFromText(input= input)
         }
     }
 }

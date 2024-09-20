@@ -62,7 +62,6 @@ import mir.oslav.jet.annotations.JetExperimental
  * @param header
  * @param footer
  * @param linkClickCallback
- * @param colors
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
  * created on 25.08.2023
@@ -111,11 +110,11 @@ public fun JetHtmlArticleContent(
     data: HtmlArticleData,
     listState: LazyListState = rememberLazyListState(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    text: @Composable (HtmlElement.TextBlock) -> Unit = { HtmlTextBlock(text = it) },
     image: @Composable (HtmlElement.Image) -> Unit = { HtmlImage(data = it) },
     quote: @Composable (HtmlElement.Quote) -> Unit = { HtmlQuoete(data = it) },
     table: @Composable (HtmlElement.Table) -> Unit = { HtmlTable(data = it) },
     address: @Composable (HtmlElement.Address) -> Unit = { HtmlAddress(address = it) },
-    text: @Composable (HtmlElement.TextBlock) -> Unit = { HtmlTextBlock(text = it) },
     title: @Composable (HtmlElement.Title) -> Unit = { HtmlTitle(title = it) },
     code: @Composable (HtmlElement.Code) -> Unit = { HtmlCode(code = it) },
     basicList: @Composable (HtmlElement.BasicList) -> Unit = { HtmlBasicList(list = it) },

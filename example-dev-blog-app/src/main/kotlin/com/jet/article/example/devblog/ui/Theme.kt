@@ -75,12 +75,12 @@ private val DarkColorScheme = darkColorScheme(
     onError = Color(color = 0xFFFFFFFF),
     errorContainer = Color(color = 0xFF420000),
     onErrorContainer = Color(0xFFFFFFFF),
-    background = Color.Black,
-    onBackground = Color.White,
-    surface = Color.Black,
+    background = Color(color = 0xFF181818),
+    onBackground = Color(color = 0xFFEFEFEF),
+    surface = Color(color = 0xFF181818),
     onSurface = Color.White,
-    surfaceVariant = Color(color = 0xFF49454F),
-    onSurfaceVariant = Color(color = 0xFFCAC4D0),
+    surfaceVariant = Color.Black,
+    onSurfaceVariant = Color(color = 0xFF181818),
     outline = Color(color = 0xFF938F99),
 )
 
@@ -189,6 +189,9 @@ val LocalDimensions: ProvidableCompositionLocal<Dimensions> = compositionLocalOf
 data object Routes {
     const val main: String = "main"
     const val settings: String = "settings"
+    const val aboutLibs: String = "settings/about-libs"
+    const val channelLog: String = "settings/channel-log"
+    const val about: String = "settings/about"
 }
 
 

@@ -114,40 +114,8 @@ void ContentAnalyzer::doNextStep() {
         }
 
         index.moveIndex(tei + 1);
-//        bool isCurrentTagPair = utils::isTagPairTag(currentTagBody);
-//        if (isCurrentTagPair) {
-//            //TODO probably when comes to <div> it skipps to </div> instead goint intside
-//            try {
-//                int s = tei + 1;
-//                int ctsi = utils::findClosingTag(input, currentTag, tei);
-//                currentPairTagContent = input.substr(tei + 1, ctsi - tei - 1);
-//
-//                int next;
-//                try {
-//                    next = utils::indexOfOrThrow(input, ">", ctsi);
-//                    index.moveIndex(next + 1);
-//                } catch (ErrorCode e) {
-//                    abortWithError(e);
-//                    return;
-//                }
-//            } catch (ErrorCode code) {
-//                std::string message =
-//                        "Problematic area within " + std::to_string(tei)
-//                        + " .. " + std::to_string(length) + "\n"
-//                        + "tei: " + input.substr(tei, 1) + "\n"
-//                        + "Near substring:\n\n" +
-//                        input.substr(tei - tagBodyLength, 40)
-//                        + "\n";
-//
-//                abortWithError(code, message);
-//                return;
-//            }
-//
-//        } else {
-//            index.moveIndex(tei + 1);
-//        }
 
-        //TODO split supported and unsupported tags
+        //TODO maybe skip unsupported tags?
 
         return;
     }

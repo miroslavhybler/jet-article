@@ -22,6 +22,9 @@ import com.jet.article.example.devblog.data.SettingsStorage
 import com.jet.article.example.devblog.isAppDark
 import com.jet.article.example.devblog.rememberSystemBarsStyle
 import com.jet.article.example.devblog.ui.home.MainScreen
+import com.jet.article.example.devblog.ui.settings.AboutLibsScreen
+import com.jet.article.example.devblog.ui.settings.AboutScreen
+import com.jet.article.example.devblog.ui.settings.ChangelogScreen
 import com.jet.article.example.devblog.ui.settings.SettingsScreen
 import dagger.hilt.android.AndroidEntryPoint
 import mir.oslav.jet.annotations.JetExperimental
@@ -83,6 +86,34 @@ class MainActivity : ComponentActivity() {
                             SettingsScreen(
                                 navHostController = navHostController,
                                 viewModel = hiltViewModel(),
+                            )
+                        }
+
+                        composable(
+                            route = Routes.aboutLibs,
+                            enterTransition = { fadeIn() },
+                            exitTransition = { fadeOut() },
+                        ) {
+                            AboutLibsScreen(
+                                navHostController = navHostController,
+                            )
+                        }
+                        composable(
+                            route = Routes.channelLog,
+                            enterTransition = { fadeIn() },
+                            exitTransition = { fadeOut() },
+                        ) {
+                            ChangelogScreen(
+                                navHostController = navHostController,
+                            )
+                        }
+                        composable(
+                            route = Routes.about,
+                            enterTransition = { fadeIn() },
+                            exitTransition = { fadeOut() },
+                        ) {
+                            AboutScreen(
+                                navHostController = navHostController,
                             )
                         }
                     }

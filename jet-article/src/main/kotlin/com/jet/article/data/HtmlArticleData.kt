@@ -2,6 +2,9 @@
 
 package com.jet.article.data
 
+import androidx.annotation.Keep
+import androidx.compose.runtime.Immutable
+
 
 /**
  * @param url Original full url of the article
@@ -11,6 +14,8 @@ package com.jet.article.data
  * @author Miroslav Hýbler <br>
  * created on 15.07.2023
  */
+@Keep
+@Immutable
 public data class HtmlArticleData public constructor(
     val url: String,
     val elements: List<HtmlElement> = emptyList(),

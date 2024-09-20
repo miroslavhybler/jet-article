@@ -237,6 +237,18 @@ namespace utils {
      * @param output
      * @since 1.0.0
      */
+    void clearTagsAndEntitiesFromText(
+            const std::string_view &input,
+            std::string &output
+    );
+
+
+    /**
+     *
+     * @param input
+     * @param output
+     * @since 1.0.0
+     */
     void clearTagsFromText(
             const std::string_view &input,
             std::string &output

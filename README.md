@@ -21,9 +21,10 @@ showing html content within application.
 
 
 Main goals are:
-* Better UX - Showing elements using Material3 design, support of DarkMode
+* Better UX - Showing elements using Material3 design, support of dark mode, no annoying cookies bar or other interactive elements interupting user
 * Speed - since all scripts, cookies are exluded it could work much faster than webview
-* No annoying cookies bar
+* User Privacy - since all scripts are disabled, there are no statictics or t
+
 
 [//]: # (This is still under development, no relases yet)
 [//]: # (### Import)
@@ -81,3 +82,33 @@ JetHtmlArticle(
     contentPadding = paddingValues
 )
 ```
+
+#### Customize UI
+To customize UI use `JetHtmlArticleContent` where you can pass custom composables for items. Composable
+lambdas are providing `HtmlElement` attribute
+e.g.
+```kotlin
+JetHtmlArticleContent(
+    data = post.postData,
+    text = { text ->
+        CustomHtmlText(
+            modifier = Modifier.animateContentSize(),
+            image = image,
+        )
+    }
+    image = { image ->
+        CustomHtmlImage(
+            modifier = Modifier.animateContentSize(),
+            image = image,
+        )
+    }
+)
+```
+
+### Quick showcases for usage (TODO)
+
+#### Links Handling
+
+#### Filtering content
+
+#### Support various types of images

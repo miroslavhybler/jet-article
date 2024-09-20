@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.jet.article.example.devblog.horizontalPadding
 import com.jet.article.example.devblog.ui.LocalDimensions
 
 /**
@@ -29,10 +30,8 @@ fun SettingsSwitch(
     Row(
         modifier = modifier
             .clickable(onClick = { onCheckedChange(!isChecked) })
-            .padding(
-                horizontal = dimensions.sidePadding,
-                vertical = 12.dp
-            ),
+            .horizontalPadding()
+            .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
 

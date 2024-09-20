@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.jet.article
 
 
@@ -15,4 +17,9 @@ internal object UtilsNative {
      */
     external fun clearTagsFromText(input: String): String
 
+
+    /**
+     * @since 1.0.0
+     */
+    external fun clearTagsAndReplaceEntitiesFromText(input: String): String
 }

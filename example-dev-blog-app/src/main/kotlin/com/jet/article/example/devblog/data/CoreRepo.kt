@@ -81,18 +81,19 @@ class CoreRepo @Inject constructor(
             val result = loadPostsFromRemote()
             when {
                 result.isSuccess -> {
-                    mPosts.value = Result.success(value = databaseRepo.postDao.getAll())
+                    loadPostsFromLocal()
                 }
 
                 result.isFailure -> {
-                    mPosts.value = Result.failure(exception = result.exceptionOrNull()!!)
+                    mPosts.value = Result.failure(
+                        exception = result.exceptionOrNull() ?: UnknownError()
+                    )
                 }
             }
 
-
             return@withContext
         }
-        mPosts.value = Result.success(value = databaseRepo.postDao.getAll())
+        loadPostsFromLocal()
     }
 
 
@@ -192,12 +193,18 @@ class CoreRepo @Inject constructor(
                 }
             }
         )
-
         val finalData = data.getPostList(links = links)
         mHasErrorFromRemote.value = finalData.isFailure
         return@withContext finalData
     }
 
+
+    private suspend fun loadPostsFromLocal() {
+        mPosts.value = Result.success(
+            value = databaseRepo.postDao.getAll()
+                .sortedByDescending { it.date }
+        )
+    }
 
     private suspend fun loadHtmlFromUrl(
         url: String,

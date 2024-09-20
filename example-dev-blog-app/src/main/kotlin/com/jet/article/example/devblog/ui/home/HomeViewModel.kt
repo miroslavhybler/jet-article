@@ -32,7 +32,10 @@ class HomeViewModel @Inject constructor(
     val postData: StateFlow<Result<AdjustedPostData>?> = mPostData.asStateFlow()
 
 
-    fun loadPost(url: String, isRefresh: Boolean = false) {
+    fun loadPost(
+        url: String,
+        isRefresh: Boolean = false,
+    ) {
         viewModelScope.launch {
             mPostData.value = coreRepo.loadPostDetail(url = url, isRefresh = isRefresh)
         }

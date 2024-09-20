@@ -39,7 +39,7 @@ protected:
     ErrorCode error;
     std::string errorMessage;
 
-    //TODO maybe private
+    //TODO protected
     size_t temporaryOutIndex = 0;
 
 

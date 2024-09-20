@@ -2,11 +2,14 @@
 
 package com.jet.article.data
 
+import androidx.annotation.Keep
+
 
 /**
  * @author Miroslav Hýbler <br>
  * created on 13.02.2024
  */
+@Keep
 public sealed class TagInfo private constructor(
     open val tag: String,
     open val tagAttributes: Map<String, String> = emptyMap(),
@@ -19,7 +22,7 @@ public sealed class TagInfo private constructor(
 
     abstract val isPairTag: Boolean
 
-
+    @Keep
     data class Single constructor(
         override val tag: String,
         override val tagAttributes: Map<String, String> = emptyMap(),
@@ -41,7 +44,7 @@ public sealed class TagInfo private constructor(
     }
 
 
-
+    @Keep
     data class Pair constructor(
         override val tag: String,
         override val tagAttributes: Map<String, String> = emptyMap(),

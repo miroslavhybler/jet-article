@@ -59,12 +59,14 @@ fun MainScreen(
     val navigator = rememberListDetailPaneScaffoldNavigator<Nothing>(
         scaffoldDirective = calculatePaneScaffoldDirective(currentWindowAdaptiveInfo()),
     )
+
+    //TODO fix back navigation
     BackHandler(
         enabled = state.role != ListDetailPaneScaffoldRole.List
     ) {
         state.onNavigateBack()
-        navigator.navigateBack(backNavigationBehavior = BackNavigationBehavior.PopLatest)
-        //   navigator.navigateTo(pane = state.role)
+        navigator.navigateTo(pane = state.role)
+
 
         if (state.role == ListDetailPaneScaffoldRole.List) {
             viewModel.onBack()
@@ -117,9 +119,12 @@ fun MainScreenContent(
                     AnimatedPane {
                         HomeListPane(
                             onOpenPost = { index, item ->
-                                state.openPost(url = item.url, index = index)
-                                onLoad(item.url)
-                                navigator.navigateTo(pane = ListDetailPaneScaffoldRole.Detail)
+                           //     coroutineScope.launch {
+                                    state.openPost(url = item.url, index = index)
+                                    onLoad(item.url)
+                         //           delay(timeMillis = 200)
+                                    navigator.navigateTo(pane = ListDetailPaneScaffoldRole.Detail)
+                       //         }
                             },
                             viewModel = hiltViewModel(),
                             navHostController = navHostController,
@@ -144,6 +149,7 @@ fun MainScreenContent(
                                     listState = postListState,
                                 )
                             }
+
                             state.isEmptyPaneVisible -> {
                                 PostEmptyPane()
                             }

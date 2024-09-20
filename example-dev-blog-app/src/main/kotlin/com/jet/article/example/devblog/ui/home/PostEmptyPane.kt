@@ -18,9 +18,11 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.jet.article.example.devblog.R
+import com.jet.article.example.devblog.composables.Android
 import com.jet.article.example.devblog.composables.EmptyAnimation
 import com.jet.article.example.devblog.ui.DevBlogAppTheme
 import com.jet.utils.dpToPx
@@ -42,37 +44,10 @@ fun PostEmptyPane() {
 
         EmptyAnimation(modifier = Modifier)
 
+        Android()
 
-        Box(
-            modifier = Modifier
-                .wrapContentSize()
-                .clipToBounds()
-                .padding(horizontal = 32.dp)
-        ) {
-            Icon(
-                modifier = Modifier
-                    .wrapContentSize()
-                    .scale(scale = 1.3f),
-                painter = painterResource(id = R.drawable.android_robot),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-            )
-            Icon(
-                modifier = Modifier
-                    .align(alignment = Alignment.BottomEnd)
-                    .scale(scale = 1.5f)
-                    .graphicsLayer(
-                        rotationZ = 75f,
-                        translationX = density.dpToPx(dp = 16.dp),
-                        translationY = density.dpToPx(dp = 2.dp)
-                    ),
-                painter = painterResource(id = R.drawable.ic_wrench),
-                tint = MaterialTheme.colorScheme.secondary,
-                contentDescription = null,
-            )
-        }
         Text(
-            text = "Android developers blog",
+            text = stringResource(id = R.string.app_name),
             style = MaterialTheme.typography.headlineMedium,
             maxLines = 1,
         )

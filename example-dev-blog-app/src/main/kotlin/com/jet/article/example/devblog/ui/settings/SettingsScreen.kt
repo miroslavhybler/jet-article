@@ -6,12 +6,17 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -45,6 +51,7 @@ import com.jet.article.example.devblog.data.SettingsStorage
 import com.jet.article.example.devblog.horizontalPadding
 import com.jet.article.example.devblog.ui.DevBlogAppTheme
 import com.jet.article.example.devblog.ui.LocalDimensions
+import com.jet.article.example.devblog.ui.Routes
 import com.jet.utils.plus
 import kotlinx.coroutines.launch
 
@@ -111,7 +118,7 @@ private fun SettingsScreenContent(
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     SettingsSwitch(
-                        modifier = Modifier.horizontalPadding(),
+                        modifier = Modifier,
                         title = stringResource(R.string.settings_dynamic_colors_label),
                         isChecked = settings.isUsingDynamicColors,
                         onCheckedChange = {
@@ -121,7 +128,7 @@ private fun SettingsScreenContent(
                 }
 
                 SettingsDropdown(
-                    modifier = Modifier.horizontalPadding(),
+                    modifier = Modifier,
                     title = stringResource(R.string.settings_dark_mode_label),
                     items = darkModeOptions,
                     transform = {
@@ -138,11 +145,27 @@ private fun SettingsScreenContent(
 
                 Spacer(modifier = Modifier.weight(weight = 1f))
 
+                SettingsRow(
+                    title = stringResource(R.string.settings_changelog_title),
+                    onClick = { navHostController.navigate(route = Routes.channelLog) },
+                    icon = null,
+                )
+                SettingsRow(
+                    title = stringResource(R.string.settings_about_title),
+                    onClick = { navHostController.navigate(route = Routes.about) },
+                    icon = null,
+                )
+                SettingsRow(
+                    title = stringResource(R.string.settings_about_libs_title),
+                    onClick = { navHostController.navigate(route = Routes.aboutLibs) },
+                    icon = null,
+                )
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .horizontalPadding(),
-                    verticalAlignment = Alignment.CenterVertically,
+                    verticalAlignment = Alignment.Bottom,
                 ) {
                     Text(
                         text = stringResource(R.string.settings_version),
@@ -157,41 +180,56 @@ private fun SettingsScreenContent(
                         style = MaterialTheme.typography.labelSmall,
                     )
                 }
-
-
-                Row(
-                    modifier = Modifier
-                        .align(alignment = Alignment.CenterHorizontally)
-                        .horizontalPadding()
-                        .wrapContentSize()
-                        .clip(shape = CircleShape)
-                        .clickable(
-                            onClick = {
-                                context.startActivity(
-                                    Intent(Intent.ACTION_VIEW)
-                                        .setData("https://github.com/miroslavhybler/jet-article".toUri())
-                                )
-                            }
-                        )
-                        .padding(horizontal = 24.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(space = 12.dp)
-                ) {
-
-                    Icon(
-                        modifier = Modifier.size(size = 16.dp),
-                        painter = painterResource(id = R.drawable.ic_logo_github),
-                        contentDescription = null,
-                    )
-
-                    Text(
-                        modifier = Modifier,
-                        text = stringResource(R.string.settings_github),
-                    )
-                }
             }
+        },
+        bottomBar = {
+            GithubBottomBar()
         }
     )
+}
+
+@Composable
+fun GithubBottomBar() {
+    val dimensions = LocalDimensions.current
+    val context = LocalContext.current
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+    ) {
+        Row(
+            modifier = Modifier
+                .align(alignment = Alignment.Center)
+                .horizontalPadding()
+                .padding(bottom = dimensions.bottomLinePadding)
+                .wrapContentSize()
+                .clip(shape = CircleShape)
+                .offset()
+                .clickable(
+                    onClick = {
+                        context.startActivity(
+                            Intent(Intent.ACTION_VIEW)
+                                .setData("https://github.com/miroslavhybler/jet-article".toUri())
+                        )
+                    }
+                )
+                .padding(horizontal = 24.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(space = 12.dp)
+        ) {
+
+            Icon(
+                modifier = Modifier.size(size = 16.dp),
+                painter = painterResource(id = R.drawable.ic_logo_github),
+                contentDescription = null,
+            )
+
+            Text(
+                modifier = Modifier,
+                text = stringResource(R.string.settings_github),
+            )
+        }
+    }
 }
 
 

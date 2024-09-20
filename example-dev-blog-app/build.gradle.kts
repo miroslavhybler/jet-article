@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.google.devtools.ksp)
     alias(libs.plugins.google.dagger.hilt)
+    id("com.mikepenz.aboutlibraries.plugin")
 }
 
 android {
@@ -33,6 +34,12 @@ android {
                 "proguard-rules.pro"
             )
         }
+        create("benchmark") {
+            initWith(buildTypes.getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -58,6 +65,8 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.ui.tooling.preview)
+
 
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
@@ -70,7 +79,8 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
 
     implementation(libs.android.joda)
-
+    implementation(libs.aboutlibraries.compose)
+    implementation(libs.coil.gif)
 
     /** Adaptive UI */
     implementation(libs.androidx.adaptive)
@@ -84,6 +94,7 @@ dependencies {
     implementation(libs.androidx.datastore.core.android)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.storage)
+    debugImplementation(libs.ui.tooling)
     ksp(libs.androidx.room.compiler)
 
     /** KTOR */
@@ -95,7 +106,7 @@ dependencies {
     implementation(libs.google.dagger.hilt)
     implementation(libs.androidx.hilt.common)
     ksp(libs.google.dagger.hilt.compiler)
-    ksp (libs.androidx.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.hilt.work)
 }

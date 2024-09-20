@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,7 +56,7 @@ fun HtmlQuoete(
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
-        HorizontalDivider(
+        VerticalDivider(
             modifier = Modifier
                 .height(height = dividerHeight)
                 .width(width = 5.dp)

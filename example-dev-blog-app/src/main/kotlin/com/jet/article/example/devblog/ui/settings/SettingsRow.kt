@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.jet.article.example.devblog.horizontalPadding
 import com.jet.article.example.devblog.ui.LocalDimensions
 
 @Composable
@@ -51,16 +52,13 @@ fun SettingsRow(
     icon: (@Composable () -> Unit)? = null
 ) {
 
-    val dimensions = LocalDimensions.current
     Column(modifier = modifier) {
         Row(
             modifier = Modifier
                 .clickable(onClick = onClick)
-                .padding(
-                    horizontal = dimensions.sidePadding,
-                    vertical = 12.dp
-                ),
-            verticalAlignment = Alignment.CenterVertically
+                .horizontalPadding()
+                .padding(vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
 
             Column(

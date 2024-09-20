@@ -5,6 +5,9 @@ import java.io.FileInputStream
 import kotlin.collections.mutableListOf
 import java.util.Properties
 
+include(":benchmark")
+
+
 
 pluginManagement {
     repositories {
@@ -26,5 +29,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Jet Article"
 include(":jet-article")
+include(":app-catalog")
 include(":example-debug-app")
 include(":example-dev-blog-app")

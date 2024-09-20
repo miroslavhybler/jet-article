@@ -2,6 +2,7 @@
 
 package com.jet.article.ui.elements
 
+import android.util.Log
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -60,6 +61,7 @@ fun HtmlTextBlock(
     val data = LocalHtmlArticleData.current
     val colorScheme = MaterialTheme.colorScheme
 
+    //TODO format text before sending it to UI
     val formattedText = remember(
         key1 = text,
         key2 = ArticleParser.isSimpleTextFormatAllowed,
@@ -68,11 +70,12 @@ fun HtmlTextBlock(
             text.toHtml()
                 .toSpannable()
                 .toAnnotatedString(
-                    primaryColor =colorScheme.primary,
+                    primaryColor = colorScheme.primary,
                     linkClickHandler = linkClickHandler,
                     data = data,
                     articleUrl = articleUrl,
                 )
+
         } else {
             buildAnnotatedString {
                 append(text = text)

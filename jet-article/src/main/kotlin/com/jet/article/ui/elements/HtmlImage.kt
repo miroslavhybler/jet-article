@@ -29,8 +29,11 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import androidx.palette.graphics.Palette
+import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
+import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.imageLoader
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import coil.size.Size
@@ -51,13 +54,9 @@ fun HtmlImage(
     showErrorPlaceholder: Boolean = false,
     contentScale: ContentScale = ContentScale.FillWidth,
     shape: Shape = MaterialTheme.shapes.medium,
-    loading: @Composable BoxScope.() -> Unit = { HtmlImageDefaults.LoadingLayout(scope = this) },
-    error: @Composable BoxScope.() -> Unit = { HtmlImageDefaults.ErrorLayout(scope = this) },
-    diskCachePolicy: CachePolicy = CachePolicy.ENABLED,
-    allowHardware: Boolean = true,
-    onPainterReady: ((AsyncImagePainter) -> Unit)? = null,
-
-    ) {
+    loading: @Composable () -> Unit = { HtmlImageDefaults.LoadingLayout() },
+    error: @Composable () -> Unit = { HtmlImageDefaults.ErrorLayout() },
+) {
 
     HtmlImage(
         modifier = modifier,
@@ -68,9 +67,6 @@ fun HtmlImage(
         shape = shape,
         loading = loading,
         error = error,
-        diskCachePolicy = diskCachePolicy,
-        onPainterReady = onPainterReady,
-        allowHardware=allowHardware,
     )
 }
 
@@ -83,64 +79,27 @@ fun HtmlImage(
     showErrorPlaceholder: Boolean = false,
     contentScale: ContentScale = ContentScale.FillWidth,
     shape: Shape = MaterialTheme.shapes.medium,
-    loading: @Composable BoxScope.() -> Unit = { HtmlImageDefaults.LoadingLayout(scope = this) },
-    error: @Composable BoxScope.() -> Unit = { HtmlImageDefaults.ErrorLayout(scope = this) },
-    diskCachePolicy: CachePolicy = CachePolicy.ENABLED,
-    allowHardware: Boolean = true,
-    onPainterReady: ((AsyncImagePainter) -> Unit)? = null,
+    loading: @Composable () -> Unit = { HtmlImageDefaults.LoadingLayout() },
+    error: @Composable () -> Unit = { HtmlImageDefaults.ErrorLayout() },
 ) {
     val context = LocalContext.current
-
-    val painter = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(context = context)
-            .data(data = url)
-            .size(size = Size.ORIGINAL)
-            .diskCachePolicy(diskCachePolicy)
-            .allowHardware(allowHardware)
-            .diskCacheKey(key = if (diskCachePolicy == CachePolicy.ENABLED) url else null)
-            .build()
-    )
-
-
-    LaunchedEffect(
-        key1 = onPainterReady,
-        key2 = painter.state,
-    ) {
-        if (onPainterReady != null && painter.state is AsyncImagePainter.State.Success) {
-            onPainterReady(painter)
-        }
-    }
-
-    Box(
+    SubcomposeAsyncImage(
         modifier = Modifier
+            .htmlImage(size = defaultSize)
             .then(other = modifier)
-            .clip(shape = shape)
-    ) {
-        when (painter.state) {
-            is AsyncImagePainter.State.Success -> {
-                Image(
-                    painter = painter,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .htmlImage(size = defaultSize)
-                        .then(other = modifier),
-                    contentScale = contentScale,
-                )
-            }
+            .clip(shape = shape),
+        model = url,
+        contentDescription = null,
+        contentScale=contentScale,
 
-            is AsyncImagePainter.State.Loading -> {
-                loading(this)
+        imageLoader = context.imageLoader,
+        loading = { loading() },
+        error = {
+            if (showErrorPlaceholder) {
+                error()
             }
-
-            is AsyncImagePainter.State.Error -> {
-                if (showErrorPlaceholder) {
-                    error(this)
-                }
-            }
-
-            is AsyncImagePainter.State.Empty -> Unit
         }
-    }
+    )
 }
 
 
@@ -161,22 +120,21 @@ private fun Modifier.htmlImage(size: IntSize): Modifier {
 data object HtmlImageDefaults {
 
     @Composable
-    fun LoadingLayout(scope: BoxScope): Unit = with(scope) {
+    fun LoadingLayout() {
         CircularProgressIndicator(
             modifier = Modifier
                 .size(size = 24.dp)
-                .align(alignment = Alignment.Center)
         )
     }
 
     @Composable
-    fun ErrorLayout(scope: BoxScope): Unit = with(scope) {
+    fun ErrorLayout() {
         Icon(
             painter = painterResource(id = R.drawable.jet_article_broken_image),
             contentDescription = null,
             modifier = Modifier
-                .size(size = 32.dp)
-                .align(alignment = Alignment.Center),
+                .size(size = 32.dp),
+            // .align(alignment = Alignment.Center),
             tint = MaterialTheme.colorScheme.onErrorContainer,
         )
     }

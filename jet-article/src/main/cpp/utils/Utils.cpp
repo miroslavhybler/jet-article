@@ -20,6 +20,7 @@ namespace utils {
      * Temporary working integer, should be always used only within scope of one function.
      * @since 1.0.0
      */
+    //TODO size_t
     int tempWorkingInt;
 
     /**
@@ -78,9 +79,9 @@ namespace utils {
             const char &separator,
             std::vector<std::string_view> &outList
     ) {
-        int s = 0;
-        int i = 0;
-        int l = input.length();
+        size_t s = 0;
+        size_t i = 0;
+        size_t l = input.length();
 
         if (input.find(separator, 0) == std::string_view::npos) {
 
@@ -139,6 +140,9 @@ namespace utils {
     }
 
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "misc-throw-by-value-catch-by-reference"
+
     size_t indexOfOrThrow(
             const std::string_view &input,
             const std::string &sub,
@@ -158,6 +162,8 @@ namespace utils {
 
         return index;
     }
+
+#pragma clang diagnostic pop
 
 
     std::string getTagName(const std::string_view &tagBody) {
@@ -483,7 +489,7 @@ namespace utils {
         while (i < e) {
             char ch = input[i];
             if (ch != '<') {
-                output = output + ch;
+                output += ch;
                 i += 1;
                 continue;
             }
@@ -501,7 +507,7 @@ namespace utils {
             //TagType closing index, index of next '>'
             size_t tei = utils::indexOfOrThrow(input, ">", i);
             // -1 to remove '<' at the end
-            int tagBodyLength = tei - i - 1;
+            size_t tagBodyLength = tei - i - 1;
             //tagbody within <>, i + 1 to remove '<'
             std::string tagBody = input.substr(i + 1, tagBodyLength);
             std::string rawTagName = utils::getTagName(tagBody);
@@ -515,7 +521,7 @@ namespace utils {
                 //Unsuported tag found, probably script, has to be skipped
                 try {
                     std::string closingTag = "</" + rawTagName + ">";
-                    int ctsi = utils::indexOfOrThrow(input, closingTag, i);
+                    size_t ctsi = utils::indexOfOrThrow(input, closingTag, i);
                     i = ctsi + closingTag.length();
                 } catch (ErrorCode e) {
                     break;
@@ -552,7 +558,7 @@ namespace utils {
         while (i < e) {
             char ch = input[i];
             if (ch != '<') {
-                output = output + ch;
+                output += ch;
                 i += 1;
                 continue;
             }
@@ -594,7 +600,7 @@ namespace utils {
             } else {
                 try {
                     std::string closingTag = "</" + rawTagName + ">";
-                    int ctsi = utils::indexOfOrThrow(input, closingTag, i);
+                    size_t ctsi = utils::indexOfOrThrow(input, closingTag, i);
                     output += std::string(input, i, (ctsi + closingTag.length()) - i);
                     i = ctsi + closingTag.length();
                 } catch (ErrorCode e) {
@@ -603,6 +609,32 @@ namespace utils {
                 }
             }
 
+        }
+    }
+
+
+    //TODO handle entities, extract number from entity, number is decimal "byte" representation of char
+    //TODO see java.text.Html.withinStyle
+    void clearTagsAndEntitiesFromText(
+            const std::string_view &input,
+            std::string &output
+    ) {
+        if (input.empty()) {
+            return;
+        }
+
+        output.clear();
+        bool insideTag = false;
+        for (char c: input) {
+            if (c == '<') {
+                insideTag = true;
+            } else if (c == '>' && insideTag) {
+                insideTag = false;
+            } else if (c == '&') {
+
+            } else if (!insideTag) {
+                output += c;
+            }
         }
     }
 
@@ -626,7 +658,6 @@ namespace utils {
                 output += c;
             }
         }
-
     }
 
 
@@ -777,7 +808,7 @@ namespace utils {
         }
 
         std::string endCh = isSinglemark ? "\'" : "\"";
-        int e = utils::indexOfOrThrow(tagBody, endCh, s + separator.length());
+        size_t e = utils::indexOfOrThrow(tagBody, endCh, s + separator.length());
         std::string_view classes = tagBody.substr(
                 s + separator.length(),
                 e - (s + separator.length())

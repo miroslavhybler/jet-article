@@ -4,11 +4,17 @@ package com.jet.article.example.devblog
 
 import android.app.Application
 import android.app.NotificationManager
+import android.os.Build
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationChannelGroupCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.request.CachePolicy
 import com.jet.article.example.devblog.data.ContentSyncWorker
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
@@ -19,7 +25,7 @@ import javax.inject.Inject
  * created on 13.08.2024
  */
 @HiltAndroidApp
-class AndroidDevBlogApp : Application(),  Configuration.Provider {
+class AndroidDevBlogApp : Application(), Configuration.Provider, ImageLoaderFactory {
 
 
     companion object {
@@ -38,6 +44,22 @@ class AndroidDevBlogApp : Application(),  Configuration.Provider {
         prepareNotificationsGroupAndChannel()
         ContentSyncWorker.register(context = this)
         System.loadLibrary("jet-article")
+    }
+
+
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .diskCachePolicy(CachePolicy.ENABLED)
+            .memoryCachePolicy(CachePolicy.ENABLED)
+            .components {
+                if (Build.VERSION.SDK_INT >= 28) {
+                    add(ImageDecoderDecoder.Factory())
+                } else {
+                    add(GifDecoder.Factory())
+                }
+            }
+            .build()
+
     }
 
 

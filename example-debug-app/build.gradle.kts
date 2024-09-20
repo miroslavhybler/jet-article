@@ -13,12 +13,12 @@ plugins {
 
 android {
     namespace = "com.jet.article.test"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "jet.html.article.example"
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 5
         versionName = "1.0.0"
 
