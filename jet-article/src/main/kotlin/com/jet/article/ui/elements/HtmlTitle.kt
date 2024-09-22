@@ -23,13 +23,13 @@ fun HtmlTitle(
 
     val textStyle = remember(key1 = title) {
         when (title.titleTag) {
-            "h1", "h2" -> typography.displaySmall.copy(color =color )
+            "h1", "h2" -> typography.displaySmall.copy(color = color)
             else -> typography.titleLarge.copy(color = color)
         }
     }
 
     HtmlTextBlock(
-        modifier=modifier,
+        modifier = modifier,
         text = title.text,
         style = textStyle,
     )
@@ -44,6 +44,7 @@ private fun HtmlTitlePreview() {
             text = "Jetpack Compose rules!",
             titleTag = "h1",
             id = "page-title",
+            key = 0,
         )
     )
 }

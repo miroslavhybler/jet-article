@@ -12,7 +12,7 @@ plugins {
 }
 
 android {
-    namespace = "mir.oslav.jet.html.article"
+    namespace = "com.jet.article"
     compileSdk = 35
 
     defaultConfig {
@@ -36,7 +36,7 @@ android {
     }
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

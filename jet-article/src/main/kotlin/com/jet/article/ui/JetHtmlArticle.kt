@@ -160,6 +160,7 @@ public fun JetHtmlArticleContent(
                             item(content = header)
                             itemsIndexed(
                                 items = data.elements,
+                                key = { _, element -> element.key },
                             ) { index, element ->
                                 when (element) {
                                     is HtmlElement.Image -> image(element)
@@ -170,12 +171,12 @@ public fun JetHtmlArticleContent(
                                     is HtmlElement.Title -> {
                                         if (index != 0) {
                                             Column(modifier = Modifier) {
+                                                //TODO spacing
                                                 Spacer(modifier = Modifier.height(height = 24.dp))
                                                 title(element)
                                             }
                                         } else {
                                             title(element)
-
                                         }
                                     }
 

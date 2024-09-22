@@ -225,7 +225,7 @@ Java_com_jet_article_ParserNative_getTableCell(
         JNIEnv *environment, jobject caller, jint column, jint row
 ) {
     std::vector<std::vector<std::string_view>> table = jni::contentParser->getTable();
-    std::vector<std::string_view> r = table[row];
+     std::vector<std::string_view>& r = table[row];
     std::string_view cell = r[column];
     return environment->NewStringUTF(std::string(cell).c_str());
 }

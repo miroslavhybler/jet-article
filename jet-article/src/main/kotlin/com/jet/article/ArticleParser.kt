@@ -127,10 +127,11 @@ public object ArticleParser {
                 )
             }
 
+            var key = 0
             while (ParserNative.hasNextStep()) {
                 ParserNative.doNextStep()
                 if (ParserNative.hasContent()) {
-                    onElement(elements = elements, articleUrl = url)
+                    onElement(elements = elements, articleUrl = url, newKey = ++key)
                     ParserNative.resetCurrentContent()
                 }
             }
@@ -163,7 +164,8 @@ public object ArticleParser {
      */
     private suspend fun onElement(
         elements: MutableList<HtmlElement>,
-        articleUrl: String
+        articleUrl: String,
+        newKey: Int,
     ) {
         val type = ParserNative.getContentType()
         if (type == HtmlContentType.NO_CONTENT) {
@@ -202,7 +204,8 @@ public object ArticleParser {
                         description = alt,
                         defaultSize = size,
                         alt = alt,
-                        id = ParserNative.getCurrentTagId()
+                        id = ParserNative.getCurrentTagId(),
+                        key = newKey,
                     )
                 )
             }
@@ -210,13 +213,15 @@ public object ArticleParser {
             HtmlContentType.TEXT -> {
                 val content = ParserNative.getContent()
 
+                //TODO MOVE blank check into native code
                 if (content.isBlank()) {
                     return
                 }
 
                 val text = HtmlElement.TextBlock(
                     text = content,
-                    id = ParserNative.getCurrentTagId()
+                    id = ParserNative.getCurrentTagId(),
+                    key = newKey,
                 )
                 elements.add(element = text)
             }
@@ -230,7 +235,8 @@ public object ArticleParser {
                     element = HtmlElement.Title(
                         text = content,
                         titleTag = ParserNative.getCurrentTag(),
-                        id = ParserNative.getCurrentTagId()
+                        id = ParserNative.getCurrentTagId(),
+                        key = newKey,
                     )
                 )
             }
@@ -247,7 +253,8 @@ public object ArticleParser {
                     element = HtmlElement.BasicList(
                         isOrdered = isOrdered,
                         items = itemsList,
-                        id = ParserNative.getCurrentTagId()
+                        id = ParserNative.getCurrentTagId(),
+                        key = newKey,
                     )
                 )
             }
@@ -260,7 +267,8 @@ public object ArticleParser {
                 elements.add(
                     element = HtmlElement.Quote(
                         text = content,
-                        id = ParserNative.getCurrentTagId()
+                        id = ParserNative.getCurrentTagId(),
+                        key = newKey,
                     ),
                 )
             }
@@ -273,13 +281,14 @@ public object ArticleParser {
                 elements.add(
                     element = HtmlElement.Code(
                         content = content,
-                        id = ParserNative.getCurrentTagId()
+                        id = ParserNative.getCurrentTagId(),
+                        key = newKey,
                     )
                 )
             }
 
             HtmlContentType.TABLE -> {
-                val rows = ArrayList<List<String>>()
+                val rows = ArrayList<HtmlElement.Table.TableRow>()
 
                 val columnCount = ParserNative.getTableColumnCount()
                 val rowsCount = ParserNative.getTableRowsCount()
@@ -294,16 +303,43 @@ public object ArticleParser {
                         val el = ParserNative.getTableCell(row = i, column = j)
                         columns.add(element = el)
                     }
-                    rows.add(columns)
+                    rows.add(
+                        element = HtmlElement.Table.TableRow(
+                            values = columns.mapIndexed { i, value ->
+                                HtmlElement.Table.TableRow.TableCell(
+                                    columnKey = i,
+                                    value = value
+                                )
+                            },
+                            rowKey = i
+                        )
+                    )
                 }
 
 
                 elements.add(
                     element = HtmlElement.Table(
                         rows = rows,
-                        id = ParserNative.getCurrentTagId()
+                        id = ParserNative.getCurrentTagId(),
+                        key = newKey,
                     )
                 )
+            }
+
+            HtmlContentType.ADDRESS -> {
+                val content = ParserNative.getContent()
+
+                //TODO move blank check into native code
+                if (content.isBlank()) {
+                    return
+                }
+
+                val text = HtmlElement.TextBlock(
+                    text = content,
+                    id = ParserNative.getCurrentTagId(),
+                    key = newKey,
+                )
+                elements.add(element = text)
             }
 
             else -> {}
@@ -323,8 +359,10 @@ public object ArticleParser {
          * @return
          * @since 1.0.0
          */
-        fun clearTagsFromText(input: String): String {
-            return UtilsNative.clearTagsFromText(input = input)
+        suspend fun clearTagsFromText(
+            input: String
+        ): String = withContext(context = safeCoroutineContext) {
+            return@withContext UtilsNative.clearTagsFromText(input = input)
         }
 
 
@@ -333,8 +371,10 @@ public object ArticleParser {
          * @return
          * @since 1.0.0
          */
-        fun clearTagsAndReplaceEntitiesFromText(input: String): String {
-            return UtilsNative.clearTagsAndReplaceEntitiesFromText(input= input)
+        suspend fun clearTagsAndReplaceEntitiesFromText(
+            input: String
+        ): String = withContext(context = safeCoroutineContext) {
+            return@withContext UtilsNative.clearTagsAndReplaceEntitiesFromText(input = input)
         }
     }
 }

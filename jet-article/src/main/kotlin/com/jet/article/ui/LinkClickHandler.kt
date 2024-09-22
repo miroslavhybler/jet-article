@@ -18,7 +18,7 @@ import com.jet.article.openEmailApp
 import com.jet.article.toDomainName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import mir.oslav.jet.html.article.R
+import com.jet.article.R
 import java.net.URISyntaxException
 
 

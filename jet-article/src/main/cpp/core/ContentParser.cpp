@@ -341,6 +341,8 @@ void ContentParser::parseImageTag(const size_t &tei) {
 
 void ContentParser::parseTableTag(const size_t &ctsi) {
     bool wasHeaderRowParsed = false;
+    tableHolder.clear();
+    tempOutputVector.clear();
     utils::groupPairTagContents(
             input, "tr", index.getIndex(), ctsi, tempOutputVector
     );

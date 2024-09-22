@@ -7,15 +7,17 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.unit.IntSize
 
 /**
+ * @param id Id of html tag element parsed from content
+ * @param key Key used for [androidx.compose.foundation.lazy.LazyColumn] as unique key of item
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
  * created on 30.06.2023
  */
-//TODO add something to serve as key for JetHtmlArticle lazy column
 @Keep
 @Immutable
 sealed class HtmlElement private constructor(
-    open val id: String?
+    open val id: String?,
+    open val key: Int,
 ) {
 
 
@@ -29,7 +31,8 @@ sealed class HtmlElement private constructor(
         val defaultSize: IntSize,
         val alt: String?,
         override val id: String?,
-    ) : HtmlElement(id = id)
+        override val key: Int,
+    ) : HtmlElement(id = id, key = key)
 
 
     /**
@@ -42,7 +45,8 @@ sealed class HtmlElement private constructor(
     public data class TextBlock public constructor(
         val text: String,
         override val id: String?,
-    ) : HtmlElement(id = id)
+        override val key: Int,
+    ) : HtmlElement(id = id, key = key)
 
 
     /**
@@ -55,7 +59,8 @@ sealed class HtmlElement private constructor(
         val text: String,
         val titleTag: String,
         override val id: String?,
-    ) : HtmlElement(id = id)
+        override val key: Int,
+    ) : HtmlElement(id = id, key = key)
 
 
     /**
@@ -65,7 +70,8 @@ sealed class HtmlElement private constructor(
     public data class Quote public constructor(
         val text: String,
         override val id: String?,
-    ) : HtmlElement(id = id)
+        override val key: Int,
+    ) : HtmlElement(id = id, key = key)
 
 
     /**
@@ -73,9 +79,28 @@ sealed class HtmlElement private constructor(
      */
     @Keep
     public data class Table public constructor(
-        val rows: List<List<String>>,
+        val rows: List<TableRow>,
         override val id: String?,
-    ) : HtmlElement(id = id)
+        override val key: Int,
+    ) : HtmlElement(id = id, key = key) {
+
+        /**
+         * @param values List of values
+         * @param rowKey Local unique key of table row for UI
+         */
+        @Keep
+        public data class TableRow constructor(
+            val values: List<TableCell>,
+            val rowKey: Int,
+        ) {
+
+            @Keep
+            public data class TableCell constructor(
+                val value: String,
+                val columnKey: Int,
+            )
+        }
+    }
 
 
     /**
@@ -86,7 +111,8 @@ sealed class HtmlElement private constructor(
         val items: List<String>,
         val isOrdered: Boolean,
         override val id: String?,
-    ) : HtmlElement(id = id)
+        override val key: Int,
+    ) : HtmlElement(id = id, key = key)
 
 
     /**
@@ -97,7 +123,8 @@ sealed class HtmlElement private constructor(
         val items: List<String>,
         val isOrdered: Boolean,
         override val id: String?,
-    ) : HtmlElement(id = id)
+        override val key: Int,
+    ) : HtmlElement(id = id, key = key)
 
     /**
      * @since 1.0.0
@@ -106,7 +133,8 @@ sealed class HtmlElement private constructor(
     public data class Address public constructor(
         val content: String,
         override val id: String?,
-    ) : HtmlElement(id = id)
+        override val key: Int,
+    ) : HtmlElement(id = id, key = key)
 
 
     /**
@@ -116,5 +144,6 @@ sealed class HtmlElement private constructor(
     public data class Code public constructor(
         val content: String,
         override val id: String?,
-    ) : HtmlElement(id = id)
+        override val key: Int,
+    ) : HtmlElement(id = id, key = key)
 }

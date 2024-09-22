@@ -4,7 +4,7 @@ import androidx.annotation.IntRange
 
 
 /**
- * @author Miroslav Hýbler (Peko Studio s.r.o)<br>
+ * @author Miroslav Hýbler <br>
  * created on 12.09.2024
  */
 class SimpleDate constructor(

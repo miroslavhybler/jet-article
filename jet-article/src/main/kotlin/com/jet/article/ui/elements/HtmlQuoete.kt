@@ -97,7 +97,8 @@ private fun QuotePreview() {
     HtmlQuoete(
         data = HtmlElement.Quote(
             text = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Suspendisse nisl. Quisque porta. Curabitur ligula sapien, pulvinar a vestibulum quis, facilisis vel sapien. Nullam sit amet magna in magna gravida vehicula. Morbi imperdiet, mauris ac auctor dictum, nisl ligula egestas nulla, et sollicitudin sem purus in lacus. Etiam ligula pede, sagittis quis, interdum ultricies, scelerisque eu. Mauris dolor felis, sagittis at, luctus sed, aliquam non, tellus. Ut tempus purus at lorem. Integer imperdiet lectus quis justo. Phasellus faucibus molestie nisl. Morbi scelerisque luctus velit. Phasellus et lorem id felis nonummy placerat.",
-            id = ""
+            id = "",
+            key = 0,
         )
     )
 

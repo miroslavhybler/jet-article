@@ -62,6 +62,7 @@ fun HtmlTextBlock(
     val colorScheme = MaterialTheme.colorScheme
 
     //TODO format text before sending it to UI
+    // TODO simplify keys
     val formattedText = remember(
         key1 = text,
         key2 = ArticleParser.isSimpleTextFormatAllowed,
