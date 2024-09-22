@@ -1,5 +1,6 @@
 package com.jet.article.ui.elements
 
+import androidx.annotation.Keep
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight

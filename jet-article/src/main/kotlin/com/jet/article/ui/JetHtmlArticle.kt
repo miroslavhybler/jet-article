@@ -110,6 +110,7 @@ public fun JetHtmlArticleContent(
     data: HtmlArticleData,
     listState: LazyListState = rememberLazyListState(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    contentPadding: PaddingValues = PaddingValues(all = 0.dp),
     text: @Composable (HtmlElement.TextBlock) -> Unit = { HtmlTextBlock(text = it) },
     image: @Composable (HtmlElement.Image) -> Unit = { HtmlImage(data = it) },
     quote: @Composable (HtmlElement.Quote) -> Unit = { HtmlQuoete(data = it) },
@@ -120,7 +121,6 @@ public fun JetHtmlArticleContent(
     basicList: @Composable (HtmlElement.BasicList) -> Unit = { HtmlBasicList(list = it) },
     header: @Composable LazyItemScope. () -> Unit = {},
     footer: @Composable LazyItemScope.() -> Unit = {},
-    contentPadding: PaddingValues = PaddingValues(all = 0.dp),
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     linkClickCallback: LinkClickHandler.LinkCallback = rememberDefaultLinkCallback(

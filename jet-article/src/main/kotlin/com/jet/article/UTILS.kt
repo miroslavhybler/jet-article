@@ -14,20 +14,57 @@ import android.text.style.StyleSpan
 import android.text.style.URLSpan
 import android.text.style.UnderlineSpan
 import android.util.Log
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
+import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlArticleData
 import com.jet.article.ui.LinkClickHandler
+import com.jet.article.ui.LocalBaseArticleUrl
+import com.jet.article.ui.LocalHtmlArticleData
+import com.jet.article.ui.LocalLinkHandler
 import java.net.URI
 import java.net.URISyntaxException
 import kotlin.jvm.Throws
+
+
+@Composable
+internal fun rememberHtmlText(
+    key: Any,
+    text: String,
+): AnnotatedString {
+    val linkClickHandler = LocalLinkHandler.current
+    val articleData = LocalHtmlArticleData.current
+    val articleUrl = LocalBaseArticleUrl.current
+    val colorScheme = MaterialTheme.colorScheme
+
+    return remember(key1 = key) {
+        if (ArticleParser.isSimpleTextFormatAllowed) {
+            text.toHtml()
+                .toSpannable()
+                .toAnnotatedString(
+                    primaryColor = colorScheme.primary,
+                    linkClickHandler = linkClickHandler,
+                    data = articleData,
+                    articleUrl = articleUrl,
+                )
+        } else {
+            buildAnnotatedString {
+                append(text = text)
+            }
+        }
+    }
+}
 
 
 /**
@@ -110,7 +147,7 @@ private enum class SpanCopier {
                             link = urlSpan.url,
                             articleUrl = articleUrl,
                             data = data,
-                        )?: kotlin.run {
+                        ) ?: kotlin.run {
                             Log.w("Jet-Article", "Clicked on link but linkClickHandler is null")
                         }
                     },

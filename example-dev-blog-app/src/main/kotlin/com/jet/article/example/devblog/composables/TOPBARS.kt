@@ -131,6 +131,7 @@ fun PostTopBar(
             HtmlTextBlock(
                 modifier = Modifier.horizontalPadding(),
                 text = title,
+                key = Int.MIN_VALUE,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.titleLarge,

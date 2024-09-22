@@ -6,16 +6,22 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -44,11 +50,15 @@ import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
+import com.jet.article.rememberHtmlText
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
 import com.jet.article.ui.LocalBaseArticleUrl
 import com.jet.article.ui.LocalHtmlArticleData
 import com.jet.article.ui.LocalLinkHandler
+import com.jet.utils.dpToPx
+import com.jet.utils.pxToDp
+import mir.oslav.jet.annotations.JetExperimental
 
 /**
  * @since 1.0.0
@@ -56,8 +66,8 @@ import com.jet.article.ui.LocalLinkHandler
  * created on 30.06.2023
  */
 //TODO needs refactor, put more login into layout layer
-//TODO need some key otherwise data are mixed up
 @Composable
+@JetExperimental
 fun HtmlTable(
     modifier: Modifier = Modifier,
     data: HtmlElement.Table,
@@ -65,16 +75,15 @@ fun HtmlTable(
     shape: Shape = MaterialTheme.shapes.small,
 ) {
     val density = LocalDensity.current
-    val configuration = LocalConfiguration.current
 
     val textMeasurer = rememberTextMeasurer()
     val typography = MaterialTheme.typography
-    val screenWidth = configuration.screenWidthDp.dp
     var width by remember(key1 = data.key) { mutableStateOf(value = 0.dp) }
     var isScrollEnabled by remember(key1 = data.key) { mutableStateOf(value = true) }
-
     val cellWidthsForColumns: SnapshotStateMap<Int, Dp> = remember { mutableStateMapOf() }
-
+    val columnCount = remember(key1 = data.key) {
+        data.rows.firstOrNull()?.values?.size ?: 0
+    }
     val fullRowWidth by remember(key1 = data.key) {
         derivedStateOf {
             cellWidthsForColumns.values.sumOf { width ->
@@ -83,46 +92,41 @@ fun HtmlTable(
         }
     }
 
-    val rowsCount = remember(key1 = data.key) {
-        data.rows.size
-    }
-    val columnCount = remember(key1 = data.key) {
-        data.rows.firstOrNull()?.values?.size ?: 0
-    }
-
-
     Column(
         modifier = modifier
             .fillMaxWidth()
             .onSizeChanged { newSize ->
-                width = with(density) { newSize.width.dp }
+                width = with(density) { newSize.width.toDp() }
             }
-            .horizontalScroll(
-                state = scrollState,
-                enabled = isScrollEnabled,
-            )
             .clip(shape = shape)
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.outline,
                 shape = shape,
-            ),
+            )
+            .horizontalScroll(
+                state = scrollState,
+                enabled = isScrollEnabled,
+            )
     ) {
         data.rows.forEachIndexed { rowIndex, row ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight(),
-
-                ) {
+            ) {
                 row.values.forEachIndexed { columnIndex, value ->
                     var widthForColumn by remember {
                         mutableStateOf(value = cellWidthsForColumns[columnIndex])
                     }
+                    var cellHeight by remember {
+                        mutableStateOf(value = 0.dp)
+                    }
+
                     LaunchedEffect(
                         key1 = value.columnKey,
                         block = {
-                            val defaultWidthByColumns = screenWidth / columnCount
+                            val defaultWidthByColumns = width / columnCount
                             val requiredWidth = textMeasurer.measure(
                                 text = value.value,
                                 style = typography.titleSmall
@@ -150,34 +154,36 @@ fun HtmlTable(
 
                     TableCell(
                         modifier = Modifier
-                            .width(
-                                width = widthForColumn ?: 128.dp,
-                                //    height = dimensions.maxCellHeight
-                            )
-                            .onSizeChanged {
-                                Log.d(
-                                    "mirek",
-                                    "cell: ${row.rowKey} ${value.columnKey} size: $it for: ${
-                                        with(density) { widthForColumn?.toPx() }
-                                    }"
-                                )
+                            .width(width = widthForColumn ?: 128.dp)
+                            .onSizeChanged { newSize ->
+                                cellHeight = density.pxToDp(px = newSize.height)
                             },
                         value = value,
-                        columnIndex = columnIndex,
                         rowIndex = rowIndex,
-                        rowCount = data.rows.size,
                     )
+
+
+                    if (columnIndex < data.rows.size) {
+                        VerticalDivider(
+                            modifier = Modifier.height(height = cellHeight),
+                            color = MaterialTheme.colorScheme.outline,
+                            thickness = 1.dp,
+                        )
+                    }
+
                 }
             }
 
-            Divider(
-                modifier = Modifier,
-                color = MaterialTheme.colorScheme.outline,
-                thickness = 1.dp
-            )
+            if (rowIndex < data.rows.lastIndex) {
+                HorizontalDivider(
+                    modifier = Modifier
+                        .width(width = density.pxToDp(px = fullRowWidth.toFloat())),
+                    color = MaterialTheme.colorScheme.outline,
+                    thickness = 1.dp
+                )
+            }
         }
     }
-
 }
 
 
@@ -185,55 +191,27 @@ fun HtmlTable(
 private fun TableCell(
     modifier: Modifier = Modifier,
     value: HtmlElement.Table.TableRow.TableCell,
-    columnIndex: Int,
     rowIndex: Int,
-    rowCount: Int,
 ) {
-
-    val linkClickHandler = LocalLinkHandler.current
-    val articleData = LocalHtmlArticleData.current
-    val articleUrl = LocalBaseArticleUrl.current
     val colorScheme = MaterialTheme.colorScheme
+    val text = rememberHtmlText(key = value.columnKey, text = value.value)
     Box(
         modifier = modifier
-            .sizeIn(minWidth = 128.dp, minHeight = 32.dp)
+            .sizeIn(minWidth = 128.dp, minHeight = 32.dp, maxHeight = 256.dp)
             .wrapContentSize()
     ) {
         Text(
-            text = remember(key1 = value.columnKey) {
-                value.value.toHtml()
-                    .toSpannable()
-                    .toAnnotatedString(
-                        primaryColor = colorScheme.primary,
-                        linkClickHandler = linkClickHandler,
-                        data = articleData,
-                        articleUrl = articleUrl,
-                    )
-            },
             modifier = Modifier
-                .align(alignment = Alignment.Center)
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp, vertical = 2.dp),
+                .align(alignment = Alignment.Center),
+            text = text,
             style = if (rowIndex == 0)
                 MaterialTheme.typography.titleSmall
             else
                 MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
             color = colorScheme.onBackground,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
         )
-
-        if (columnIndex < (rowCount - 1)) {
-            VerticalDivider(
-                modifier = Modifier
-                    .align(alignment = Alignment.CenterEnd)
-                    .defaultMinSize(minWidth = 1.dp)
-                    .matchParentSize(),
-                color = MaterialTheme.colorScheme.outline,
-                thickness = 1.dp,
-            )
-        }
     }
 }
 
@@ -263,7 +241,7 @@ private fun TablePreview() {
                             columnKey = 3,
                             value = "date of Birt"
                         )
-                    )
+                    ),
                 ),
                 HtmlElement.Table.TableRow(
                     rowKey = 1,
@@ -284,7 +262,7 @@ private fun TablePreview() {
                             columnKey = 3,
                             value = "1990-01-01"
                         )
-                    )
+                    ),
                 ),
             ),
             key = 0,

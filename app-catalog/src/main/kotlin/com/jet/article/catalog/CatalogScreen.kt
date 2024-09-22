@@ -3,6 +3,7 @@
 package com.jet.article.catalog
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -74,7 +75,14 @@ fun CatalogScreen(
             JetHtmlArticle(
                 modifier = Modifier,
                 data = data.value,
-                contentPadding = paddingValues,
+                contentPadding = remember(key1 = paddingValues) {
+                    PaddingValues(
+                        top = 32.dp + paddingValues.calculateTopPadding(),
+                        bottom = 16.dp + paddingValues.calculateBottomPadding(),
+                        start = 20.dp + paddingValues.calculateStartPadding(layoutDirection),
+                        end = 20.dp + paddingValues.calculateEndPadding(layoutDirection),
+                    )
+                },
             )
         },
         bottomBar = {

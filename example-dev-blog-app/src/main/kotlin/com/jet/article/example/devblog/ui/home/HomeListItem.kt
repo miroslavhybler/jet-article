@@ -138,12 +138,14 @@ private fun HomeListItemColumn(
         HtmlTextBlock(
             modifier = Modifier,
             text = item.title,
+            key = index,
             style = MaterialTheme.typography.titleLarge,
             color = contentColor,
         )
         HtmlTextBlock(
             modifier = Modifier,
             text = item.description,
+            key = index,
             style = MaterialTheme.typography.bodyMedium,
             color = contentColor,
         )

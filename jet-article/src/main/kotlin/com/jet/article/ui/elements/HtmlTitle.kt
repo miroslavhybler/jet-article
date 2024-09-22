@@ -21,7 +21,7 @@ fun HtmlTitle(
 ) {
     val typography = MaterialTheme.typography
 
-    val textStyle = remember(key1 = title) {
+    val textStyle = remember(key1 = title.key) {
         when (title.titleTag) {
             "h1", "h2" -> typography.displaySmall.copy(color = color)
             else -> typography.titleLarge.copy(color = color)
@@ -31,6 +31,7 @@ fun HtmlTitle(
     HtmlTextBlock(
         modifier = modifier,
         text = title.text,
+        key = title.key,
         style = textStyle,
     )
 }

@@ -17,6 +17,7 @@ fun HtmlAddress(
 ) {
     HtmlTextBlock(
         text = address.content,
+        key = address.key,
         modifier = modifier
     )
 }

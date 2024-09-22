@@ -58,7 +58,11 @@ public fun HtmlBasicList(
                     contentDescription = null,
                     tint = bulletTint
                 )
-                HtmlTextBlock(text = s, style = style)
+                HtmlTextBlock(
+                    text = s,
+                    key = index,
+                    style = style,
+                )
             }
         }
     }

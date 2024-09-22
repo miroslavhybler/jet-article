@@ -359,10 +359,10 @@ public object ArticleParser {
          * @return
          * @since 1.0.0
          */
-        suspend fun clearTagsFromText(
+        fun clearTagsFromText(
             input: String
-        ): String = withContext(context = safeCoroutineContext) {
-            return@withContext UtilsNative.clearTagsFromText(input = input)
+        ): String {
+            return UtilsNative.clearTagsFromText(input = input)
         }
 
 
@@ -371,10 +371,10 @@ public object ArticleParser {
          * @return
          * @since 1.0.0
          */
-        suspend fun clearTagsAndReplaceEntitiesFromText(
+        fun clearTagsAndReplaceEntitiesFromText(
             input: String
-        ): String = withContext(context = safeCoroutineContext) {
-            return@withContext UtilsNative.clearTagsAndReplaceEntitiesFromText(input = input)
+        ): String {
+            return UtilsNative.clearTagsAndReplaceEntitiesFromText(input = input)
         }
     }
 }

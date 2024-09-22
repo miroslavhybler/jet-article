@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.core.text.toSpannable
 import com.jet.article.ArticleParser
 import com.jet.article.data.HtmlElement
+import com.jet.article.rememberHtmlText
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
 import com.jet.article.ui.LocalBaseArticleUrl
@@ -25,6 +26,7 @@ import com.jet.article.ui.LocalLinkHandler
 /**
  * @author Miroslav Hýbler <br>
  * created on 07.09.2023
+ * @since 1.0.0
  */
 @Composable
 fun HtmlTextBlock(
@@ -39,6 +41,7 @@ fun HtmlTextBlock(
     HtmlTextBlock(
         modifier = modifier,
         text = text.text,
+        key = text.key,
         style = style,
         color = color,
         maxLines = maxLines,
@@ -47,49 +50,29 @@ fun HtmlTextBlock(
 }
 
 
+/**
+ * @since 1.0.0
+ */
 @Composable
 fun HtmlTextBlock(
     modifier: Modifier = Modifier,
     text: String,
+    key: Int,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
     color: Color = MaterialTheme.colorScheme.onBackground,
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
 ) {
-    val linkClickHandler = LocalLinkHandler.current
-    val articleUrl = LocalBaseArticleUrl.current
-    val data = LocalHtmlArticleData.current
-    val colorScheme = MaterialTheme.colorScheme
-
     //TODO format text before sending it to UI
-    // TODO simplify keys
-    val formattedText = remember(
-        key1 = text,
-        key2 = ArticleParser.isSimpleTextFormatAllowed,
-    ) {
-        if (ArticleParser.isSimpleTextFormatAllowed) {
-            text.toHtml()
-                .toSpannable()
-                .toAnnotatedString(
-                    primaryColor = colorScheme.primary,
-                    linkClickHandler = linkClickHandler,
-                    data = data,
-                    articleUrl = articleUrl,
-                )
-
-        } else {
-            buildAnnotatedString {
-                append(text = text)
-            }
-        }
+    val formattedText = rememberHtmlText(key = key, text = text)
+    val actualStyle = remember(key1 = style, key2 = color) {
+        style.copy(color = color)
     }
 
     Text(
         modifier = modifier,
         text = formattedText,
-        style = remember(key1 = style, key2 = color) {
-            style.copy(color = color)
-        },
+        style = actualStyle,
         maxLines = maxLines,
         overflow = overflow,
     )
