@@ -52,7 +52,7 @@ abstract class LocalDatabase constructor() : RoomDatabase() {
 
     @Dao
     interface PostDao : BaseDao<PostItem> {
-        @Query("SELECT * FROM posts")
+        @Query("SELECT * FROM posts ORDER BY date_timestamp DESC")
         fun getAll(): List<PostItem>
 
 

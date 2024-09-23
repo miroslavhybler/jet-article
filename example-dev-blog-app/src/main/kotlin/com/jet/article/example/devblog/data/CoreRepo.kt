@@ -202,7 +202,7 @@ class CoreRepo @Inject constructor(
     private suspend fun loadPostsFromLocal() {
         mPosts.value = Result.success(
             value = databaseRepo.postDao.getAll()
-                .sortedByDescending { it.date }
+             //   .sortedByDescending { it.date }
         )
     }
 

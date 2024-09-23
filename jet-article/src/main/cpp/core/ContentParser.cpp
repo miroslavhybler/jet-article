@@ -87,8 +87,6 @@ std::string ContentParser::getTempContent() {
 }
 
 
-//TODO Maybe enable that ininitialization, to process text outside tags
-//TODO https://android-developers.googleblog.com/ has texts inside divs
 void ContentParser::doNextStep() {
 
     currentTag = "";
@@ -429,10 +427,7 @@ void ContentParser::abortWithError(
                    + "Message: " + message + "\n"
                    + "body: " + currentTagBody + "\n"
                    + "subtring to find problematic area: " + input.substr(index.getIndex(), 50);
-
     utils::log("PARSER", errorMessage, ANDROID_LOG_ERROR);
-
-
     index.moveIndex(length);
 }
 

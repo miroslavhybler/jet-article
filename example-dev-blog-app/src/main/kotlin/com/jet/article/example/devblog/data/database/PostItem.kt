@@ -20,6 +20,8 @@ data class PostItem constructor(
         val url: String,
         @ColumnInfo(name = "date", typeAffinity = ColumnInfo.TEXT)
         val date: SimpleDate,
+        @ColumnInfo(name = "date_timestamp", typeAffinity = ColumnInfo.INTEGER)
+        val dateTimeStamp: Int,
         @ColumnInfo(name = "description", typeAffinity = ColumnInfo.TEXT)
         val description: String,
         @ColumnInfo(name = "image_url", typeAffinity = ColumnInfo.TEXT)

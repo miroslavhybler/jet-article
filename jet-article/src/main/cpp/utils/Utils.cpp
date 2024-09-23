@@ -543,7 +543,6 @@ namespace utils {
         }
     }
 
-
     void clearUnsupportedTagsFromTextBlock(
             std::string_view &input,
             std::string &output,
@@ -612,9 +611,6 @@ namespace utils {
         }
     }
 
-
-    //TODO handle entities, extract number from entity, number is decimal "byte" representation of char
-    //TODO see java.text.Html.withinStyle
     void clearTagsAndEntitiesFromText(
             const std::string_view &input,
             std::string &output
@@ -625,15 +621,30 @@ namespace utils {
 
         output.clear();
         bool insideTag = false;
-        for (char c: input) {
+
+        size_t length = input.length();
+        size_t i = 0;
+        while (i < length) {
+            char c = input[i];
             if (c == '<') {
                 insideTag = true;
+                i += 1;
             } else if (c == '>' && insideTag) {
                 insideTag = false;
+                i += 1;
             } else if (c == '&') {
-
+                //Entity end index
+                size_t endI = indexOfOrThrow(input, ";", i);
+                //+1 to inlude ; into entity string
+                std::string_view entity = input.substr(i, endI - i + 1);
+                std::string ch = decodeHtmlEntity(std::string(entity));
+                output += ch;
+                i += entity.length();
             } else if (!insideTag) {
                 output += c;
+                i += 1;
+            } else {
+                i += 1;
             }
         }
     }
@@ -660,6 +671,95 @@ namespace utils {
         }
     }
 
+
+    std::string decodeHtmlEntity(
+            const std::string &entity
+    ) {
+        if (entity.substr(0, 2) == "&#" && entity.back() == ';') {
+            if (entity[2] == 'x' || entity[2] == 'X') {
+                return decodeHtmlEntityHexadecimal(entity);
+            } else {
+                return decodeHtmlEntityDecimal(entity);
+            }
+        }
+        return "";
+    }
+
+
+    std::string decodeHtmlEntityDecimal(
+            const std::string &entity
+    ) {
+        std::string decimalNumber = entity.substr(2, entity.size() - 3);  // Extract decimal number
+        int codePoint = 0;
+
+        try {
+            codePoint = std::stoi(decimalNumber, nullptr, 10);  // Convert decimal string to integer
+        } catch (const std::invalid_argument &e) {
+            return "";  // Return empty if conversion fails
+        }
+
+        // Convert codePoint to UTF-8 or ASCII
+        std::string result;
+        if (codePoint < 128) {
+            // Basic ASCII
+            result += static_cast<char>(codePoint);
+        } else {
+            // Convert to UTF-8
+            if (codePoint <= 0x7FF) {
+                result += static_cast<char>(0xC0 | ((codePoint >> 6) & 0x1F));
+                result += static_cast<char>(0x80 | (codePoint & 0x3F));
+            } else if (codePoint <= 0xFFFF) {
+                result += static_cast<char>(0xE0 | ((codePoint >> 12) & 0x0F));
+                result += static_cast<char>(0x80 | ((codePoint >> 6) & 0x3F));
+                result += static_cast<char>(0x80 | (codePoint & 0x3F));
+            } else if (codePoint <= 0x10FFFF) {
+                result += static_cast<char>(0xF0 | ((codePoint >> 18) & 0x07));
+                result += static_cast<char>(0x80 | ((codePoint >> 12) & 0x3F));
+                result += static_cast<char>(0x80 | ((codePoint >> 6) & 0x3F));
+                result += static_cast<char>(0x80 | (codePoint & 0x3F));
+            }
+        }
+
+        return result;
+    }
+
+
+    std::string decodeHtmlEntityHexadecimal(
+            const std::string &entity
+    ) {
+        std::string hexNumber = entity.substr(3, entity.size() - 4);  // Extract hexadecimal number
+        int codePoint = 0;
+
+        try {
+            codePoint = std::stoi(hexNumber, nullptr, 16);  // Convert hex string to integer
+        } catch (const std::invalid_argument &e) {
+            return "";  // Return empty if conversion fails
+        }
+
+        // Convert codePoint to UTF-8 or ASCII
+        std::string result;
+        if (codePoint < 128) {
+            // Basic ASCII
+            result += static_cast<char>(codePoint);
+        } else {
+            // Convert to UTF-8
+            if (codePoint <= 0x7FF) {
+                result += static_cast<char>(0xC0 | ((codePoint >> 6) & 0x1F));
+                result += static_cast<char>(0x80 | (codePoint & 0x3F));
+            } else if (codePoint <= 0xFFFF) {
+                result += static_cast<char>(0xE0 | ((codePoint >> 12) & 0x0F));
+                result += static_cast<char>(0x80 | ((codePoint >> 6) & 0x3F));
+                result += static_cast<char>(0x80 | (codePoint & 0x3F));
+            } else if (codePoint <= 0x10FFFF) {
+                result += static_cast<char>(0xF0 | ((codePoint >> 18) & 0x07));
+                result += static_cast<char>(0x80 | ((codePoint >> 12) & 0x3F));
+                result += static_cast<char>(0x80 | ((codePoint >> 6) & 0x3F));
+                result += static_cast<char>(0x80 | (codePoint & 0x3F));
+            }
+        }
+
+        return result;
+    }
 
     void getTagAttributes(
             const std::string &tagBody,

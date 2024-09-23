@@ -1,6 +1,8 @@
 package com.jet.article.example.devblog.data
 
+import android.icu.util.Calendar
 import androidx.annotation.IntRange
+import java.time.LocalDate
 
 
 /**
@@ -13,6 +15,17 @@ class SimpleDate constructor(
     @IntRange(from = 0, to = 31)
     val dayOfMonth: Int,
 ) : Comparable<SimpleDate> {
+
+
+    /**
+     * Timestamp in seconds
+     */
+    val timestamp: Int
+        get() {
+            val calendar = Calendar.getInstance()
+            calendar.set(year, month.value, dayOfMonth, 0, 0)
+            return (calendar.timeInMillis / 1000).toInt()
+        }
 
 
     fun getDateString(): String {

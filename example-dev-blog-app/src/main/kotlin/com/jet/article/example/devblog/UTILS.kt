@@ -178,11 +178,13 @@ fun HtmlArticleData.getPostList(
 
         val chunked = newList.chunked(size = 4)
         val list = chunked.mapIndexed { index, sublist ->
-            val date = (sublist[2] as HtmlElement.TextBlock).text
+            val dateString = (sublist[2] as HtmlElement.TextBlock).text
+            val date = processDate(date = dateString)!!
             PostItem(
                 image = (sublist[0] as HtmlElement.Image).url,
                 title = (sublist[1] as HtmlElement.TextBlock).text,
-                date = processDate(date = date)!!,
+                date =date ,
+                dateTimeStamp = date.timestamp,
                 description = (sublist[3] as HtmlElement.TextBlock).text,
                 url = links[index].tagAttributes["href"]
                     ?: throw NullPointerException("Unable to extract href from ${links[index]}"),

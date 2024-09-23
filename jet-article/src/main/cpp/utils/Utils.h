@@ -233,6 +233,35 @@ namespace utils {
 
     /**
      *
+     * @param entity
+     * @return
+     * @since 1.0.0
+     */
+    std::string decodeHtmlEntity(
+            const std::string &entity
+    );
+
+    /**
+     *
+     * @param entity
+     * @return
+     */
+    std::string decodeHtmlEntityDecimal(
+            const std::string &entity
+    );
+
+    /**
+     *
+     * @param entity
+     * @return
+     */
+    std::string decodeHtmlEntityHexadecimal(
+            const std::string &entity
+    );
+
+
+    /**
+     *
      * @param input
      * @param output
      * @since 1.0.0
