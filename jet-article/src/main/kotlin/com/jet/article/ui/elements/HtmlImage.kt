@@ -64,9 +64,8 @@ fun HtmlImage(
 ) {
     val context = LocalContext.current
     SubcomposeAsyncImage(
-        modifier = Modifier
+        modifier = modifier
             .htmlImage(size = defaultSize)
-            .then(other = modifier)
             .clip(shape = shape),
         model = url,
         contentDescription = null,

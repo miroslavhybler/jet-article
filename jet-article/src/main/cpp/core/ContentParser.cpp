@@ -253,6 +253,7 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, size_t &tei)
         return;
     }
 
+    //TODO maybe change proccessing of span
     if (utils::fastCompare(tag, "p")
         || utils::fastCompare(tag, "span")
         || utils::fastCompare(tag, "em")
