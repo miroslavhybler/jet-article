@@ -25,6 +25,7 @@ sealed class HtmlElement private constructor(
      * @since 1.0.0
      */
     @Keep
+    @Immutable
     public data class Image public constructor(
         val url: String,
         val description: String?,
@@ -42,6 +43,7 @@ sealed class HtmlElement private constructor(
      */
     //TODO add formatted, move annotated string build into ArticleParser
     @Keep
+    @Immutable
     public data class TextBlock public constructor(
         val text: String,
         override val id: String?,
@@ -55,6 +57,7 @@ sealed class HtmlElement private constructor(
      * @since 1.0.0
      */
     @Keep
+    @Immutable
     public data class Title public constructor(
         val text: String,
         val titleTag: String,
@@ -67,6 +70,7 @@ sealed class HtmlElement private constructor(
      * @since 1.0.0
      */
     @Keep
+    @Immutable
     public data class Quote public constructor(
         val text: String,
         override val id: String?,
@@ -78,6 +82,7 @@ sealed class HtmlElement private constructor(
      * @since 1.0.0
      */
     @Keep
+    @Immutable
     public data class Table public constructor(
         val rows: List<TableRow>,
         override val id: String?,
@@ -89,12 +94,14 @@ sealed class HtmlElement private constructor(
          * @param rowKey Local unique key of table row for UI
          */
         @Keep
+        @Immutable
         public data class TableRow constructor(
             val values: List<TableCell>,
             val rowKey: Int,
         ) {
 
             @Keep
+            @Immutable
             public data class TableCell constructor(
                 val value: String,
                 val columnKey: Int,
@@ -107,6 +114,7 @@ sealed class HtmlElement private constructor(
      * @since 1.0.0
      */
     @Keep
+    @Immutable
     public data class BasicList public constructor(
         val items: List<String>,
         val isOrdered: Boolean,
@@ -119,6 +127,7 @@ sealed class HtmlElement private constructor(
      * @since 1.0.0
      */
     @Keep
+    @Immutable
     public data class DescriptionList public constructor(
         val items: List<String>,
         val isOrdered: Boolean,
@@ -130,6 +139,7 @@ sealed class HtmlElement private constructor(
      * @since 1.0.0
      */
     @Keep
+    @Immutable
     public data class Address public constructor(
         val content: String,
         override val id: String?,
@@ -141,6 +151,7 @@ sealed class HtmlElement private constructor(
      * @since 1.0.0
      */
     @Keep
+    @Immutable
     public data class Code public constructor(
         val content: String,
         override val id: String?,

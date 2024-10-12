@@ -1,13 +1,20 @@
-@file:Suppress("RedundantVisibilityModifier", "RedundantUnitReturnType")
+@file:Suppress(
+    "RedundantVisibilityModifier",
+    "RedundantUnitReturnType",
+    "DATA_CLASS_COPY_VISIBILITY_WILL_BE_CHANGED_WARNING",
+)
 
 package com.jet.article.ui
 
 import android.content.Context
+import androidx.annotation.Keep
 import androidx.annotation.StringRes
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
@@ -33,6 +40,7 @@ import java.net.URISyntaxException
  * @author Miroslav Hýbler <br>
  * created on 06.02.2024
  */
+@Keep
 public class LinkClickHandler internal constructor(
     private val lazyListState: LazyListState,
     private val context: Context,
@@ -192,6 +200,7 @@ public class LinkClickHandler internal constructor(
     /**
      * @since 1.0.0
      */
+    @Keep
     public open class LinkCallback public constructor() {
 
         /**
@@ -242,6 +251,7 @@ public class LinkClickHandler internal constructor(
      * @see rememberDefaultLinkCallback
      * @since 1.0.0
      */
+    @Keep
     public open class DefaultLinkCallback public constructor(
         private val snackbarHostState: SnackbarHostState,
         private val coroutineScope: CoroutineScope,
@@ -324,17 +334,23 @@ public class LinkClickHandler internal constructor(
  *
  * @since 1.0.0
  */
+@Keep
+@Immutable
 public sealed class Link private constructor(
     open val rawLink: String,
     open val fullLink: String,
 ) {
 
+    @Keep
+    @Immutable
     data class UriLink internal constructor(
         override val rawLink: String,
         override val fullLink: String,
     ) : Link(rawLink = rawLink, fullLink = fullLink)
 
 
+    @Keep
+    @Immutable
     data class SameDomainLink internal constructor(
         override val rawLink: String,
         override val fullLink: String,
@@ -344,6 +360,8 @@ public sealed class Link private constructor(
     )
 
 
+    @Keep
+    @Immutable
     data class OtherDomainLink internal constructor(
         override val rawLink: String,
         override val fullLink: String,
@@ -353,12 +371,14 @@ public sealed class Link private constructor(
     )
 
 
+    @Keep
+    @Immutable
     data class SectionLink internal constructor(
         override val rawLink: String,
         override val fullLink: String,
     ) : Link(
         rawLink = rawLink,
-        fullLink = fullLink
+        fullLink = fullLink,
     )
 }
 

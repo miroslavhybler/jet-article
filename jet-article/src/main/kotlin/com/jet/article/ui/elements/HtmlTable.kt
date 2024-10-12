@@ -1,9 +1,12 @@
+@file:OptIn(JetExperimental::class)
+
 package com.jet.article.ui.elements
 
 import android.util.Log
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -163,7 +166,7 @@ fun HtmlTable(
                     )
 
 
-                    if (columnIndex < data.rows.size) {
+                    if (columnIndex < data.rows.lastIndex) {
                         VerticalDivider(
                             modifier = Modifier.height(height = cellHeight),
                             color = MaterialTheme.colorScheme.outline,
@@ -219,54 +222,130 @@ private fun TableCell(
 @Composable
 @Preview(showBackground = true)
 private fun TablePreview() {
-    HtmlTable(
-        data = HtmlElement.Table(
-            rows = listOf(
-                HtmlElement.Table.TableRow(
-                    rowKey = 0,
-                    values = listOf(
-                        HtmlElement.Table.TableRow.TableCell(
-                            columnKey = 0,
-                            value = "id"
+    Column(
+        verticalArrangement = Arrangement.spacedBy(space = 32.dp)
+    ) {
+        HtmlTable(
+            data = HtmlElement.Table(
+                rows = listOf(
+                    HtmlElement.Table.TableRow(
+                        rowKey = 0,
+                        values = listOf(
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 0,
+                                value = "id"
+                            ),
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 1,
+                                value = "first name"
+                            ),
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 2,
+                                value = "last name"
+                            ),
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 3,
+                                value = "date of Birt"
+                            )
                         ),
-                        HtmlElement.Table.TableRow.TableCell(
-                            columnKey = 1,
-                            value = "first name"
+                    ),
+                    HtmlElement.Table.TableRow(
+                        rowKey = 1,
+                        values = listOf(
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 0,
+                                value = "1"
+                            ),
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 1,
+                                value = "John"
+                            ),
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 2,
+                                value = "Doe"
+                            ),
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 3,
+                                value = "1990-01-01"
+                            )
                         ),
-                        HtmlElement.Table.TableRow.TableCell(
-                            columnKey = 2,
-                            value = "last name"
-                        ),
-                        HtmlElement.Table.TableRow.TableCell(
-                            columnKey = 3,
-                            value = "date of Birt"
-                        )
                     ),
                 ),
-                HtmlElement.Table.TableRow(
-                    rowKey = 1,
-                    values = listOf(
-                        HtmlElement.Table.TableRow.TableCell(
-                            columnKey = 0,
-                            value = "1"
-                        ),
-                        HtmlElement.Table.TableRow.TableCell(
-                            columnKey = 1,
-                            value = "John"
-                        ),
-                        HtmlElement.Table.TableRow.TableCell(
-                            columnKey = 2,
-                            value = "Doe"
-                        ),
-                        HtmlElement.Table.TableRow.TableCell(
-                            columnKey = 3,
-                            value = "1990-01-01"
-                        )
-                    ),
-                ),
-            ),
-            key = 0,
-            id = null,
+                key = 0,
+                id = null,
+            )
         )
-    )
+
+        HtmlTable(
+            data = HtmlElement.Table(
+                rows = listOf(
+                    HtmlElement.Table.TableRow(
+                        rowKey = 0,
+                        values = listOf(
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 0,
+                                value = "id"
+                            ),
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 1,
+                                value = "first name"
+                            ),
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 2,
+                                value = "last name"
+                            ),
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 3,
+                                value = "date of Birt"
+                            )
+                        ),
+                    ),
+                    HtmlElement.Table.TableRow(
+                        rowKey = 1,
+                        values = listOf(
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 0,
+                                value = "1"
+                            ),
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 1,
+                                value = "John"
+                            ),
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 2,
+                                value = "Doe"
+                            ),
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 3,
+                                value = "1990-01-01"
+                            )
+                        ),
+                    ),
+                    HtmlElement.Table.TableRow(
+                        rowKey = 1,
+                        values = listOf(
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 0,
+                                value = "1"
+                            ),
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 1,
+                                value = "John Doe Marry"
+                            ),
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 2,
+                                value = "Doe"
+                            ),
+                            HtmlElement.Table.TableRow.TableCell(
+                                columnKey = 3,
+                                value = "1990-01-01"
+                            )
+                        ),
+                    ),
+                ),
+                key = 0,
+                id = null,
+            )
+        )
+    }
 }

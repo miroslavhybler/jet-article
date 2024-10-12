@@ -4,7 +4,7 @@
 package com.jet.article.ui
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.annotation.Keep
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,15 +18,13 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ProvidableCompositionLocal
@@ -37,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.trace
 import com.jet.article.ArticleParser
 import com.jet.article.data.HtmlArticleData
 import com.jet.article.data.HtmlElement
@@ -67,6 +66,7 @@ import mir.oslav.jet.annotations.JetExperimental
  * created on 25.08.2023
  * @see JetHtmlArticleContent
  */
+//TODO simplify links
 @Composable
 @JetExperimental
 public fun JetHtmlArticle(
@@ -111,14 +111,30 @@ public fun JetHtmlArticleContent(
     listState: LazyListState = rememberLazyListState(),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     contentPadding: PaddingValues = PaddingValues(all = 0.dp),
-    text: @Composable (HtmlElement.TextBlock) -> Unit = { HtmlTextBlock(text = it) },
-    image: @Composable (HtmlElement.Image) -> Unit = { HtmlImage(data = it) },
-    quote: @Composable (HtmlElement.Quote) -> Unit = { HtmlQuoete(data = it) },
-    table: @Composable (HtmlElement.Table) -> Unit = { HtmlTable(data = it) },
-    address: @Composable (HtmlElement.Address) -> Unit = { HtmlAddress(address = it) },
-    title: @Composable (HtmlElement.Title) -> Unit = { HtmlTitle(title = it) },
-    code: @Composable (HtmlElement.Code) -> Unit = { HtmlCode(code = it) },
-    basicList: @Composable (HtmlElement.BasicList) -> Unit = { HtmlBasicList(list = it) },
+    text: @Composable (HtmlElement.TextBlock) -> Unit = {
+        JetHtmlArticleDefaults.TextBlock(text = it)
+    },
+    image: @Composable (HtmlElement.Image) -> Unit = {
+        JetHtmlArticleDefaults.Image(data = it)
+    },
+    quote: @Composable (HtmlElement.Quote) -> Unit = {
+        JetHtmlArticleDefaults.Quoete(data = it)
+    },
+    table: @Composable (HtmlElement.Table) -> Unit = {
+        JetHtmlArticleDefaults.Table(data = it)
+    },
+    address: @Composable (HtmlElement.Address) -> Unit = {
+        JetHtmlArticleDefaults.Address(address = it)
+    },
+    title: @Composable (HtmlElement.Title) -> Unit = {
+        JetHtmlArticleDefaults.Title(title = it)
+    },
+    code: @Composable (HtmlElement.Code) -> Unit = {
+        JetHtmlArticleDefaults.Code(code = it)
+    },
+    basicList: @Composable (HtmlElement.BasicList) -> Unit = {
+        JetHtmlArticleDefaults.List(list = it)
+    },
     header: @Composable LazyItemScope. () -> Unit = {},
     footer: @Composable LazyItemScope.() -> Unit = {},
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
@@ -128,20 +144,18 @@ public fun JetHtmlArticleContent(
         coroutineScope = rememberCoroutineScope(),
     ),
     containerColor: Color = MaterialTheme.colorScheme.background,
-
-    ) {
+)  = trace(sectionName = "JetHtmlArticleContent") {
 
     val linkHandler = rememberLinkClickHandler(
         lazyListState = listState,
         snackbarHostState = snackbarHostState,
-        callback = linkClickCallback
+        callback = linkClickCallback,
     )
 
     CompositionLocalProvider(
         LocalBaseArticleUrl provides data.url,
         LocalLinkHandler provides linkHandler,
         LocalHtmlArticleData provides data,
-        LocalContentPadding provides contentPadding,
     ) {
         //TODO remove scaffold and use box or something instead
         Scaffold(
@@ -218,13 +232,52 @@ public fun JetHtmlArticleContent(
  */
 public object JetHtmlArticleDefaults {
 
+    @Composable
+    fun TextBlock(text: HtmlElement.TextBlock) {
+        HtmlTextBlock(text = text)
+    }
+
+    @Composable
+    fun Image(data: HtmlElement.Image) {
+        HtmlImage(data = data)
+    }
+
+    @Composable
+    fun Quoete(data: HtmlElement.Quote) {
+        HtmlQuoete(data = data)
+    }
+
+    @Composable
+    fun Table(data: HtmlElement.Table) {
+        HtmlTable(data = data)
+    }
+
+    @Composable
+    fun Address(address: HtmlElement.Address) {
+        HtmlAddress(address = address)
+    }
+
+    @Composable
+    fun Title(title: HtmlElement.Title) {
+        HtmlTitle(title = title)
+    }
+
+    @Composable
+    fun List(list: HtmlElement.BasicList) {
+        HtmlBasicList(list = list)
+    }
+
+    @Composable
+    fun Code(code: HtmlElement.Code) {
+        HtmlCode(code = code)
+    }
 }
 
 
 /**
  * @since 1.0.0
  */
-internal val LocalLinkHandler: ProvidableCompositionLocal<LinkClickHandler?> = compositionLocalOf(
+public val LocalLinkHandler: ProvidableCompositionLocal<LinkClickHandler?> = compositionLocalOf(
     defaultFactory = { null }
 )
 
@@ -232,7 +285,7 @@ internal val LocalLinkHandler: ProvidableCompositionLocal<LinkClickHandler?> = c
 /**
  * @since 1.0.0
  */
-internal val LocalBaseArticleUrl: ProvidableCompositionLocal<String> = compositionLocalOf(
+public val LocalBaseArticleUrl: ProvidableCompositionLocal<String> = compositionLocalOf(
     defaultFactory = { "" }
 )
 
@@ -240,14 +293,6 @@ internal val LocalBaseArticleUrl: ProvidableCompositionLocal<String> = compositi
 /**
  * @since 1.0.0
  */
-internal val LocalHtmlArticleData: ProvidableCompositionLocal<HtmlArticleData> = compositionLocalOf(
+public val LocalHtmlArticleData: ProvidableCompositionLocal<HtmlArticleData> = compositionLocalOf(
     defaultFactory = HtmlArticleData::empty
-)
-
-
-/**
- * @since 1.0.0
- */
-internal val LocalContentPadding: ProvidableCompositionLocal<PaddingValues> = compositionLocalOf(
-    defaultFactory = { PaddingValues() }
 )
