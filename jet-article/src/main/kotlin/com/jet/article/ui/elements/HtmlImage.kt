@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.trace
 import coil.compose.SubcomposeAsyncImage
 import coil.imageLoader
 import com.jet.article.data.HtmlElement
@@ -36,7 +37,7 @@ fun HtmlImage(
     shape: Shape = MaterialTheme.shapes.medium,
     loading: @Composable () -> Unit = { HtmlImageDefaults.LoadingLayout() },
     error: @Composable () -> Unit = { HtmlImageDefaults.ErrorLayout() },
-) {
+) = trace(sectionName = "HtmlImage"){
 
     HtmlImage(
         modifier = modifier,
@@ -61,7 +62,7 @@ fun HtmlImage(
     shape: Shape = MaterialTheme.shapes.medium,
     loading: @Composable () -> Unit = { HtmlImageDefaults.LoadingLayout() },
     error: @Composable () -> Unit = { HtmlImageDefaults.ErrorLayout() },
-) {
+) = trace(sectionName = "HtmlImage") {
     val context = LocalContext.current
     SubcomposeAsyncImage(
         modifier = modifier

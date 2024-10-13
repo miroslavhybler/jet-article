@@ -2,7 +2,6 @@
 
 package com.jet.article.ui.elements
 
-import android.util.Log
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -11,17 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.core.text.toSpannable
-import com.jet.article.ArticleParser
+import androidx.compose.ui.util.trace
 import com.jet.article.data.HtmlElement
 import com.jet.article.rememberHtmlText
-import com.jet.article.toAnnotatedString
-import com.jet.article.toHtml
-import com.jet.article.ui.LocalBaseArticleUrl
-import com.jet.article.ui.LocalHtmlArticleData
-import com.jet.article.ui.LocalLinkHandler
 
 /**
  * @author Miroslav Hýbler <br>
@@ -36,7 +28,7 @@ fun HtmlTextBlock(
     color: Color = MaterialTheme.colorScheme.onBackground,
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
-) {
+) = trace(sectionName = "HtmlTextBlock") {
 
     HtmlTextBlock(
         modifier = modifier,

@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.trace
 import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
@@ -41,7 +42,7 @@ import com.jet.article.ui.LocalLinkHandler
 fun HtmlQuoete(
     modifier: Modifier = Modifier,
     data: HtmlElement.Quote
-) {
+) = trace(sectionName = "HtmlQuoete") {
 
     val density = LocalDensity.current
     val linkClickHandler = LocalLinkHandler.current

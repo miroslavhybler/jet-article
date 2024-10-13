@@ -3,6 +3,7 @@
 package com.jet.article
 
 import android.util.Log
+import androidx.compose.ui.util.trace
 import com.jet.article.data.ContentTag
 import com.jet.article.data.TagInfo
 import kotlinx.coroutines.CoroutineName
@@ -41,16 +42,18 @@ public object ArticleAnalyzer {
     suspend fun process(
         content: String,
         onTag: suspend (tag: TagInfo) -> Unit,
-    ): Unit = withContext(context = safeCoroutineContext) {
-        AnalyzerNative.setInput(input = content)
-        jumpToBody()
-        while (moveNext()) {
-            val data = analyzerFlow.value
-            if (data != null
-                && data.tag.tag.isNotBlank()
-                && !data.tag.tag.startsWith(prefix = "/")
-            ) {
-                onTag(data.tag)
+    ): Unit = trace(sectionName = "ArticleAnalyzer#process") {
+        withContext(context = safeCoroutineContext) {
+            AnalyzerNative.setInput(input = content)
+            jumpToBody()
+            while (moveNext()) {
+                val data = analyzerFlow.value
+                if (data != null
+                    && data.tag.tag.isNotBlank()
+                    && !data.tag.tag.startsWith(prefix = "/")
+                ) {
+                    onTag(data.tag)
+                }
             }
         }
     }

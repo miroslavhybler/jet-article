@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.util.trace
 import com.jet.article.data.HtmlArticleData
 
 
@@ -19,7 +20,7 @@ import com.jet.article.data.HtmlArticleData
 @Composable
 public fun HtmlInvalid(
     modifier: Modifier = Modifier,
-) {
+) = trace(sectionName = "HtmlInvalid") {
 
 
     Column(modifier = modifier.fillMaxWidth()) {

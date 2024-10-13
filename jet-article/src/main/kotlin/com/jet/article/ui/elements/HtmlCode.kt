@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.trace
 import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
@@ -29,7 +30,7 @@ import com.jet.article.ui.LocalLinkHandler
 fun HtmlCode(
     modifier: Modifier = Modifier,
     code: HtmlElement.Code
-) {
+) = trace(sectionName = "HtmlCode") {
     val linkClickHandler = LocalLinkHandler.current
     val articleData = LocalHtmlArticleData.current
     val articleUrl = LocalBaseArticleUrl.current

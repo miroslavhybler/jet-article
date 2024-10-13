@@ -84,7 +84,7 @@ public fun JetHtmlArticle(
         coroutineScope = rememberCoroutineScope(),
     ),
     containerColor: Color = MaterialTheme.colorScheme.background,
-) {
+) = trace(sectionName = "JetHtmlArticle") {
     JetHtmlArticleContent(
         modifier = modifier,
         data = data,
@@ -144,7 +144,7 @@ public fun JetHtmlArticleContent(
         coroutineScope = rememberCoroutineScope(),
     ),
     containerColor: Color = MaterialTheme.colorScheme.background,
-)  = trace(sectionName = "JetHtmlArticleContent") {
+) = trace(sectionName = "JetHtmlArticleContent") {
 
     val linkHandler = rememberLinkClickHandler(
         lazyListState = listState,

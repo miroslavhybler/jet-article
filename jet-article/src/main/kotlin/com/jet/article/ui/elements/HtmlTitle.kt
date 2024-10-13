@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.util.trace
 import com.jet.article.data.HtmlElement
 
 
@@ -18,7 +19,7 @@ fun HtmlTitle(
     modifier: Modifier = Modifier,
     title: HtmlElement.Title,
     color: Color = MaterialTheme.colorScheme.onBackground,
-) {
+) = trace(sectionName = "HtmlTitle") {
     val typography = MaterialTheme.typography
 
     val textStyle = remember(key1 = title.key) {

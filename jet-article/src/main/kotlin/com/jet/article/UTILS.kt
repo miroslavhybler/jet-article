@@ -25,6 +25,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.util.trace
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.toSpannable
@@ -42,7 +43,7 @@ import kotlin.jvm.Throws
 internal fun rememberHtmlText(
     key: Any,
     text: String,
-): AnnotatedString {
+): AnnotatedString  = trace(sectionName = "rememberHtmlText") {
     val linkClickHandler = LocalLinkHandler.current
     val articleData = LocalHtmlArticleData.current
     val articleUrl = LocalBaseArticleUrl.current

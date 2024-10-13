@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.util.trace
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -114,7 +115,7 @@ public object ArticleParser {
     public suspend fun parse(
         content: String,
         url: String,
-    ): HtmlArticleData {
+    ): HtmlArticleData = trace(sectionName = "ArticleParser#parse") {
         return withContext(context = safeCoroutineContext) parser@{
             val elements = ArrayList<HtmlElement>()
             ParserNative.setInput(content = content)
@@ -166,12 +167,12 @@ public object ArticleParser {
         elements: MutableList<HtmlElement>,
         articleUrl: String,
         newKey: Int,
-    ) {
+    ) = trace(sectionName = "ArticleParser#onElement()") {
         val type = ParserNative.getContentType()
         if (type == HtmlContentType.NO_CONTENT) {
             //Some weird error, this should never happen but teoretically it can since elements
             //parts are stored separately on c++ side.
-            return
+            return@trace
         }
         when (type) {
             HtmlContentType.IMAGE -> {

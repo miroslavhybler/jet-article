@@ -51,6 +51,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.trace
 import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
 import com.jet.article.rememberHtmlText
@@ -76,7 +77,7 @@ fun HtmlTable(
     data: HtmlElement.Table,
     scrollState: ScrollState = rememberScrollState(),
     shape: Shape = MaterialTheme.shapes.small,
-) {
+) = trace(sectionName = "HtmlTable") {
     val density = LocalDensity.current
 
     val textMeasurer = rememberTextMeasurer()

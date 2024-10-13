@@ -3,6 +3,7 @@ package com.jet.article.ui.elements
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.util.trace
 import com.jet.article.data.HtmlElement
 
 
@@ -14,7 +15,7 @@ import com.jet.article.data.HtmlElement
 fun HtmlAddress(
     modifier: Modifier = Modifier,
     address: HtmlElement.Address
-) {
+) = trace(sectionName = "HtmlAddress") {
     HtmlTextBlock(
         text = address.content,
         key = address.key,

@@ -22,6 +22,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.trace
 import com.jet.article.data.HtmlElement
 import com.jet.article.R
 
@@ -37,7 +38,7 @@ public fun HtmlBasicList(
     @DrawableRes bulletRes: Int = R.drawable.ic_jet_article_list_item,
     bulletTint: Color = MaterialTheme.colorScheme.onBackground,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
-) {
+) = trace(sectionName = "HtmlBasicList") {
     val density = LocalDensity.current
     Column(
         modifier = modifier
