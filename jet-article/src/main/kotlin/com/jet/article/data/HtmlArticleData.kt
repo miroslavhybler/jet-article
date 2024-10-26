@@ -21,14 +21,16 @@ public data class HtmlArticleData public constructor(
     val elements: List<HtmlElement> = emptyList(),
     val headData: HtmlHeadData = HtmlHeadData.empty,
 ) {
+
     @Keep
     companion object {
         /**
-         * Empty html data, can be used to avoid nullability
+         * Empty html data instance, can be used to avoid nullability
          * @since 1.0.0
          */
         val empty: HtmlArticleData = HtmlArticleData(url = "")
     }
+
 
     /**
      * True when html data are empty

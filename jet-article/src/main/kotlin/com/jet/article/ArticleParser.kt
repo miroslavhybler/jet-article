@@ -2,20 +2,23 @@
 
 package com.jet.article
 
+import android.content.Context
 import androidx.annotation.CheckResult
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.trace
+import androidx.core.text.toSpannable
 import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.jet.article.data.HtmlContentType
 import com.jet.article.data.HtmlArticleData
 import com.jet.article.data.HtmlElement
 import com.jet.article.data.HtmlHeadData
-import com.jet.article.data.TagInfo
+import com.jet.article.ui.LinkClickHandler
 import kotlinx.coroutines.asCoroutineDispatcher
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
@@ -50,6 +53,8 @@ public object ArticleParser {
     var isSimpleTextFormatAllowed: Boolean by mutableStateOf(value = true)
         private set
 
+    var linkColor: Color = Color.Blue
+        private set
 
     /**
      * Sets up input options for parser. Keep in mind that this function should be called before [parse].
@@ -69,8 +74,10 @@ public object ArticleParser {
         isLoggingEnabled: Boolean = false,
         isSimpleTextFormatAllowed: Boolean = true,
         isQueringTextOutsideTextTags: Boolean = false,
+        linkColor: Color = Color.Blue,
     ): Unit {
         this.isSimpleTextFormatAllowed = isSimpleTextFormatAllowed
+        this.linkColor = linkColor
         ParserNative.initialize(
             areImagesEnabled = areImagesEnabled,
             isLoggingEnabled = isLoggingEnabled,
@@ -115,6 +122,7 @@ public object ArticleParser {
     public suspend fun parse(
         content: String,
         url: String,
+        linkClickHandler: LinkClickHandler = LinkClickHandler(),
     ): HtmlArticleData = trace(sectionName = "ArticleParser#parse") {
         return withContext(context = safeCoroutineContext) parser@{
             val elements = ArrayList<HtmlElement>()
@@ -132,7 +140,12 @@ public object ArticleParser {
             while (ParserNative.hasNextStep()) {
                 ParserNative.doNextStep()
                 if (ParserNative.hasContent()) {
-                    onElement(elements = elements, articleUrl = url, newKey = ++key)
+                    onElement(
+                        elements = elements,
+                        articleUrl = url,
+                        newKey = ++key,
+                        linkHandler = linkClickHandler,
+                    )
                     ParserNative.resetCurrentContent()
                 }
             }
@@ -167,6 +180,7 @@ public object ArticleParser {
         elements: MutableList<HtmlElement>,
         articleUrl: String,
         newKey: Int,
+        linkHandler: LinkClickHandler,
     ) = trace(sectionName = "ArticleParser#onElement()") {
         val type = ParserNative.getContentType()
         if (type == HtmlContentType.NO_CONTENT) {
@@ -176,55 +190,11 @@ public object ArticleParser {
         }
         when (type) {
             HtmlContentType.IMAGE -> {
-                var imageUrl: String = ParserNative.getContentMapItem(attributeName = "src")
-                if (
-                    imageUrl.isEmpty()
-                    || imageUrl.endsWith(suffix = ".svg")
-                ) {
-                    //Svg format not supported
-                    return
-                }
-                if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
-                    val base = articleUrl.toDomainName()?.removeSuffix(suffix = "/")
-                    val end = imageUrl.removePrefix(prefix = "/")
-                    imageUrl = "www.$base/$end"
-                }
-
-                val w = ParserNative.getContentMapItem(attributeName = "width").toIntOrNull()
-                val h = ParserNative.getContentMapItem(attributeName = "height").toIntOrNull()
-                val alt = ParserNative.getContentMapItem(attributeName = "alt")
-
-                val size = if (w != null && h != null)
-                    IntSize(width = w, height = h)
-                else
-                    IntSize.Zero
-
-                elements.add(
-                    element = HtmlElement.Image(
-                        url = imageUrl,
-                        description = alt,
-                        defaultSize = size,
-                        alt = alt,
-                        id = ParserNative.getCurrentTagId(),
-                        key = newKey,
-                    )
-                )
+                onImage(key = newKey, elements = elements, articleUrl = articleUrl)
             }
 
             HtmlContentType.TEXT -> {
-                val content = ParserNative.getContent()
-
-                //TODO MOVE blank check into native code
-                if (content.isBlank()) {
-                    return
-                }
-
-                val text = HtmlElement.TextBlock(
-                    text = content,
-                    id = ParserNative.getCurrentTagId(),
-                    key = newKey,
-                )
-                elements.add(element = text)
+                onText(key = newKey, elements = elements,linkHandler=linkHandler,)
             }
 
             HtmlContentType.TITLE -> {
@@ -289,62 +259,145 @@ public object ArticleParser {
             }
 
             HtmlContentType.TABLE -> {
-                val rows = ArrayList<HtmlElement.Table.TableRow>()
+                onTable(key = newKey, elements = elements)
+            }
 
-                val columnCount = ParserNative.getTableColumnCount()
-                val rowsCount = ParserNative.getTableRowsCount()
+            HtmlContentType.ADDRESS -> {
+                val content = ParserNative.getContent()
 
-                if (rowsCount == 0 || columnCount == 0) {
+                if (content.isBlank()) {
                     return
                 }
-
-                for (i in 0 until rowsCount) {
-                    val columns = ArrayList<String>()
-                    for (j in 0 until columnCount) {
-                        val el = ParserNative.getTableCell(row = i, column = j)
-                        columns.add(element = el)
-                    }
-                    rows.add(
-                        element = HtmlElement.Table.TableRow(
-                            values = columns.mapIndexed { i, value ->
-                                HtmlElement.Table.TableRow.TableCell(
-                                    columnKey = i,
-                                    value = value
-                                )
-                            },
-                            rowKey = i
-                        )
-                    )
-                }
-
-
                 elements.add(
-                    element = HtmlElement.Table(
-                        rows = rows,
+                    element = HtmlElement.TextBlock(
+                        text = buildAnnotatedString {
+                            append(text = content)
+                        },
                         id = ParserNative.getCurrentTagId(),
                         key = newKey,
                     )
                 )
             }
 
-            HtmlContentType.ADDRESS -> {
-                val content = ParserNative.getContent()
-
-                //TODO move blank check into native code
-                if (content.isBlank()) {
-                    return
-                }
-
-                val text = HtmlElement.TextBlock(
-                    text = content,
-                    id = ParserNative.getCurrentTagId(),
-                    key = newKey,
-                )
-                elements.add(element = text)
-            }
-
             else -> {}
         }
+    }
+
+
+    private fun onText(
+        elements: MutableList<HtmlElement>,
+        key: Int,
+        linkHandler: LinkClickHandler,
+    ) {
+        val content = ParserNative.getContent()
+
+        if (content.isBlank()) {
+            return
+        }
+
+        val finalContent = if (isSimpleTextFormatAllowed) {
+            content.toHtml()
+                .toSpannable()
+                .toAnnotatedString(
+                    primaryColor = linkColor,
+                    linkClickHandler = linkHandler,
+                )
+        } else {
+            buildAnnotatedString {
+                append(text = content)
+            }
+        }
+        elements.add(
+            element = HtmlElement.TextBlock(
+                text = finalContent,
+                id = ParserNative.getCurrentTagId(),
+                key = key,
+            )
+        )
+    }
+
+
+    private fun onImage(
+        elements: MutableList<HtmlElement>,
+        articleUrl: String,
+        key: Int,
+    ) {
+        var imageUrl: String = ParserNative.getContentMapItem(attributeName = "src")
+        if (
+            imageUrl.isEmpty()
+            || imageUrl.endsWith(suffix = ".svg")
+        ) {
+            //Svg format not supported
+            return
+        }
+        if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
+            val base = articleUrl.toDomainName()?.removeSuffix(suffix = "/")
+            val end = imageUrl.removePrefix(prefix = "/")
+            imageUrl = "www.$base/$end"
+        }
+
+        val w = ParserNative.getContentMapItem(attributeName = "width").toIntOrNull()
+        val h = ParserNative.getContentMapItem(attributeName = "height").toIntOrNull()
+        val alt = ParserNative.getContentMapItem(attributeName = "alt")
+
+        val size = if (w != null && h != null)
+            IntSize(width = w, height = h)
+        else
+            IntSize.Zero
+
+        elements.add(
+            element = HtmlElement.Image(
+                url = imageUrl,
+                description = alt,
+                defaultSize = size,
+                alt = alt,
+                id = ParserNative.getCurrentTagId(),
+                key = key,
+            )
+        )
+    }
+
+
+    private fun onTable(
+        elements: MutableList<HtmlElement>,
+        key: Int,
+    ) {
+        val rows = ArrayList<HtmlElement.Table.TableRow>()
+
+        val columnCount = ParserNative.getTableColumnCount()
+        val rowsCount = ParserNative.getTableRowsCount()
+
+        if (rowsCount == 0 || columnCount == 0) {
+            return
+        }
+
+        for (i in 0 until rowsCount) {
+            val columns = ArrayList<String>()
+            for (j in 0 until columnCount) {
+                val el = ParserNative.getTableCell(row = i, column = j)
+                columns.add(element = el)
+            }
+            rows.add(
+                element = HtmlElement.Table.TableRow(
+                    values = columns.mapIndexed { i, value ->
+                        HtmlElement.Table.TableRow.TableCell(
+                            columnKey = i,
+                            value = value
+                        )
+                    },
+                    rowKey = i
+                )
+            )
+        }
+
+
+        elements.add(
+            element = HtmlElement.Table(
+                rows = rows,
+                id = ParserNative.getCurrentTagId(),
+                key = key,
+            )
+        )
     }
 
 

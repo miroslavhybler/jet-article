@@ -96,6 +96,11 @@ val items = listOf(
         asset = "title",
     ),
     Item(
+        title = "Image",
+        asset = "image",
+        iconRes = R.drawable.ic_image,
+    ),
+    Item(
         title = "Quote",
         asset = "quote",
     ),
@@ -112,5 +117,9 @@ val items = listOf(
     Item(
         title = "Address",
         asset = "address",
+    ),
+    Item(
+        title = "Code",
+        asset = "code",
     ),
 )

@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="jet_article_links_supported">Url links are not supported by default</string>
-    <string name="jet_article_unkonw_uri_link">Unknown Uri link</string>
 </resources>

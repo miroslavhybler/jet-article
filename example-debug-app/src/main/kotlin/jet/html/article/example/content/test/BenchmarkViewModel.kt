@@ -27,33 +27,28 @@ class BenchmarkViewModel @Inject constructor(
 
     private val assets: AssetManager = context.assets
 
-    private val mArticleData: MutableStateFlow<HtmlArticleData> =
-        MutableStateFlow(value = HtmlArticleData.empty)
-    val articleData: StateFlow<HtmlArticleData> get() = mArticleData
-
-
     val testResults: MutableStateFlow<TestResults?> = MutableStateFlow(value = null)
 
     var articlePath: String = ""
     private var article: String = ""
 
-    fun loadArticleFromResources(article: String,) {
+    suspend fun loadArticleFromResources(
+        article: String
+    ): HtmlArticleData {
         this.article = article
-        viewModelScope.launch {
-            ExcludeRule.globalRules.forEach {
-                ArticleParser.addExcludeOption(
-                    tag = it.tag,
-                    clazz = it.clazz,
-                    id = it.id,
-                    keyword = it.keyword
-                )
-            }
-            val articleContent = getArticle(fileName = article)
-            mArticleData.value = ArticleParser.parse(
-                content = articleContent,
-                url = "https://www.example.com"
+        ExcludeRule.globalRules.forEach {
+            ArticleParser.addExcludeOption(
+                tag = it.tag,
+                clazz = it.clazz,
+                id = it.id,
+                keyword = it.keyword
             )
         }
+        val articleContent = getArticle(fileName = article)
+        return ArticleParser.parse(
+            content = articleContent,
+            url = "https://www.example.com"
+        )
     }
 
 

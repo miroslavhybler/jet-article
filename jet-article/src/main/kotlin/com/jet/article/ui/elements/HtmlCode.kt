@@ -16,10 +16,6 @@ import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
 import com.jet.article.toAnnotatedString
 import com.jet.article.toHtml
-import com.jet.article.ui.LocalBaseArticleUrl
-import com.jet.article.ui.LocalHtmlArticleData
-import com.jet.article.ui.LocalLinkHandler
-
 
 /**
  * @author Miroslav Hýbler <br>
@@ -31,10 +27,6 @@ fun HtmlCode(
     modifier: Modifier = Modifier,
     code: HtmlElement.Code
 ) = trace(sectionName = "HtmlCode") {
-    val linkClickHandler = LocalLinkHandler.current
-    val articleData = LocalHtmlArticleData.current
-    val articleUrl = LocalBaseArticleUrl.current
-    val colorScheme = MaterialTheme.colorScheme
     Box(
         modifier = Modifier
             .padding(vertical = 4.dp)
@@ -53,12 +45,7 @@ fun HtmlCode(
             text = remember(key1 = code) {
                 code.content.toHtml()
                     .toSpannable()
-                    .toAnnotatedString(
-                        primaryColor = colorScheme.primary,
-                        linkClickHandler = linkClickHandler,
-                        data = articleData,
-                        articleUrl = articleUrl,
-                    )
+                    .toAnnotatedString()
             },
             modifier = modifier
                 .fillMaxWidth()

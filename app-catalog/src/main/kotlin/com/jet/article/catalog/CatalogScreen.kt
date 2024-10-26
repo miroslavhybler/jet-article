@@ -27,6 +27,7 @@ import androidx.navigation.NavHostController
 import com.jet.article.ArticleParser
 import com.jet.article.data.HtmlArticleData
 import com.jet.article.ui.JetHtmlArticle
+import com.jet.article.ui.rememberJetHtmlArticleState
 import mir.oslav.jet.annotations.JetExperimental
 
 
@@ -43,13 +44,14 @@ fun CatalogScreen(
 ) {
     val context = LocalContext.current
     val layoutDirection = LocalLayoutDirection.current
-
-    var data = remember { mutableStateOf(value = HtmlArticleData.empty) }
+    val state = rememberJetHtmlArticleState()
 
     LaunchedEffect(key1 = asset) {
-        data.value = ArticleParser.parse(
-            content = context.getHtmlAsset(fileName = asset),
-            url = "https://www.example.com",
+        state.show(
+            data = ArticleParser.parse(
+                content = context.getHtmlAsset(fileName = asset),
+                url = "https://www.example.com",
+            )
         )
     }
 
@@ -74,15 +76,8 @@ fun CatalogScreen(
         content = { paddingValues ->
             JetHtmlArticle(
                 modifier = Modifier,
-                data = data.value,
-                contentPadding = remember(key1 = paddingValues) {
-                    PaddingValues(
-                        top = 32.dp + paddingValues.calculateTopPadding(),
-                        bottom = 16.dp + paddingValues.calculateBottomPadding(),
-                        start = 20.dp + paddingValues.calculateStartPadding(layoutDirection),
-                        end = 20.dp + paddingValues.calculateEndPadding(layoutDirection),
-                    )
-                },
+                state = state,
+                contentPadding = paddingValues,
             )
         },
         bottomBar = {

@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.jet.article.ui.JetHtmlArticle
+import com.jet.article.ui.rememberJetHtmlArticleState
 import jet.html.article.example.composables.DebugBottomBar
 import jet.html.article.example.composables.Results
 import jet.html.article.example.composables.SimpleTopaBar
@@ -39,12 +40,14 @@ fun PerformanceScreen(
     navHostController: NavHostController,
 ) {
     val context = LocalContext.current
-    val data by viewModel.articleData.collectAsState()
     val testResults by viewModel.testResults.collectAsState()
+    val state = rememberJetHtmlArticleState()
 
     LaunchedEffect(key1 = Unit, block = {
-        viewModel.loadArticleFromResources(
-            article = article,
+        state.show(
+            data = viewModel.loadArticleFromResources(
+                article = article,
+            )
         )
     })
 
@@ -55,21 +58,14 @@ fun PerformanceScreen(
 
     Scaffold(
         topBar = {
-            SimpleTopaBar(text = "Benchmark: ${data.headData.title}")
+            SimpleTopaBar(text = "Benchmark: ${state.data.headData.title}")
         },
         content = { paddingValues ->
             Box(modifier = Modifier.fillMaxSize()) {
                 JetHtmlArticle(
-                    data = data,
                     modifier = Modifier,
-                    contentPadding = remember(key1 = paddingValues) {
-                        PaddingValues(
-                            top = paddingValues.calculateTopPadding() + 32.dp,
-                            bottom = paddingValues.calculateBottomPadding() + 16.dp,
-                            start = 18.dp,
-                            end = 18.dp
-                        )
-                    }
+                    contentPadding = paddingValues,
+                    state = state,
                 )
 
                 AnimatedVisibility(

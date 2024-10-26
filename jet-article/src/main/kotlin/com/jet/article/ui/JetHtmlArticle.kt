@@ -4,7 +4,6 @@
 package com.jet.article.ui
 
 import android.annotation.SuppressLint
-import androidx.annotation.Keep
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,7 +18,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -27,13 +25,18 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.trace
 import com.jet.article.ArticleParser
@@ -56,7 +59,6 @@ import mir.oslav.jet.annotations.JetExperimental
  * @param modifier Modifier to modify composable
  * @param data Parsed html article data to be shown. Mostly result of [ArticleParser.parse].
  * @param listState [LazyListState] used to controll scroll.
- * @param snackbarHostState SnackBar state used to show errors.
  * @param contentPadding
  * @param header
  * @param footer
@@ -66,37 +68,25 @@ import mir.oslav.jet.annotations.JetExperimental
  * created on 25.08.2023
  * @see JetHtmlArticleContent
  */
-//TODO simplify links
 @Composable
 @JetExperimental
 public fun JetHtmlArticle(
     modifier: Modifier = Modifier,
-    data: HtmlArticleData,
-    listState: LazyListState = rememberLazyListState(),
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    state: JetHtmlArticleState,
     contentPadding: PaddingValues = PaddingValues(all = 0.dp),
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     header: @Composable LazyItemScope.() -> Unit = {},
     footer: @Composable LazyItemScope.() -> Unit = {},
-    linkClickCallback: LinkClickHandler.LinkCallback = rememberDefaultLinkCallback(
-        snackbarHostState = snackbarHostState,
-        coroutineScope = rememberCoroutineScope(),
-    ),
-    containerColor: Color = MaterialTheme.colorScheme.background,
 ) = trace(sectionName = "JetHtmlArticle") {
     JetHtmlArticleContent(
         modifier = modifier,
-        data = data,
-        listState = listState,
+        state = state,
         contentPadding = contentPadding,
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
         header = header,
         footer = footer,
-        snackbarHostState = snackbarHostState,
-        linkClickCallback = linkClickCallback,
-        containerColor = containerColor,
     )
 }
 
@@ -107,9 +97,7 @@ public fun JetHtmlArticle(
 @Composable
 public fun JetHtmlArticleContent(
     modifier: Modifier = Modifier,
-    data: HtmlArticleData,
-    listState: LazyListState = rememberLazyListState(),
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    state: JetHtmlArticleState,
     contentPadding: PaddingValues = PaddingValues(all = 0.dp),
     text: @Composable (HtmlElement.TextBlock) -> Unit = {
         JetHtmlArticleDefaults.TextBlock(text = it)
@@ -139,91 +127,125 @@ public fun JetHtmlArticleContent(
     footer: @Composable LazyItemScope.() -> Unit = {},
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-    linkClickCallback: LinkClickHandler.LinkCallback = rememberDefaultLinkCallback(
-        snackbarHostState = snackbarHostState,
-        coroutineScope = rememberCoroutineScope(),
-    ),
-    containerColor: Color = MaterialTheme.colorScheme.background,
 ) = trace(sectionName = "JetHtmlArticleContent") {
 
-    val linkHandler = rememberLinkClickHandler(
-        lazyListState = listState,
-        snackbarHostState = snackbarHostState,
-        callback = linkClickCallback,
-    )
-
     CompositionLocalProvider(
-        LocalBaseArticleUrl provides data.url,
-        LocalLinkHandler provides linkHandler,
-        LocalHtmlArticleData provides data,
+        /*
+        LocalBaseArticleUrl provides state.data.url,
+        LocalLinkHandler provides state.linkClickHandler,
+        LocalHtmlArticleData provides state.data,
+
+
+         */
     ) {
-        //TODO remove scaffold and use box or something instead
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            containerColor = containerColor,
-            content = { paddingValues ->
-                //TODO enable/disable selection
-                SelectionContainer {
-                    LazyColumn(
-                        modifier = modifier
-                            .fillMaxSize(),
-                        state = listState,
-                        verticalArrangement = verticalArrangement,
-                        horizontalAlignment = horizontalAlignment,
-                        content = {
-                            item(content = header)
-                            itemsIndexed(
-                                items = data.elements,
-                                key = { _, element -> element.key },
-                            ) { index, element ->
-                                when (element) {
-                                    is HtmlElement.Image -> image(element)
-                                    is HtmlElement.Quote -> quote(element)
-                                    is HtmlElement.Table -> table(element)
-                                    is HtmlElement.Address -> address(element)
-                                    is HtmlElement.TextBlock -> text(element)
-                                    is HtmlElement.Title -> {
-                                        if (index != 0) {
-                                            Column(modifier = Modifier) {
-                                                //TODO spacing
-                                                Spacer(modifier = Modifier.height(height = 24.dp))
-                                                title(element)
-                                            }
-                                        } else {
-                                            title(element)
-                                        }
-                                    }
+        if (state.isSelectionEnabled) {
+            SelectionContainer {
+                JetHtmlArticleLazyColumn(
+                    modifier = modifier,
+                    state = state,
+                    contentPadding = contentPadding,
+                    text = text,
+                    image = image,
+                    quote = quote,
+                    table = table,
+                    address = address,
+                    title = title,
+                    code = code,
+                    basicList = basicList,
+                    header = header,
+                    footer = footer,
+                    verticalArrangement = verticalArrangement,
+                    horizontalAlignment = horizontalAlignment,
+                )
+            }
+        } else {
+            JetHtmlArticleLazyColumn(
+                modifier = modifier,
+                state = state,
+                contentPadding = contentPadding,
+                text = text,
+                image = image,
+                quote = quote,
+                table = table,
+                address = address,
+                title = title,
+                code = code,
+                basicList = basicList,
+                header = header,
+                footer = footer,
+                verticalArrangement = verticalArrangement,
+                horizontalAlignment = horizontalAlignment,
+            )
+        }
+    }
+}
 
-                                    is HtmlElement.Code -> code(element)
-                                    is HtmlElement.BasicList -> basicList(element)
-                                    else -> throw IllegalStateException(
-                                        "Element ${element.javaClass.simpleName} not supported yet!"
-                                    )
-                                }
-                            }
 
-                            if (data.isEmpty) {
-                                item {
-                                    Text(text = "EMPTY")
-                                }
+@Composable
+private fun JetHtmlArticleLazyColumn(
+    modifier: Modifier,
+    state: JetHtmlArticleState,
+    contentPadding: PaddingValues,
+    text: @Composable (HtmlElement.TextBlock) -> Unit,
+    image: @Composable (HtmlElement.Image) -> Unit,
+    quote: @Composable (HtmlElement.Quote) -> Unit,
+    table: @Composable (HtmlElement.Table) -> Unit,
+    address: @Composable (HtmlElement.Address) -> Unit,
+    title: @Composable (HtmlElement.Title) -> Unit,
+    code: @Composable (HtmlElement.Code) -> Unit,
+    basicList: @Composable (HtmlElement.BasicList) -> Unit,
+    header: @Composable LazyItemScope. () -> Unit,
+    footer: @Composable LazyItemScope.() -> Unit,
+    verticalArrangement: Arrangement.Vertical,
+    horizontalAlignment: Alignment.Horizontal,
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize(),
+        state = state.listState,
+        verticalArrangement = verticalArrangement,
+        horizontalAlignment = horizontalAlignment,
+        contentPadding = contentPadding,
+        content = {
+            item(content = header)
+            itemsIndexed(
+                items = state.data.elements,
+                key = { _, element -> element.key },
+            ) { index, element ->
+                when (element) {
+                    is HtmlElement.Image -> image(element)
+                    is HtmlElement.Quote -> quote(element)
+                    is HtmlElement.Table -> table(element)
+                    is HtmlElement.Address -> address(element)
+                    is HtmlElement.TextBlock -> text(element)
+                    is HtmlElement.Title -> {
+                        if (index != 0) {
+                            Column(modifier = Modifier) {
+                                //TODO spacing
+                                Spacer(modifier = Modifier.height(height = 24.dp))
+                                title(element)
                             }
-                            item(content = footer)
-                        },
-                        contentPadding = contentPadding
-                    )
-                }
-            },
-            snackbarHost = {
-                SnackbarHost(hostState = snackbarHostState) {
-                    Snackbar(
-                        snackbarData = it,
-                        modifier = Modifier
-                            .padding(bottom = contentPadding.calculateBottomPadding())
+                        } else {
+                            title(element)
+                        }
+                    }
+
+                    is HtmlElement.Code -> code(element)
+                    is HtmlElement.BasicList -> basicList(element)
+                    else -> throw IllegalStateException(
+                        "Element ${element.javaClass.simpleName} not supported yet!"
                     )
                 }
             }
-        )
-    }
+
+            if (state.data.isEmpty) {
+                item {
+                    Text(text = "EMPTY")
+                }
+            }
+            item(content = footer)
+        },
+    )
 }
 
 
@@ -234,7 +256,9 @@ public object JetHtmlArticleDefaults {
 
     @Composable
     fun TextBlock(text: HtmlElement.TextBlock) {
-        HtmlTextBlock(text = text)
+        HtmlTextBlock(
+            text = text,
+        )
     }
 
     @Composable
@@ -274,25 +298,32 @@ public object JetHtmlArticleDefaults {
 }
 
 
-/**
- * @since 1.0.0
- */
-public val LocalLinkHandler: ProvidableCompositionLocal<LinkClickHandler?> = compositionLocalOf(
-    defaultFactory = { null }
-)
+public class JetHtmlArticleState internal constructor(
+    val listState: LazyListState,
+    initialIsSelectionEnabled: Boolean,
+    initialData: HtmlArticleData,
+) {
+    var isSelectionEnabled: Boolean by mutableStateOf(value = initialIsSelectionEnabled)
 
+    var data: HtmlArticleData by mutableStateOf(value = initialData)
+        private set
 
-/**
- * @since 1.0.0
- */
-public val LocalBaseArticleUrl: ProvidableCompositionLocal<String> = compositionLocalOf(
-    defaultFactory = { "" }
-)
+    fun show(data: HtmlArticleData) {
+        this.data = data
+    }
+}
 
-
-/**
- * @since 1.0.0
- */
-public val LocalHtmlArticleData: ProvidableCompositionLocal<HtmlArticleData> = compositionLocalOf(
-    defaultFactory = HtmlArticleData::empty
-)
+@Composable
+fun rememberJetHtmlArticleState(
+    listState: LazyListState = rememberLazyListState(),
+    initialIsSelectionEnabled: Boolean = false,
+    initialData: HtmlArticleData = HtmlArticleData.empty,
+): JetHtmlArticleState {
+    return remember {
+        JetHtmlArticleState(
+            listState = listState,
+            initialIsSelectionEnabled = initialIsSelectionEnabled,
+            initialData = initialData,
+        )
+    }
+}

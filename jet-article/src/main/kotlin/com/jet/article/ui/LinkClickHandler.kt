@@ -7,18 +7,17 @@
 package com.jet.article.ui
 
 import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.annotation.Keep
 import androidx.annotation.StringRes
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import com.jet.article.data.HtmlArticleData
 import com.jet.article.openDialApp
 import com.jet.article.openEmailApp
@@ -30,73 +29,35 @@ import java.net.URISyntaxException
 
 
 /**
- * @param lazyListState Lazy list state of parent [JetHtmlArticle] which is needed in case of click
- * to link wich leads to another section of the same page.
- * @param context Context
  * @param callback
  * @see LinkCallback
- * @see rememberLinkClickHandler
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
  * created on 06.02.2024
  */
 @Keep
-public class LinkClickHandler internal constructor(
-    private val lazyListState: LazyListState,
-    private val context: Context,
-    private val callback: LinkCallback,
-) {
+public class LinkClickHandler internal constructor() {
+
+    var data: HtmlArticleData = HtmlArticleData.empty
+        internal set
+
+
+    var callback: LinkCallback? = null
 
 
     /**
-     * @param clickedText Text on which user clicked
-     * @param clickOffset Index of first charracted in clicked annotation
-     * @param articleUrl Original full url of the article
      * @param data Parsed data
-     * @param scrollOffset
      */
-    @Deprecated(
-        message = "Was used with ClickableText which becames depricated, use the other handleLink() instead"
-    )
-    internal fun handleLink(
-        clickedText: AnnotatedString,
-        clickOffset: Int,
-        articleUrl: String,
-        data: HtmlArticleData,
-        scrollOffset: Int
-    ): Unit {
-        val anotations = clickedText.getStringAnnotations(
-            start = clickOffset,
-            end = clickOffset,
-        )
-        anotations.firstOrNull()?.let { annotation ->
-            val link = getLink(
-                rawLink = annotation.item,
-                articleUrl = articleUrl
-            )
-            onLink(
-                link = link,
-                data = data,
-                scrollOffset = scrollOffset,
-            )
-        }
-    }
-
-
     internal fun handleLink(
         link: String,
-        articleUrl: String,
-        data: HtmlArticleData,
     ): Unit {
         val linkData = getLink(
             rawLink = link,
-            articleUrl = articleUrl
+            articleUrl = data.url,
         )
-        //TODO scroll offset
         onLink(
             link = linkData,
             data = data,
-            scrollOffset = 0,
         )
     }
 
@@ -107,39 +68,25 @@ public class LinkClickHandler internal constructor(
     internal fun onLink(
         link: Link,
         data: HtmlArticleData,
-        scrollOffset: Int
     ): Unit {
+
+        if (callback == null) {
+            Log.d("LinkClickHandler", "onLink called but callback is null")
+            return
+        }
+
         when (link) {
-            is Link.UriLink -> {
-                callback.onUriLink(
-                    link = link,
-                    context = context,
-                )
-            }
-
-            is Link.SectionLink -> {
-                callback.onSectionLink(
-                    link = link,
-                    lazyListState = lazyListState,
-                    data = data,
-                    scrollOffset = scrollOffset
-                )
-            }
-
-            is Link.SameDomainLink -> {
-                callback.onSameDomainLink(link = link)
-            }
-
-            is Link.OtherDomainLink -> {
-                callback.onOtherDomainLink(link = link)
-            }
+            is Link.UriLink -> callback?.onUriLink(link = link,)
+            is Link.SectionLink ->  callback?.onSectionLink(link = link,)
+            is Link.SameDomainLink -> callback?.onSameDomainLink(link = link)
+            is Link.OtherDomainLink -> callback?.onOtherDomainLink(link = link)
         }
     }
 
 
     private fun getLink(
         rawLink: String,
-        articleUrl: String
+        articleUrl: String,
     ): Link {
         if (rawLink.startsWith(prefix = "#")) {
             return Link.SectionLink(rawLink = rawLink, fullLink = rawLink)
@@ -208,9 +155,6 @@ public class LinkClickHandler internal constructor(
          */
         public open fun onSectionLink(
             link: Link.SectionLink,
-            lazyListState: LazyListState,
-            data: HtmlArticleData,
-            scrollOffset: Int,
         ): Unit = Unit
 
 
@@ -229,96 +173,12 @@ public class LinkClickHandler internal constructor(
             link: Link.OtherDomainLink,
         ): Unit = Unit
 
-
         /**
          * @since 1.0.0
          */
         public open fun onUriLink(
             link: Link.UriLink,
-            context: Context,
         ): Unit = Unit
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    /////
-    /////   DefaultLinkCallback Class
-    /////
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    /**
-     * @see rememberDefaultLinkCallback
-     * @since 1.0.0
-     */
-    @Keep
-    public open class DefaultLinkCallback public constructor(
-        private val snackbarHostState: SnackbarHostState,
-        private val coroutineScope: CoroutineScope,
-        private val context: Context,
-    ) : LinkCallback() {
-
-        override fun onSectionLink(
-            link: Link.SectionLink,
-            lazyListState: LazyListState,
-            data: HtmlArticleData,
-            scrollOffset: Int,
-        ) {
-            coroutineScope.launch {
-                val i = data.elements.indexOfFirst { element ->
-                    element.id == link.rawLink.removePrefix(prefix = "#")
-                }
-
-                i.takeIf { index -> index != -1 }
-                    ?.let { index ->
-                        lazyListState.animateScrollToItem(
-                            index = index,
-                            scrollOffset = scrollOffset
-                        )
-                    }
-
-            }
-        }
-
-
-        override fun onUriLink(link: Link.UriLink, context: Context) {
-            val rawLink = link.rawLink
-            when {
-                rawLink.startsWith(prefix = "mailto:") -> {
-                    context.openEmailApp(email = rawLink.removePrefix(prefix = "mailto:"))
-                }
-
-                rawLink.startsWith(prefix = "tel:") -> {
-                    context.openDialApp(phoneNumber = rawLink.removePrefix(prefix = "tel:"))
-                }
-
-                else -> {
-                    showNotSupportedSnackBar(stringRes = R.string.jet_article_unkonw_uri_link)
-                }
-            }
-        }
-
-
-        override fun onSameDomainLink(link: Link.SameDomainLink) {
-            showNotSupportedSnackBar()
-        }
-
-        override fun onOtherDomainLink(link: Link.OtherDomainLink) {
-            showNotSupportedSnackBar()
-        }
-
-
-        private fun showNotSupportedSnackBar(
-            @StringRes stringRes: Int = R.string.jet_article_links_supported
-        ) {
-            coroutineScope.launch {
-                snackbarHostState.showSnackbar(
-                    message = context.getString(stringRes),
-                    withDismissAction = true,
-                    duration = SnackbarDuration.Short
-                )
-            }
-        }
     }
 }
 
@@ -391,36 +251,32 @@ public sealed class Link private constructor(
 
 
 @Composable
-internal fun rememberLinkClickHandler(
-    lazyListState: LazyListState,
-    snackbarHostState: SnackbarHostState,
-    callback: LinkClickHandler.LinkCallback = rememberDefaultLinkCallback(
-        snackbarHostState = snackbarHostState,
-        coroutineScope = rememberCoroutineScope(),
-    )
-): LinkClickHandler {
-    val context = LocalContext.current
+public fun rememberDefaultLinkCallback(): LinkClickHandler.LinkCallback {
     return remember {
-        LinkClickHandler(
-            lazyListState = lazyListState,
-            context = context,
-            callback = callback,
-        )
+        LinkClickHandler.LinkCallback()
     }
 }
 
 
-@Composable
-public fun rememberDefaultLinkCallback(
-    snackbarHostState: SnackbarHostState,
+fun onSectionLink(
     coroutineScope: CoroutineScope,
-    context: Context = LocalContext.current,
-): LinkClickHandler.LinkCallback {
-    return remember {
-        LinkClickHandler.DefaultLinkCallback(
-            snackbarHostState = snackbarHostState,
-            coroutineScope = coroutineScope,
-            context = context,
-        )
+    data: HtmlArticleData,
+    lazyListState: LazyListState,
+    link: Link.SectionLink,
+    scrollOffset: Int
+) {
+    coroutineScope.launch {
+        val i = data.elements.indexOfFirst { element ->
+            element.id == link.rawLink.removePrefix(prefix = "#")
+        }
+
+        i.takeIf { index -> index != -1 }
+            ?.let { index ->
+                lazyListState.animateScrollToItem(
+                    index = index,
+                    scrollOffset = scrollOffset
+                )
+            }
+
     }
 }

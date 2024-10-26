@@ -4,6 +4,7 @@ package com.jet.article.data
 
 import androidx.annotation.Keep
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.IntSize
 
 /**
@@ -19,7 +20,6 @@ sealed class HtmlElement private constructor(
     open val id: String?,
     open val key: Int,
 ) {
-
 
     /**
      * @since 1.0.0
@@ -41,11 +41,10 @@ sealed class HtmlElement private constructor(
      * [com.jet.article.ArticleParser.isSimpleTextFormatAllowed] is set to true by [com.jet.article.ArticleParser.initialize].
      * @since 1.0.0
      */
-    //TODO add formatted, move annotated string build into ArticleParser
     @Keep
     @Immutable
     public data class TextBlock public constructor(
-        val text: String,
+        val text: AnnotatedString,
         override val id: String?,
         override val key: Int,
     ) : HtmlElement(id = id, key = key)
@@ -140,6 +139,7 @@ sealed class HtmlElement private constructor(
      */
     @Keep
     @Immutable
+    @Deprecated(message = "Probably will be replaced by TextBlock")
     public data class Address public constructor(
         val content: String,
         override val id: String?,

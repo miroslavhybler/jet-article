@@ -43,7 +43,7 @@ class ExcludedRulesTest : BaseAndroidTest() {
 
             val excluded = data.elements
                 .filterIsInstance<HtmlElement.TextBlock>()
-                .filter { element -> element.text == "excluded" }
+                .filter { element -> element.text.toString() == "excluded" }
 
             val included = data.elements
                 .filterIsInstance<HtmlElement.TextBlock>()
@@ -97,7 +97,7 @@ class ExcludedRulesTest : BaseAndroidTest() {
 
             val excluded = data.elements
                 .filterIsInstance<HtmlElement.TextBlock>()
-                .filter { element -> element.text == "excluded" }
+                .filter { element -> element.text.toString() == "excluded" }
 
             val included = data.elements
                 .filterIsInstance<HtmlElement.TextBlock>()

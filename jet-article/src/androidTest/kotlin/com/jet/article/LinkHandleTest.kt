@@ -58,16 +58,11 @@ class LinkHandleTest : BaseAndroidTest() {
 
         }
 
-        override fun onUriLink(link: Link.UriLink, context: Context) {
+        override fun onUriLink(link: Link.UriLink) {
             uriLinkClicks += 1
         }
 
-        override fun onSectionLink(
-            link: Link.SectionLink,
-            lazyListState: LazyListState,
-            data: HtmlArticleData,
-            scrollOffset: Int
-        ) {
+        override fun onSectionLink(link: Link.SectionLink) {
             sectionLinkClicks += 1
         }
 
@@ -90,6 +85,7 @@ class LinkHandleTest : BaseAndroidTest() {
                 data = ArticleParser.parse(
                     content = text,
                     url = "https://www.example.com/article/24",
+                    context = context,
                 )
                 clicableTags = data.elements.filterIsInstance<HtmlElement.TextBlock>()
                     .mapNotNull { it.id }

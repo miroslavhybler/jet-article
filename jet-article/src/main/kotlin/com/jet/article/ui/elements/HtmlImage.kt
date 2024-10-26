@@ -64,6 +64,7 @@ fun HtmlImage(
     error: @Composable () -> Unit = { HtmlImageDefaults.ErrorLayout() },
 ) = trace(sectionName = "HtmlImage") {
     val context = LocalContext.current
+
     SubcomposeAsyncImage(
         modifier = modifier
             .htmlImage(size = defaultSize)
@@ -71,7 +72,6 @@ fun HtmlImage(
         model = url,
         contentDescription = null,
         contentScale=contentScale,
-
         imageLoader = context.imageLoader,
         loading = { loading() },
         error = {

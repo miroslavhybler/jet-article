@@ -31,22 +31,25 @@ import androidx.core.text.HtmlCompat
 import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlArticleData
 import com.jet.article.ui.LinkClickHandler
-import com.jet.article.ui.LocalBaseArticleUrl
-import com.jet.article.ui.LocalHtmlArticleData
-import com.jet.article.ui.LocalLinkHandler
 import java.net.URI
 import java.net.URISyntaxException
 import kotlin.jvm.Throws
 
 
+@Deprecated("remove")
 @Composable
 internal fun rememberHtmlText(
     key: Any,
     text: String,
-): AnnotatedString  = trace(sectionName = "rememberHtmlText") {
+    linkClickHandler: LinkClickHandler?,
+): AnnotatedString = trace(sectionName = "rememberHtmlText") {
+
+    /*
     val linkClickHandler = LocalLinkHandler.current
     val articleData = LocalHtmlArticleData.current
     val articleUrl = LocalBaseArticleUrl.current
+     */
+
     val colorScheme = MaterialTheme.colorScheme
 
     return remember(key1 = key) {
@@ -56,8 +59,6 @@ internal fun rememberHtmlText(
                 .toAnnotatedString(
                     primaryColor = colorScheme.primary,
                     linkClickHandler = linkClickHandler,
-                    data = articleData,
-                    articleUrl = articleUrl,
                 )
         } else {
             buildAnnotatedString {
@@ -93,14 +94,12 @@ public fun String.toDomainName(): String? {
  * @author Miroslav Hýbler <br>
  * created on 26.08.2023
  */
+//TODO split to link and not link
 public fun Spannable.toAnnotatedString(
     primaryColor: Color,
     linkClickHandler: LinkClickHandler?,
-    data: HtmlArticleData,
-    articleUrl: String,
 ): AnnotatedString {
     val builder = AnnotatedString.Builder(this.toString())
-    val copierContext = CopierContext(primaryColor)
 
     SpanCopier.entries.forEach { copier ->
         getSpans(0, length, copier.spanClass).forEach { span ->
@@ -109,10 +108,7 @@ public fun Spannable.toAnnotatedString(
                 start = getSpanStart(span),
                 end = getSpanEnd(span),
                 destination = builder,
-                context = copierContext,
                 linkClickHandler = linkClickHandler,
-                data = data,
-                articleUrl = articleUrl,
             )
         }
     }
@@ -120,23 +116,34 @@ public fun Spannable.toAnnotatedString(
 }
 
 
-private data class CopierContext(
-    val primaryColor: Color,
-)
+public fun Spannable.toAnnotatedString(): AnnotatedString {
+    val builder = AnnotatedString.Builder(this.toString())
+
+    SpanCopier.entries.forEach { copier ->
+        getSpans(0, length, copier.spanClass).forEach { span ->
+            copier.copySpan(
+                span = span,
+                start = getSpanStart(span),
+                end = getSpanEnd(span),
+                destination = builder,
+                linkClickHandler = null,
+            )
+        }
+    }
+    return builder.toAnnotatedString()
+}
 
 
 private enum class SpanCopier {
     URL {
         override val spanClass = URLSpan::class.java
+
         override fun copySpan(
             span: Any,
             start: Int,
             end: Int,
             destination: AnnotatedString.Builder,
-            context: CopierContext,
             linkClickHandler: LinkClickHandler?,
-            data: HtmlArticleData,
-            articleUrl: String,
         ) {
             val urlSpan = span as URLSpan
 
@@ -144,22 +151,17 @@ private enum class SpanCopier {
                 clickable = LinkAnnotation.Clickable(
                     tag = urlSpan.url,
                     linkInteractionListener = {
-                        linkClickHandler?.handleLink(
-                            link = urlSpan.url,
-                            articleUrl = articleUrl,
-                            data = data,
-                        ) ?: kotlin.run {
+                        linkClickHandler?.handleLink(link = urlSpan.url) ?: kotlin.run {
                             Log.w("Jet-Article", "Clicked on link but linkClickHandler is null")
                         }
                     },
                 ),
                 start = start,
-                end = end
+                end = end,
             )
             destination.addStyle(
                 style = SpanStyle(
-                    color = context.primaryColor,
-                    textDecoration = TextDecoration.Underline
+                    textDecoration = TextDecoration.Underline,
                 ),
                 start = start,
                 end = end,
@@ -173,12 +175,8 @@ private enum class SpanCopier {
             start: Int,
             end: Int,
             destination: AnnotatedString.Builder,
-            context: CopierContext,
             linkClickHandler: LinkClickHandler?,
-            data: HtmlArticleData,
-            articleUrl: String,
-
-            ) {
+        ) {
             val colorSpan = span as ForegroundColorSpan
             destination.addStyle(
                 style = SpanStyle(color = Color(colorSpan.foregroundColor)),
@@ -194,10 +192,7 @@ private enum class SpanCopier {
             start: Int,
             end: Int,
             destination: AnnotatedString.Builder,
-            context: CopierContext,
             linkClickHandler: LinkClickHandler?,
-            data: HtmlArticleData,
-            articleUrl: String,
         ) {
             destination.addStyle(
                 style = SpanStyle(textDecoration = TextDecoration.Underline),
@@ -213,10 +208,7 @@ private enum class SpanCopier {
             start: Int,
             end: Int,
             destination: AnnotatedString.Builder,
-            context: CopierContext,
             linkClickHandler: LinkClickHandler?,
-            data: HtmlArticleData,
-            articleUrl: String,
         ) {
             val styleSpan = span as StyleSpan
 
@@ -243,12 +235,8 @@ private enum class SpanCopier {
         start: Int,
         end: Int,
         destination: AnnotatedString.Builder,
-        context: CopierContext,
         linkClickHandler: LinkClickHandler?,
-        data: HtmlArticleData,
-        articleUrl: String,
-
-        )
+    )
 }
 
 

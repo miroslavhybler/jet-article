@@ -9,21 +9,14 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -42,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
@@ -52,15 +44,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.trace
-import androidx.core.text.toSpannable
 import com.jet.article.data.HtmlElement
 import com.jet.article.rememberHtmlText
-import com.jet.article.toAnnotatedString
-import com.jet.article.toHtml
-import com.jet.article.ui.LocalBaseArticleUrl
-import com.jet.article.ui.LocalHtmlArticleData
-import com.jet.article.ui.LocalLinkHandler
-import com.jet.utils.dpToPx
 import com.jet.utils.pxToDp
 import mir.oslav.jet.annotations.JetExperimental
 
@@ -69,7 +54,7 @@ import mir.oslav.jet.annotations.JetExperimental
  * @author Miroslav Hýbler <br>
  * created on 30.06.2023
  */
-//TODO needs refactor, put more login into layout layer
+//TODO needs refactor, put more logic into layout layer
 @Composable
 @JetExperimental
 fun HtmlTable(
@@ -198,7 +183,7 @@ private fun TableCell(
     rowIndex: Int,
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    val text = rememberHtmlText(key = value.columnKey, text = value.value)
+    val text = rememberHtmlText(key = value.columnKey, text = value.value, linkClickHandler = null)
     Box(
         modifier = modifier
             .sizeIn(minWidth = 128.dp, minHeight = 32.dp, maxHeight = 256.dp)
