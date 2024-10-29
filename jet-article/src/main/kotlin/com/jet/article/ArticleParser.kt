@@ -268,11 +268,22 @@ public object ArticleParser {
                 if (content.isBlank()) {
                     return
                 }
+
+                val finalContent = if (isSimpleTextFormatAllowed) {
+                    content.toHtml()
+                        .toSpannable()
+                        .toAnnotatedString(
+                            primaryColor = linkColor,
+                            linkClickHandler = linkHandler,
+                        )
+                } else {
+                    buildAnnotatedString {
+                        append(text = content)
+                    }
+                }
                 elements.add(
                     element = HtmlElement.TextBlock(
-                        text = buildAnnotatedString {
-                            append(text = content)
-                        },
+                        text = finalContent,
                         id = ParserNative.getCurrentTagId(),
                         key = newKey,
                     )

@@ -21,6 +21,7 @@ import com.jet.article.ui.JetHtmlArticleContent
 import com.jet.article.ui.Link
 import com.jet.article.ui.LinkClickHandler
 import com.jet.article.ui.elements.HtmlTextBlock
+import com.jet.article.ui.rememberJetHtmlArticleState
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.delay
 import mir.oslav.jet.annotations.JetExperimental
@@ -78,16 +79,18 @@ class LinkHandleTest : BaseAndroidTest() {
         var clicableTags: List<String> = emptyList()
 
         composeRule.setContent {
-            var data by remember { mutableStateOf(value = HtmlArticleData.empty) }
+
+            val state = rememberJetHtmlArticleState()
             LaunchedEffect(key1 = Unit) {
                 val text = loadAsset(fileName = "links")
                 //Using example.com as default url for testing
-                data = ArticleParser.parse(
-                    content = text,
-                    url = "https://www.example.com/article/24",
-                    context = context,
+                state.show(
+                    data = ArticleParser.parse(
+                        content = text,
+                        url = "https://www.example.com/article/24",
+                    )
                 )
-                clicableTags = data.elements.filterIsInstance<HtmlElement.TextBlock>()
+                clicableTags = state.data.elements.filterIsInstance<HtmlElement.TextBlock>()
                     .mapNotNull { it.id }
 
 
@@ -106,8 +109,7 @@ class LinkHandleTest : BaseAndroidTest() {
             }
 
             JetHtmlArticleContent(
-                data = data,
-                linkClickCallback = linkClickCallback,
+                state = state,
                 text = { text ->
                     HtmlTextBlock(
                         modifier = Modifier.testTag(
