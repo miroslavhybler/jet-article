@@ -90,8 +90,8 @@ namespace utils {
     /**
      * Fastly compares given strings. Checks first chars at fist because at 90% of scenarios first
      * characters will be different. When first chars are same, results is from strcmp() function.
-     * @param s1 Input string 1
-     * @param s2 Input string 2
+     * @param s1 Input string 1, must not be empty
+     * @param s2 Input string 2, must not be empty
      * @return True when s1 and s2 are equeal strings, false otherwise.
      * @since 1.0.0
      */

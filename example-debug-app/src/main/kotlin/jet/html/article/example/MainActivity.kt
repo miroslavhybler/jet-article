@@ -81,7 +81,6 @@ class MainActivity : ComponentActivity() {
                             darkIcons = !isAppDark
                         )
                     })
-
                     NavHost(
                         navController = navHostController,
                         startDestination = "home",
@@ -151,15 +150,32 @@ fun JetHtmlArticleExampleTheme(
     )
 }
 
-fun testRoute(name: String, excludeRules: List<ExcludeRule>): String {
-    ExcludeRule.globalRules = excludeRules
-    return "test-screen?article=$name"
-}
 
 fun NavHostController.navigateToTest(
     name: String,
-    excludeRules: List<ExcludeRule> = emptyList()
+    excludeRules: List<ExcludeRule> = emptyList(),
+    isQuearingTextOutsideTags: Boolean = false,
+    isTextFormattingEnabled: Boolean = false,
 ) {
+    navigate(
+        route = testRoute(
+            name = name,
+            excludeRules = excludeRules,
+            isQuearingTextOutsideTags = isQuearingTextOutsideTags,
+            isTextFormattingEnabled = isTextFormattingEnabled,
+        )
+    )
+}
+
+
+private fun testRoute(
+    name: String,
+    excludeRules: List<ExcludeRule>,
+    isQuearingTextOutsideTags: Boolean,
+    isTextFormattingEnabled: Boolean,
+): String {
     ExcludeRule.globalRules = excludeRules
-    navigate(route = testRoute(name = name, excludeRules = excludeRules))
+    ExcludeRule.isQuearingTextOutsideTags = isQuearingTextOutsideTags
+    ExcludeRule.isTextFormattingEnabled = isTextFormattingEnabled
+    return "test-screen?article=$name"
 }

@@ -28,11 +28,19 @@ public:
 private:
     bool hasContentToProcess = false;
     bool wasHeadParsed = false;
-    //TODO use size_t with 0 as default
-    int tempContentIndexStart = -1;
-    int tempContentIndexEnd = -1;
     bool areImagesEnabled = false;
-    bool isSimpleTextFormatAllowed = true;
+    bool isTextFormattingEnabled = true;
+
+    //TODO docs
+
+    size_t tempContentIndexStart = 0;
+    size_t tempContentIndexEnd = 0;
+    size_t tempTagIndexStart = 0;
+    size_t tempTagIndexEnd = 0;
+
+    bool isAppending = false;
+    size_t appendingIndexStart = 0;
+
     std::vector<std::string_view> tempOutputVector;
     std::vector<std::vector<std::string_view>> tableHolder;
     std::map<std::string, std::string> tempOutputMap;
@@ -186,6 +194,13 @@ public:
 
 
     /**
+     * @return
+     * @since 1.0.0
+     */
+    bool hasTempAppendedContentToSend();
+
+
+    /**
      *
      * @return
      */
@@ -225,7 +240,7 @@ private:
      * @since 1.0.0
      */
 
-    void parseImageTag(const size_t &tei);
+    void parseImgTag(const size_t &tei);
 
 
     /**

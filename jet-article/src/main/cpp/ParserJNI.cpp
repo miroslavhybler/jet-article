@@ -91,12 +91,16 @@ Java_com_jet_article_ParserNative_doNextStep(
         if (!jni::isContentForVisualAvailable) {
             //When content was filtered by processor, move index after the skipped content
             jni::contentParser->tryMoveToContainerClosing();
-
         }
     } else if (
             jni::contentParser->hasBodyContext() &&
             !jni::contentParser->currentContentOutsideTag.empty()) {
 
+        jni::isContentForVisualAvailable = true;
+    } else if (
+            jni::contentParser->hasBodyContext() &&
+            jni::contentParser->hasParsedContentToBeProcessed()
+            ) {
         jni::isContentForVisualAvailable = true;
     }
 }
@@ -225,7 +229,7 @@ Java_com_jet_article_ParserNative_getTableCell(
         JNIEnv *environment, jobject caller, jint column, jint row
 ) {
     std::vector<std::vector<std::string_view>> table = jni::contentParser->getTable();
-     std::vector<std::string_view>& r = table[row];
+    std::vector<std::string_view> &r = table[row];
     std::string_view cell = r[column];
     return environment->NewStringUTF(std::string(cell).c_str());
 }

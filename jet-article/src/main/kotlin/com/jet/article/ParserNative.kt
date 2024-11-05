@@ -1,4 +1,4 @@
-@file:Suppress("RedundantUnitReturnType")
+@file:Suppress("RedundantUnitReturnType", "unused")
 
 package com.jet.article
 
@@ -19,7 +19,7 @@ internal object ParserNative {
     external fun initialize(
         areImagesEnabled: Boolean,
         isLoggingEnabled: Boolean,
-        isSimpleTextFormatAllowed: Boolean,
+        isTextFormattingEnabled: Boolean,
         isQueringTextOutsideTextTags: Boolean,
     ): Unit
 

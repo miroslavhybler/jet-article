@@ -11,7 +11,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import jet.html.article.example.data.ExcludeRule
 import jet.html.article.example.data.TestResults
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,10 +40,18 @@ class BenchmarkViewModel @Inject constructor(
                 tag = it.tag,
                 clazz = it.clazz,
                 id = it.id,
-                keyword = it.keyword
+                keyword = it.keyword,
             )
         }
         val articleContent = getArticle(fileName = article)
+
+        ArticleParser.initialize(
+            isQueringTextOutsideTextTags = ExcludeRule.isQuearingTextOutsideTags,
+            isTextFormattingEnabled = ExcludeRule.isTextFormattingEnabled,
+            areImagesEnabled = true,
+            isLoggingEnabled = true,
+        )
+
         return ArticleParser.parse(
             content = articleContent,
             url = "https://www.example.com"

@@ -30,7 +30,7 @@ class ExcludedRulesTest : BaseAndroidTest() {
         ArticleParser.initialize(
             areImagesEnabled = false,
             isLoggingEnabled = true,
-            isSimpleTextFormatAllowed = true,
+            isTextFormattingEnabled = true,
         )
 
         runBlocking {

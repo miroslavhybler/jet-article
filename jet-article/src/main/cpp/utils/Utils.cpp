@@ -109,7 +109,10 @@ namespace utils {
     }
 
 
-    bool fastCompare(const std::string_view &s1, const std::string_view &s2) {
+    bool fastCompare(
+            const std::string_view &s1,
+            const std::string_view &s2
+    ) {
         char ch1 = s1[0];
         char ch2 = s2[0];
         if (ch1 != ch2) {
@@ -132,6 +135,7 @@ namespace utils {
                 sub.begin(),
                 sub.end()
         );
+
         if (it != input.end()) {
             return it - input.begin();
         }

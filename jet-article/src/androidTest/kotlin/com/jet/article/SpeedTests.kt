@@ -1,22 +1,13 @@
 package com.jet.article
 
 import android.graphics.Bitmap
-import android.os.Looper
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.coroutines.coroutineContext
 
 
 /**
@@ -43,7 +34,7 @@ class SpeedTests : BaseAndroidTest() {
             start1 = System.currentTimeMillis()
             ArticleParser.initialize(
                 areImagesEnabled = true,
-                isSimpleTextFormatAllowed = true,
+                isTextFormattingEnabled = true,
                 isLoggingEnabled = false,
             )
             val data1 = ArticleParser.parse(content = text1, url = "")
@@ -53,7 +44,7 @@ class SpeedTests : BaseAndroidTest() {
             start2 = System.currentTimeMillis()
             ArticleParser.initialize(
                 areImagesEnabled = true,
-                isSimpleTextFormatAllowed = true,
+                isTextFormattingEnabled = true,
                 isLoggingEnabled = false,
             )
             val data2 = ArticleParser.parse(content = text2, url = "")

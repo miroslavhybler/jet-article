@@ -43,10 +43,15 @@ fun CatalogScreen(
     asset: String
 ) {
     val context = LocalContext.current
-    val layoutDirection = LocalLayoutDirection.current
     val state = rememberJetHtmlArticleState()
 
     LaunchedEffect(key1 = asset) {
+        ArticleParser.initialize(
+            areImagesEnabled = true,
+            isTextFormattingEnabled = true,
+            isQueringTextOutsideTextTags = true,
+            isLoggingEnabled = true,
+        )
         state.show(
             data = ArticleParser.parse(
                 content = context.getHtmlAsset(fileName = asset),

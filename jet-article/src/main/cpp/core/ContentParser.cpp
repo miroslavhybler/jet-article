@@ -27,7 +27,7 @@ void ContentParser::initialize(
         const bool &isQueringTextOutsideTextTags
 ) {
     this->areImagesEnabled = areImagesEnabled;
-    this->isSimpleTextFormatAllowed = isSimpleTextFormatAllowed;
+    this->isTextFormattingEnabled = isSimpleTextFormatAllowed;
     this->isQueringTextOutsideTextTags = isQueringTextOutsideTextTags;
 }
 
@@ -60,6 +60,10 @@ void ContentParser::hasParsedContentToBeProcessed(bool hasContent) {
 
 std::string ContentParser::getTempContent() {
     if (currentContentType == NO_CONTENT) {
+        utils::log(
+                "PARSER",
+                "getTempContent() was called but currentContentType is NO_CONTENT"
+        );
         return "";
     }
 
@@ -74,11 +78,16 @@ std::string ContentParser::getTempContent() {
         utils::trim(tempInput);
         std::string output;
 
-        if (isSimpleTextFormatAllowed) {
+        if (isTextFormattingEnabled) {
             utils::clearUnsupportedTagsFromTextBlock(tempInput, output, 0, tempInput.length());
         } else {
             utils::clearTagsFromText(tempInput, output);
         }
+
+        if (appendingIndexStart > 0) { appendingIndexStart = 0; }
+        if (isAppending) { isAppending = false; }
+        tempTagIndexStart = 0;
+        tempTagIndexEnd = 0;
 
         return output;
     }
@@ -94,14 +103,39 @@ void ContentParser::doNextStep() {
     currentTagId = "";
     index.invalidate();
 
+    size_t it = index.getIndex();
+    utils::log(
+            "mirek",
+            "on Index before moving: " +
+            std::to_string(it) +
+            " " +
+            input.substr(it, 6)
+    );
+
+    utils::log(
+            "mirek",
+            "moveIndexToNextTag()"
+    );
     if (!moveIndexToNextTag()) {
         //No tag to process
         invalidateHasNextStep();
+        utils::log(
+                "mirek",
+                "invalidateHasNextStep()"
+        );
         return;
     }
+
+    utils::log(
+            "mirek",
+            "on Index: " +
+            std::to_string(index.getIndex()) +
+            " " +
+            input.substr(index.getIndex(), 6)
+    );
     //char is < and its probably start of valid tag
     //TagType end index, index of next '>'
-
+    tempTagIndexStart = index.getIndex();
 
     //Saves text that is outside regular text tags
     if (!currentContentOutsideTag.empty() && hasBodyContext()) {
@@ -125,6 +159,7 @@ void ContentParser::doNextStep() {
         return;
     }
 
+    tempTagIndexEnd = tei;
     // -1 to remove '<' at the end
     size_t tagBodyLength = tei - index.getIndex() - 1;
     //tagbody within <>, i + 1 to remove '<'
@@ -133,7 +168,16 @@ void ContentParser::doNextStep() {
     std::string tag = utils::getTagName(currentTagBody);
 
     if (currentTagBody == "/body") {
+        //TODO check if some content is left,
         mHasBodyContext = false;
+
+        if (hasTempAppendedContentToSend()) {
+            return;
+        } else if (!currentContentOutsideTag.empty()) {
+            hasContentToProcess = true;
+            currentContentType = TEXT;
+            return;
+        }
     }
 
 
@@ -234,7 +278,7 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, size_t &tei)
     //processed as tag
     if (utils::fastCompare(tag, "img")) {
         currentTag = tag;
-        parseImageTag(tei);
+        parseImgTag(tei);
         index.moveIndex(tei + 1);
         return;
     }
@@ -246,6 +290,10 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, size_t &tei)
         ctsi = utils::findClosingTag(input, tag, index.getIndex());
         tempContentIndexStart = index.getIndex();
         tempContentIndexEnd = ctsi;
+        utils::log(
+                "mirek",
+                "findClosingTag()"
+        );
     } catch (ErrorCode e) {
         //Html articles has too much html syntax errors like unclosed pair tags or others,
         //so library should keep parsing, browsers are also ignoring these errors
@@ -253,13 +301,54 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, size_t &tei)
         return;
     }
 
-    //TODO maybe change proccessing of span
+    utils::log(
+            "mirek",
+            "on Index: " +
+            std::to_string(index.getIndex()) +
+            " " +
+            input.substr(index.getIndex(), 6)
+    );
+
     if (utils::fastCompare(tag, "p")
-        || utils::fastCompare(tag, "span")
         || utils::fastCompare(tag, "em")
             ) {
+        //TODO index is too far, span result is send succesfully but next tag is excuded because
+        //tODO index is in <p> content
+        if (isAppending && hasTempAppendedContentToSend()) {
+            utils::log(
+                    "mirek",
+                    "hasTempAppendedContentToSend() true "
+            );
+            utils::log(
+                    "mirek",
+                    "on Index: " +
+                    std::to_string(index.getIndex()) +
+                    " " +
+                    input.substr(index.getIndex(), 6)
+            );
+            return;
+        }
         currentContentType = TEXT;
         hasContentToProcess = true;
+    } else if (
+            utils::fastCompare(tag, "span")
+            || utils::fastCompare(tag, "a")
+            || utils::fastCompare(tag, "b")
+            || utils::fastCompare(tag, "i")
+            || utils::fastCompare(tag, "u")
+            ) {
+        if (!isAppending) {
+            appendingIndexStart = tempTagIndexStart;
+        }
+
+        isAppending = true;
+        //Must apend content with tag included, tag can have style or something
+        hasContentToProcess = false;
+        utils::log(
+                "mirek",
+                "appending span"
+        );
+
     } else if (utils::fastCompare(tag, "h1")
                || utils::fastCompare(tag, "h2")
                || utils::fastCompare(tag, "h3")
@@ -268,42 +357,74 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, size_t &tei)
                || utils::fastCompare(tag, "h6")
                || utils::fastCompare(tag, "h7")
             ) {
+
+        if (isAppending && hasTempAppendedContentToSend()) {
+            return;
+        }
+
         currentContentType = TITLE;
         hasContentToProcess = true;
     } else if (
             utils::fastCompare(tag, "ul")
             || utils::fastCompare(tag, "ol")
             ) {
+
+        if (isAppending && hasTempAppendedContentToSend()) {
+            return;
+        }
+
         currentContentType = LIST;
         hasContentToProcess = true;
         utils::groupPairTagContents(
                 input, "li", index.getIndex(), ctsi, tempOutputVector
         );
-    }
-//    else if (utils::fastCompare(tag, "picture")) {
-//        //TODO maybe? handle picture, get image url from srcset from  source tag
-//        hasContentToProcess = false;
-//    }
-    else if (utils::fastCompare(tag, "table")) {
-        //Table is skipped temporary
+    } else if (utils::fastCompare(tag, "table")) {
+
+        if (isAppending && hasTempAppendedContentToSend()) {
+            return;
+        }
+
         currentContentType = TABLE;
         hasContentToProcess = true;
         parseTableTag(ctsi);
     } else if (utils::fastCompare(tag, "blockquote")) {
+
+        if (isAppending && hasTempAppendedContentToSend()) {
+            return;
+        }
+
         currentContentType = QUOTE;
         hasContentToProcess = true;
     } else if (utils::fastCompare(tag, "address")) {
+
+        if (isAppending && hasTempAppendedContentToSend()) {
+            return;
+        }
+
         currentContentType = ADDRESS;
         hasContentToProcess = true;
     } else if (utils::fastCompare(tag, "code")) {
+
+        if (isAppending && hasTempAppendedContentToSend()) {
+            return;
+        }
+
+
         currentContentType = CODE;
         hasContentToProcess = true;
     } else {
+
+        if (isAppending && hasTempAppendedContentToSend()) {
+            return;
+        }
+
         currentContentType = NO_CONTENT;
         hasContentToProcess = false;
         tempContentIndexStart = 0;
         tempContentIndexEnd = 0;
     }
+
+    //TODO
 
     currentTag = tag;
     if (hasContentToProcess) {
@@ -317,7 +438,7 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, size_t &tei)
 }
 
 
-void ContentParser::parseImageTag(const size_t &tei) {
+void ContentParser::parseImgTag(const size_t &tei) {
 
     if (!areImagesEnabled) {
         return;
@@ -374,6 +495,21 @@ bool ContentParser::tryMoveToContainerClosing() {
     size_t ctsi = utils::findClosingTag(input, currentTag, index.getIndex());
     index.moveIndex(ctsi + closing.length());
     return true;
+}
+
+
+bool ContentParser::hasTempAppendedContentToSend() {
+    bool hasContent = isAppending;
+    if (hasContent) {
+        //Sets temp indexes to get content by getTempContent();
+        tempContentIndexStart = appendingIndexStart;
+        tempContentIndexEnd = tempTagIndexEnd + 1;
+        currentContentType = TEXT;
+        hasContentToProcess = true;
+
+        index.moveIndex(tempTagIndexStart);
+    }
+    return hasContent;
 }
 
 
@@ -457,6 +593,10 @@ void ContentParser::clearAllResources() {
     tempContentIndexEnd = 0;
     temporaryOutIndex = 0;
 
+    tempTagIndexStart = 0;
+    tempTagIndexStart = 0;
+
+    isAppending = false;
     tempOutputVector.clear();
     tempOutputMap.clear();
 }

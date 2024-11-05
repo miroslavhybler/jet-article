@@ -22,6 +22,9 @@ public data class ExcludeRule public constructor(
 
     companion object {
         var globalRules: List<ExcludeRule> = emptyList()
+
+        var isQuearingTextOutsideTags: Boolean = false
+        var isTextFormattingEnabled: Boolean =false
     }
 
 }

@@ -149,6 +149,10 @@ protected:
             utils::log("PARSER-COMPONENT", "out of range");
             return false;
         }
+        utils::log(
+                "mirek",
+                "ch: " + std::string(1, ch)
+        );
 
         while (ch != '<' && i < length) {
             if (isQueringTextOutsideTextTags && ch != '>' && mHasBodyContext) {

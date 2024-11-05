@@ -4,6 +4,7 @@
 package com.jet.article.ui
 
 import android.annotation.SuppressLint
+import androidx.annotation.Keep
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -286,6 +287,7 @@ public object JetHtmlArticleDefaults {
 }
 
 
+@Keep
 public class JetHtmlArticleState internal constructor(
     val listState: LazyListState,
     initialIsSelectionEnabled: Boolean,

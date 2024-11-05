@@ -67,7 +67,7 @@ Add Internet permission to your application's manifest. Internet is required for
 ArticleParser.initialize(
     areImagesEnabled = false,
     isLoggingEnabled = true,
-    isSimpleTextFormatAllowed = true,
+    isTextFormattingEnabled = true,
 )
 
 //Add custom exclude options to filter out unwanted elements

@@ -90,12 +90,30 @@ fun BenchmarksScreen(
                 },
                 modifier = Modifier.spacedCard()
             )
-
             HomeCard(
                 title = "Elements test",
                 description = "Simple preview of supported attributes",
                 onClick = {
                     navHostController.navigateToTest(name = "elements-test")
+                },
+                modifier = Modifier.spacedCard()
+            )
+            HomeCard(
+                title = "Test outside tags",
+                description = "Text outside <p> tags",
+                onClick = {
+                    navHostController.navigateToTest(name = "text-outside")
+                },
+                modifier = Modifier.spacedCard()
+            )
+            HomeCard(
+                title = "Spans",
+                description = "Merging spans into single text block",
+                onClick = {
+                    navHostController.navigateToTest(
+                        name = "spans",
+                        isTextFormattingEnabled = true,
+                    )
                 },
                 modifier = Modifier.spacedCard()
             )

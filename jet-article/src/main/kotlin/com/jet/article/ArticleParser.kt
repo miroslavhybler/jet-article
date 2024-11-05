@@ -2,7 +2,6 @@
 
 package com.jet.article
 
-import android.content.Context
 import androidx.annotation.CheckResult
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,7 +60,7 @@ public object ArticleParser {
      * @param areImagesEnabled True when you want to enable images from <img> tag being included in
      * output, false otherwise. False by default.
      * @param isLoggingEnabled True if you want to enable logs from native libs, false otherwise. False by default.
-     * @param isSimpleTextFormatAllowed True if you want to use simple html formatting like bold, italic, ...
+     * @param isTextFormattingEnabled True if you want to use simple html formatting like bold, italic, ...
      * for the text. False otherwise. True by default. Keep in mind that putting false will also
      * disable links inside text blocks.
      * @param isQueringTextOutsideTextTags True if you want to query and show text that is outside of
@@ -72,16 +71,16 @@ public object ArticleParser {
     public fun initialize(
         areImagesEnabled: Boolean = false,
         isLoggingEnabled: Boolean = false,
-        isSimpleTextFormatAllowed: Boolean = true,
+        isTextFormattingEnabled: Boolean = true,
         isQueringTextOutsideTextTags: Boolean = false,
         linkColor: Color = Color.Blue,
     ): Unit {
-        this.isSimpleTextFormatAllowed = isSimpleTextFormatAllowed
+        this.isSimpleTextFormatAllowed = isTextFormattingEnabled
         this.linkColor = linkColor
         ParserNative.initialize(
             areImagesEnabled = areImagesEnabled,
             isLoggingEnabled = isLoggingEnabled,
-            isSimpleTextFormatAllowed = isSimpleTextFormatAllowed,
+            isTextFormattingEnabled = isTextFormattingEnabled,
             isQueringTextOutsideTextTags = isQueringTextOutsideTextTags,
         )
     }
