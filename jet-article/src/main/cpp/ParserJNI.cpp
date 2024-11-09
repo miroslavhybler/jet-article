@@ -94,7 +94,7 @@ Java_com_jet_article_ParserNative_doNextStep(
         }
     } else if (
             jni::contentParser->hasBodyContext() &&
-            !jni::contentParser->currentContentOutsideTag.empty()) {
+            !jni::contentParser->currentSharedContent.empty()) {
 
         jni::isContentForVisualAvailable = true;
     } else if (

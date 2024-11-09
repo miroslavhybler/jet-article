@@ -193,7 +193,7 @@ public object ArticleParser {
             }
 
             HtmlContentType.TEXT -> {
-                onText(key = newKey, elements = elements,linkHandler=linkHandler,)
+                onText(key = newKey, elements = elements, linkHandler = linkHandler)
             }
 
             HtmlContentType.TITLE -> {
@@ -306,7 +306,8 @@ public object ArticleParser {
         }
 
         val finalContent = if (isSimpleTextFormatAllowed) {
-            content.toHtml()
+            content
+                .toHtml()
                 .toSpannable()
                 .toAnnotatedString(
                     primaryColor = linkColor,

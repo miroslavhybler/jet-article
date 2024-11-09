@@ -18,7 +18,7 @@ public:
     std::string currentTag;
     std::string currentTagBody;
     std::string currentTagId;
-    std::string currentContentOutsideTag;
+    std::string currentSharedContent;
     TagType currentContentType = NO_CONTENT;
 
 protected:
@@ -140,7 +140,7 @@ protected:
             return false;
         }
 
-        currentContentOutsideTag.clear();
+        currentSharedContent.clear();
         //actual index within input
         char ch;
         try {
@@ -156,7 +156,7 @@ protected:
 
         while (ch != '<' && i < length) {
             if (isQueringTextOutsideTextTags && ch != '>' && mHasBodyContext) {
-                currentContentOutsideTag += ch;
+                currentSharedContent += ch;
             }
             i += 1;
             try {

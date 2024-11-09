@@ -67,6 +67,25 @@ const std::set<std::string> unsupportedPairTags = {
 };
 
 
+/**
+ * @since 1.0.0
+ */
+const std::set<std::string> textStyleTags = {
+        "span",
+        "a",
+        "b",
+        "i",
+        "u",
+        "strong",
+        "em",
+        "mark",
+        "small",
+        "del",
+        "ins",
+        "sub",
+        "sup",
+};
+
 
 #endif //JET_HTML_ARTICLE_CONSTANTS_H
 

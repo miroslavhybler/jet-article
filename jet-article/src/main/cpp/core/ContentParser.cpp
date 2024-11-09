@@ -67,6 +67,7 @@ std::string ContentParser::getTempContent() {
         return "";
     }
 
+    //TODO explain + 1
     size_t n = tempContentIndexEnd - tempContentIndexStart;
 
     if (n == 0) {
@@ -75,7 +76,7 @@ std::string ContentParser::getTempContent() {
 
     if (currentContentType == TEXT || currentContentType == TITLE) {
         std::string tempInput = input.substr(tempContentIndexStart, n);
-        utils::trim(tempInput);
+        //utils::trim(tempInput);
         std::string output;
 
         if (isTextFormattingEnabled) {
@@ -138,12 +139,13 @@ void ContentParser::doNextStep() {
     tempTagIndexStart = index.getIndex();
 
     //Saves text that is outside regular text tags
-    if (!currentContentOutsideTag.empty() && hasBodyContext()) {
-        utils::trim(currentContentOutsideTag);
-        if (!currentContentOutsideTag.empty()) {
-            utils::log("PARSER", "Text outside tags: " + currentContentOutsideTag);
+    if (!currentSharedContent.empty() && hasBodyContext()) {
+        utils::trim(currentSharedContent);
+        if (!currentSharedContent.empty()) {
+            utils::log("PARSER", "Text outside tags: " + currentSharedContent);
+            //Plus 1 because idnex is pointing at closing of tag '>', so first position is next index
             tempContentIndexStart = index.getIndexOnStart() + 1;
-            tempContentIndexEnd = index.getIndex() - 1;
+            tempContentIndexEnd = index.getIndex();
             currentContentType = TEXT;
             return;
         }
@@ -173,7 +175,7 @@ void ContentParser::doNextStep() {
 
         if (hasTempAppendedContentToSend()) {
             return;
-        } else if (!currentContentOutsideTag.empty()) {
+        } else if (!currentSharedContent.empty()) {
             hasContentToProcess = true;
             currentContentType = TEXT;
             return;
@@ -340,14 +342,23 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, size_t &tei)
         if (!isAppending) {
             appendingIndexStart = tempTagIndexStart;
         }
-
+        //Plus 7 is for "</span>"
+        tempContentIndexEnd += 7;
         isAppending = true;
         //Must apend content with tag included, tag can have style or something
         hasContentToProcess = false;
+
+        //Plus 7 is for "</span>"
+        std::string spanContent = input.substr(
+                tempTagIndexStart,
+                (ctsi + 7) - tempTagIndexStart
+        );
+
         utils::log(
                 "mirek",
-                "appending span"
+                "appending span, content:\n" + spanContent
         );
+        currentSharedContent += spanContent;
 
     } else if (utils::fastCompare(tag, "h1")
                || utils::fastCompare(tag, "h2")
@@ -499,13 +510,15 @@ bool ContentParser::tryMoveToContainerClosing() {
 
 
 bool ContentParser::hasTempAppendedContentToSend() {
-    bool hasContent = isAppending;
+    bool hasContent = !currentSharedContent.empty();
     if (hasContent) {
         //Sets temp indexes to get content by getTempContent();
         tempContentIndexStart = appendingIndexStart;
         tempContentIndexEnd = tempTagIndexEnd + 1;
         currentContentType = TEXT;
         hasContentToProcess = true;
+
+        isAppending = false;
 
         index.moveIndex(tempTagIndexStart);
     }

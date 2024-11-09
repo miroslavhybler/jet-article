@@ -40,5 +40,6 @@ void IndexWrapper::reset() {
 
 
 std::string IndexWrapper::toString() const {
-    return "index: " + std::to_string(index);
+    return "index: " + std::to_string(index) +
+           " indexOnStart: " + std::to_string(indexOnStart);
 }
