@@ -286,7 +286,6 @@ public object JetHtmlArticleDefaults {
     }
 }
 
-
 @Keep
 public class JetHtmlArticleState internal constructor(
     val listState: LazyListState,
