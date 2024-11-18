@@ -83,8 +83,12 @@ val data = JetHtmlArticleParser.parse(
     url = TODO("Original url of the article")
 )
 //Show the data using composable function
+val state = rememberJetHtmlArticleState()
+
+state.show(data = data)
+
 JetHtmlArticle(
-    data = data,
+  state = state,
     modifier = Modifier,
     contentPadding = paddingValues
 )
@@ -105,8 +109,8 @@ JetHtmlArticleContent(
             modifier = Modifier.animateContentSize(),
             image = image,
         )
-    }
-            image = { image ->
+    },
+  image = { image ->
         //Passing custom image composable
         CustomHtmlImage(
             modifier = Modifier.animateContentSize(),
@@ -125,7 +129,7 @@ JetHtmlArticleContent(
 #### Links Handling
 
 To have custom link handling logic you have to create custom implementation of
-`LinkClickHandler.LinkCallback` and provide it to the `JetHtmlArticle`.
+`LinkClickHandler.LinkCallback` and provide it to the `HtmlArticleData`.
 Creating custom `LinkCallback`:
 
 ```kotlin
@@ -149,19 +153,16 @@ Creating custom `LinkCallback`:
             data: HtmlArticleData,
             scrollOffset: Int,
         ) {
-            //Leads to some part of currencly loaded website, scroll to the section
-        }
+            //Leads to some part of currently loaded website, scroll to the section
+          }
+        } 
     }
-}
 ```
 
-Providing it to `JetHtmlArticle`:
+Providing it to `HtmlArticleData`:
 
 ```kotlin
-JetHtmlArticle(
-    data = data,
-    linkCallback = customLinkCallback,
-)
+    data.linkHandler.callback = customLinkCallback
 
 ```
 
