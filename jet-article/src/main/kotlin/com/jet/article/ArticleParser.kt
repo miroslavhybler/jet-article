@@ -131,7 +131,8 @@ public object ArticleParser {
                 return@parser HtmlArticleData(
                     elements = elements,
                     headData = HtmlHeadData(title = ParserNative.getTitle()),
-                    url = url
+                    url = url,
+                    linkHandler = linkClickHandler,
                 )
             }
 
@@ -154,6 +155,7 @@ public object ArticleParser {
                     elements = elements,
                     headData = HtmlHeadData(title = ParserNative.getTitle()),
                     url = url,
+                    linkHandler = linkClickHandler,
                 )
                 ParserNative.clearAllResources()
                 ContentFilterNative.clearAllResources()
@@ -164,6 +166,7 @@ public object ArticleParser {
                 elements = elements,
                 headData = HtmlHeadData(title = ParserNative.getTitle()),
                 url = url,
+                linkHandler = linkClickHandler,
             )
             ParserNative.clearAllResources()
             ContentFilterNative.clearAllResources()
@@ -306,8 +309,19 @@ public object ArticleParser {
         }
 
         val finalContent = if (isSimpleTextFormatAllowed) {
-            content
-                .toHtml()
+            content.let { originalContent ->
+                if (ParserNative.getCurrentTag() == "pre") {
+                    //White chars are removed while converting to spannable, need to replace white
+                    //chars with some html equivalents
+                    originalContent
+                        .replace(oldValue = "\n",newValue = "<br/>")
+                        .replace(
+                            oldValue = "\t",
+                            newValue = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                        )
+                        .replace(oldValue = "\r",newValue = "<br/>")
+                } else originalContent
+            }.toHtml()
                 .toSpannable()
                 .toAnnotatedString(
                     primaryColor = linkColor,

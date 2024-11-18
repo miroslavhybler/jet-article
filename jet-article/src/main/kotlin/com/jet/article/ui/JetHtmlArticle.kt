@@ -46,12 +46,9 @@ import mir.oslav.jet.annotations.JetExperimental
  * Default composable implementation for the library. To use custom layouts see [JetHtmlArticleContent].
  * It's basically [LazyColumn] with items being [HtmlElement].
  * @param modifier Modifier to modify composable
- * @param data Parsed html article data to be shown. Mostly result of [ArticleParser.parse].
- * @param listState [LazyListState] used to controll scroll.
  * @param contentPadding
  * @param header
  * @param footer
- * @param linkClickCallback
  * @since 1.0.0
  * @author Miroslav Hýbler <br>
  * created on 25.08.2023
@@ -118,36 +115,8 @@ public fun JetHtmlArticleContent(
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
 ) = trace(sectionName = "JetHtmlArticleContent") {
 
-    CompositionLocalProvider(
-        /*
-        LocalBaseArticleUrl provides state.data.url,
-        LocalLinkHandler provides state.linkClickHandler,
-        LocalHtmlArticleData provides state.data,
-
-
-         */
-    ) {
-        if (state.isSelectionEnabled) {
-            SelectionContainer {
-                JetHtmlArticleLazyColumn(
-                    modifier = modifier,
-                    state = state,
-                    contentPadding = contentPadding,
-                    text = text,
-                    image = image,
-                    quote = quote,
-                    table = table,
-                    address = address,
-                    title = title,
-                    code = code,
-                    basicList = basicList,
-                    header = header,
-                    footer = footer,
-                    verticalArrangement = verticalArrangement,
-                    horizontalAlignment = horizontalAlignment,
-                )
-            }
-        } else {
+    if (state.isSelectionEnabled) {
+        SelectionContainer {
             JetHtmlArticleLazyColumn(
                 modifier = modifier,
                 state = state,
@@ -166,6 +135,24 @@ public fun JetHtmlArticleContent(
                 horizontalAlignment = horizontalAlignment,
             )
         }
+    } else {
+        JetHtmlArticleLazyColumn(
+            modifier = modifier,
+            state = state,
+            contentPadding = contentPadding,
+            text = text,
+            image = image,
+            quote = quote,
+            table = table,
+            address = address,
+            title = title,
+            code = code,
+            basicList = basicList,
+            header = header,
+            footer = footer,
+            verticalArrangement = verticalArrangement,
+            horizontalAlignment = horizontalAlignment,
+        )
     }
 }
 

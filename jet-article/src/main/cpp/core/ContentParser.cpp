@@ -27,7 +27,7 @@ void ContentParser::initialize(
         const bool &isQueringTextOutsideTextTags
 ) {
     this->areImagesEnabled = areImagesEnabled;
-    this->isSimpleTextFormatAllowed = isSimpleTextFormatAllowed;
+    this->isTextFormattingEnabled = isSimpleTextFormatAllowed;
     this->isQueringTextOutsideTextTags = isQueringTextOutsideTextTags;
 }
 
@@ -42,7 +42,7 @@ void ContentParser::setInput(std::string &content) {
 }
 
 
-bool ContentParser::hasParsedContentToBeProcessed() {
+bool ContentParser::hasParsedContentToBeProcessed() const {
     return hasContentToProcess;
 }
 
@@ -72,9 +72,10 @@ std::string ContentParser::getTempContent() {
     if (currentContentType == TEXT || currentContentType == TITLE) {
         std::string tempInput = input.substr(tempContentIndexStart, n);
         utils::trim(tempInput);
+
         std::string output;
 
-        if (isSimpleTextFormatAllowed) {
+        if (isTextFormattingEnabled) {
             utils::clearUnsupportedTagsFromTextBlock(tempInput, output, 0, tempInput.length());
         } else {
             utils::clearTagsFromText(tempInput, output);
@@ -104,10 +105,10 @@ void ContentParser::doNextStep() {
 
 
     //Saves text that is outside regular text tags
-    if (!currentContentOutsideTag.empty() && hasBodyContext()) {
-        utils::trim(currentContentOutsideTag);
-        if (!currentContentOutsideTag.empty()) {
-            utils::log("PARSER", "Text outside tags: " + currentContentOutsideTag);
+    if (!currentSharedContent.empty() && hasBodyContext()) {
+        utils::trim(currentSharedContent);
+        if (!currentSharedContent.empty()) {
+            utils::log("PARSER", "Text outside tags: " + currentSharedContent);
             tempContentIndexStart = index.getIndexOnStart() + 1;
             tempContentIndexEnd = index.getIndex() - 1;
             currentContentType = TEXT;
@@ -234,7 +235,7 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, size_t &tei)
     //processed as tag
     if (utils::fastCompare(tag, "img")) {
         currentTag = tag;
-        parseImageTag(tei);
+        parseImgTag(tei);
         index.moveIndex(tei + 1);
         return;
     }
@@ -311,7 +312,7 @@ void ContentParser::parseNextTagWithinBodyContext(std::string &tag, size_t &tei)
 }
 
 
-void ContentParser::parseImageTag(const size_t &tei) {
+void ContentParser::parseImgTag(const size_t &tei) {
 
     if (!areImagesEnabled) {
         return;

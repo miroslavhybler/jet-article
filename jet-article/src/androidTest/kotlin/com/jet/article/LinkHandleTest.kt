@@ -88,7 +88,9 @@ class LinkHandleTest : BaseAndroidTest() {
                     data = ArticleParser.parse(
                         content = text,
                         url = "https://www.example.com/article/24",
-                    )
+                    ).also { data ->
+                        data.linkHandler.callback = linkClickCallback
+                    }
                 )
                 clicableTags = state.data.elements.filterIsInstance<HtmlElement.TextBlock>()
                     .mapNotNull { it.id }

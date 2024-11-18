@@ -101,7 +101,7 @@ public:
      * be send to receiver (Kotlin app) for further processing. False otherwise.
      * @since 1.0.0
      */
-    bool hasParsedContentToBeProcessed();
+    bool hasParsedContentToBeProcessed() const;
 
 
     /**
