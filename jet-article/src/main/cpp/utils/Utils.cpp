@@ -23,9 +23,10 @@ namespace utils {
     //TODO size_t
     int tempWorkingInt;
 
+
     /**
      * True when logging is enabled, false otherwise. Used for development and debugging only,
-     * doesn't make sence to use logging in final app.
+     * doesn't make sense to use logging in final app.
      * @since 1.0.0
      */
     bool isLoggingEnabled = false;
@@ -638,12 +639,24 @@ namespace utils {
                 i += 1;
             } else if (c == '&') {
                 //Entity end index
-                size_t endI = indexOfOrThrow(input, ";", i);
-                //+1 to inlude ; into entity string
-                std::string_view entity = input.substr(i, endI - i + 1);
-                std::string ch = decodeHtmlEntity(std::string(entity));
-                output += ch;
-                i += entity.length();
+                size_t endI;
+
+                try {
+                    endI = indexOfOrThrow(input, ";", i);
+                } catch (ErrorCode &e) {
+                    //Text is not an entity
+                    endI = -1;
+                    i += 1;
+                }
+                if (endI != -1) {
+                    //+1 to include ; into entity string
+                    std::string_view entity = input.substr(i, endI - i + 1);
+                    std::string ch = decodeHtmlEntity(std::string(entity));
+                    output += ch;
+                    i += entity.length();
+                } else {
+                    output += c;
+                }
             } else if (!insideTag) {
                 output += c;
                 i += 1;

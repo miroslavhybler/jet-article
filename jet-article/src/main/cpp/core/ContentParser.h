@@ -83,7 +83,7 @@ public:
     void initialize(
             const bool &areImagesEmabled,
             const bool &isSimpleTextFormatAllowed,
-            const bool &isQueringTextOutsideTextTags
+            const bool &isQueryingTextOutsideTextTags
     );
 
 

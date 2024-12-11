@@ -24,11 +24,11 @@ ContentParser::~ContentParser() = default;
 void ContentParser::initialize(
         const bool &areImagesEnabled,
         const bool &isSimpleTextFormatAllowed,
-        const bool &isQueringTextOutsideTextTags
+        const bool &isQueryingTextOutsideTextTags
 ) {
     this->areImagesEnabled = areImagesEnabled;
     this->isTextFormattingEnabled = isSimpleTextFormatAllowed;
-    this->isQueringTextOutsideTextTags = isQueringTextOutsideTextTags;
+    this->isQueringTextOutsideTextTags = isQueryingTextOutsideTextTags;
 }
 
 #pragma clang diagnostic pop
@@ -422,7 +422,7 @@ void ContentParser::abortWithError(
                    + index.toString() + "\n"
                    + "Message: " + message + "\n"
                    + "body: " + currentTagBody + "\n"
-                   + "subtring to find problematic area: " + input.substr(index.getIndex(), 50);
+                   + "substring to find problematic area: " + input.substr(index.getIndex(), 50);
     utils::log("PARSER", errorMessage, ANDROID_LOG_ERROR);
     index.moveIndex(length);
 }
