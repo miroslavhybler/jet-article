@@ -1,17 +1,7 @@
-```ascii
-ooooo     ooo                   .o8                          oooooooooo.                                   oooo                                                                   .   
-`888'     `8'                  "888                          `888'   `Y8b                                  `888                                                                 .o8   
- 888       8  ooo. .oo.    .oooo888   .ooooo.  oooo d8b       888      888  .ooooo.  oooo    ooo  .ooooo.   888   .ooooo.  oo.ooooo.  ooo. .oo.  .oo.    .ooooo.  ooo. .oo.   .o888oo 
- 888       8  `888P"Y88b  d88' `888  d88' `88b `888""8P       888      888 d88' `88b  `88.  .8'  d88' `88b  888  d88' `88b  888' `88b `888P"Y88bP"Y88b  d88' `88b `888P"Y88b    888   
- 888       8   888   888  888   888  888ooo888  888           888      888 888ooo888   `88..8'   888ooo888  888  888   888  888   888  888   888   888  888ooo888  888   888    888   
- `88.    .8'   888   888  888   888  888    .o  888           888     d88' 888    .o    `888'    888    .o  888  888   888  888   888  888   888   888  888    .o  888   888    888 . 
-   `YbodP'    o888o o888o `Y8bod88P" `Y8bod8P' d888b         o888bood8P'   `Y8bod8P'     `8'     `Y8bod8P' o888o `Y8bod8P'  888bod8P' o888o o888o o888o `Y8bod8P' o888o o888o   "888" 
-                                                                                                                            888                                                       
-                                                                                                                           o888o                                                      
-                                                                                                                                                                                      
-```
+**🛑 This library is no longer in develoopment as the scalability of the implementation was not so great, new library will be crated with usage of new [Html-Iterator](https://github.com/miroslavhybler/android-html-iterator) library. 🛑**
 
-This library is currently 🚧 **UNDER DEVELOPMENT** 🚧, there are no usable releases yet.
+
+
 
 # Jet Html Article
 
