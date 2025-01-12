@@ -4,6 +4,7 @@ package com.jet.article.data
 
 import androidx.annotation.Keep
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.IntSize
 

@@ -62,7 +62,7 @@ fun HtmlTable(
     data: HtmlElement.Table,
     scrollState: ScrollState = rememberScrollState(),
     shape: Shape = MaterialTheme.shapes.small,
-) = trace(sectionName = "HtmlTable") {
+)  {
     val density = LocalDensity.current
 
     val textMeasurer = rememberTextMeasurer()

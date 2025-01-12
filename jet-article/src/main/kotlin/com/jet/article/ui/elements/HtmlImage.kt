@@ -1,6 +1,5 @@
 package com.jet.article.ui.elements
 
-import androidx.annotation.Keep
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -16,11 +15,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.trace
 import coil.compose.SubcomposeAsyncImage
 import coil.imageLoader
-import com.jet.article.data.HtmlElement
 import com.jet.article.R
+import com.jet.article.data.HtmlElement
 
 
 /**
@@ -37,7 +35,7 @@ fun HtmlImage(
     shape: Shape = MaterialTheme.shapes.medium,
     loading: @Composable () -> Unit = { HtmlImageDefaults.LoadingLayout() },
     error: @Composable () -> Unit = { HtmlImageDefaults.ErrorLayout() },
-) = trace(sectionName = "HtmlImage"){
+) {
 
     HtmlImage(
         modifier = modifier,
@@ -62,7 +60,7 @@ fun HtmlImage(
     shape: Shape = MaterialTheme.shapes.medium,
     loading: @Composable () -> Unit = { HtmlImageDefaults.LoadingLayout() },
     error: @Composable () -> Unit = { HtmlImageDefaults.ErrorLayout() },
-) = trace(sectionName = "HtmlImage") {
+) {
     val context = LocalContext.current
 
     SubcomposeAsyncImage(
@@ -71,7 +69,7 @@ fun HtmlImage(
             .clip(shape = shape),
         model = url,
         contentDescription = null,
-        contentScale=contentScale,
+        contentScale = contentScale,
         imageLoader = context.imageLoader,
         loading = { loading() },
         error = {
@@ -97,7 +95,7 @@ private fun Modifier.htmlImage(size: IntSize): Modifier {
  * @author Miroslav Hýbler <br>
  * created on 13.08.2024
  */
-data object HtmlImageDefaults {
+object HtmlImageDefaults {
 
     @Composable
     fun LoadingLayout() {

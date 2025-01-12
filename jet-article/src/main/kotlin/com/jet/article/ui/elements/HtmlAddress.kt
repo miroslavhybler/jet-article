@@ -15,7 +15,7 @@ import com.jet.article.data.HtmlElement
 fun HtmlAddress(
     modifier: Modifier = Modifier,
     address: HtmlElement.Address
-) = trace(sectionName = "HtmlAddress") {
+) {
     HtmlTextBlock(
         text = address.content,
         key = address.key,

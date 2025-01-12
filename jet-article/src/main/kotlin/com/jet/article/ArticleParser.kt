@@ -122,7 +122,7 @@ public object ArticleParser {
         content: String,
         url: String,
         linkClickHandler: LinkClickHandler = LinkClickHandler(),
-    ): HtmlArticleData = trace(sectionName = "ArticleParser#parse") {
+    ): HtmlArticleData {
         return withContext(context = safeCoroutineContext) parser@{
             val elements = ArrayList<HtmlElement>()
             ParserNative.setInput(content = content)
@@ -183,12 +183,12 @@ public object ArticleParser {
         articleUrl: String,
         newKey: Int,
         linkHandler: LinkClickHandler,
-    ) = trace(sectionName = "ArticleParser#onElement()") {
+    )  {
         val type = ParserNative.getContentType()
         if (type == HtmlContentType.NO_CONTENT) {
             //Some weird error, this should never happen but teoretically it can since elements
             //parts are stored separately on c++ side.
-            return@trace
+            return
         }
         when (type) {
             HtmlContentType.IMAGE -> {

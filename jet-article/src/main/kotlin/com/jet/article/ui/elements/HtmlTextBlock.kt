@@ -29,7 +29,7 @@ fun HtmlTextBlock(
     color: Color = MaterialTheme.colorScheme.onBackground,
     maxLines: Int = Int.MAX_VALUE,
     overflow: TextOverflow = TextOverflow.Clip,
-) = trace(sectionName = "HtmlTextBlock") {
+) {
 
     HtmlTextBlock(
         modifier = modifier,

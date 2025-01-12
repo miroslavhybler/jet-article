@@ -20,7 +20,7 @@ import com.jet.article.data.HtmlArticleData
 @Composable
 public fun HtmlInvalid(
     modifier: Modifier = Modifier,
-) = trace(sectionName = "HtmlInvalid") {
+) {
 
 
     Column(modifier = modifier.fillMaxWidth()) {

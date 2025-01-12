@@ -38,7 +38,7 @@ public fun HtmlBasicList(
     @DrawableRes bulletRes: Int = R.drawable.ic_jet_article_list_item,
     bulletTint: Color = MaterialTheme.colorScheme.onBackground,
     style: TextStyle = MaterialTheme.typography.bodyLarge,
-) = trace(sectionName = "HtmlBasicList") {
+)  {
     val density = LocalDensity.current
     Column(
         modifier = modifier

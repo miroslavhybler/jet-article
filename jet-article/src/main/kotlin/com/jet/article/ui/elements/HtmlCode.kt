@@ -26,7 +26,7 @@ import com.jet.article.toHtml
 fun HtmlCode(
     modifier: Modifier = Modifier,
     code: HtmlElement.Code
-) = trace(sectionName = "HtmlCode") {
+)  {
     Box(
         modifier = Modifier
             .padding(vertical = 4.dp)

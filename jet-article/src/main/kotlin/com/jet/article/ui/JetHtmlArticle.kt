@@ -64,7 +64,7 @@ public fun JetHtmlArticle(
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     header: @Composable LazyItemScope.() -> Unit = {},
     footer: @Composable LazyItemScope.() -> Unit = {},
-) = trace(sectionName = "JetHtmlArticle") {
+) {
     JetHtmlArticleContent(
         modifier = modifier,
         state = state,
@@ -113,7 +113,7 @@ public fun JetHtmlArticleContent(
     footer: @Composable LazyItemScope.() -> Unit = {},
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
-) = trace(sectionName = "JetHtmlArticleContent") {
+) {
 
     if (state.isSelectionEnabled) {
         SelectionContainer {

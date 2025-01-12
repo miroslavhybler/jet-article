@@ -19,7 +19,7 @@ fun HtmlTitle(
     modifier: Modifier = Modifier,
     title: HtmlElement.Title,
     color: Color = MaterialTheme.colorScheme.onBackground,
-) = trace(sectionName = "HtmlTitle") {
+) {
     val typography = MaterialTheme.typography
 
     val textStyle = remember(key1 = title.key) {

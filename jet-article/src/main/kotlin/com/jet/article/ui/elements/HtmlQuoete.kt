@@ -39,7 +39,7 @@ import com.jet.article.toHtml
 fun HtmlQuoete(
     modifier: Modifier = Modifier,
     data: HtmlElement.Quote
-) = trace(sectionName = "HtmlQuoete") {
+)  {
 
     val density = LocalDensity.current
     val colorScheme = MaterialTheme.colorScheme
