@@ -59,7 +59,7 @@ sealed class HtmlElement private constructor(
     @Keep
     @Immutable
     public data class Title public constructor(
-        val text: String,
+        val text: AnnotatedString,
         val titleTag: String,
         override val id: String?,
         override val key: Int,

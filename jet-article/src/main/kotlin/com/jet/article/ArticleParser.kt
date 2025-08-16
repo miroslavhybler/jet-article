@@ -183,7 +183,7 @@ public object ArticleParser {
         articleUrl: String,
         newKey: Int,
         linkHandler: LinkClickHandler,
-    )  {
+    ) {
         val type = ParserNative.getContentType()
         if (type == HtmlContentType.NO_CONTENT) {
             //Some weird error, this should never happen but teoretically it can since elements
@@ -206,7 +206,12 @@ public object ArticleParser {
                 }
                 elements.add(
                     element = HtmlElement.Title(
-                        text = content,
+                        text = content.toHtml()
+                            .toSpannable()
+                            .toAnnotatedString(
+                                primaryColor = linkColor,
+                                linkClickHandler = linkHandler,
+                            ),
                         titleTag = ParserNative.getCurrentTag(),
                         id = ParserNative.getCurrentTagId(),
                         key = newKey,
@@ -314,12 +319,12 @@ public object ArticleParser {
                     //White chars are removed while converting to spannable, need to replace white
                     //chars with some html equivalents
                     originalContent
-                        .replace(oldValue = "\n",newValue = "<br/>")
+                        .replace(oldValue = "\n", newValue = "<br/>")
                         .replace(
                             oldValue = "\t",
                             newValue = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                         )
-                        .replace(oldValue = "\r",newValue = "<br/>")
+                        .replace(oldValue = "\r", newValue = "<br/>")
                 } else originalContent
             }.toHtml()
                 .toSpannable()
