@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.util.trace
 import com.jet.article.data.HtmlElement
@@ -32,7 +33,6 @@ fun HtmlTitle(
     HtmlTextBlock(
         modifier = modifier,
         text = title.text,
-        key = title.key,
         style = textStyle,
     )
 }
@@ -43,7 +43,9 @@ fun HtmlTitle(
 private fun HtmlTitlePreview() {
     HtmlTitle(
         title = HtmlElement.Title(
-            text = "Jetpack Compose rules!",
+            text = buildAnnotatedString {
+                append(text = "Jetpack Compose rules!")
+            },
             titleTag = "h1",
             id = "page-title",
             key = 0,
